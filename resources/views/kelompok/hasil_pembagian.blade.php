@@ -231,35 +231,59 @@
             @endif
 
             <div style="display:flex; gap:10px;">
+                @php
+                    $periode_id = request('periode_id') ?? session('periode_id');
+                @endphp
+                
                 @if($status == 0)
-                    <a href="{{ route('halaman.pindah', ['periode_id' => request('periode_id') ?? session('periode_id')]) }}"
-                        class="btn btn-warning">
-                        Pindah Peserta
-                    </a>
+                    @if($periode_id)
+                        <a href="{{ route('halaman.pindah', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
+                            Pindah Peserta
+                        </a>
+                    @else
+                        <button class="btn btn-secondary" disabled>
+                            Pindah Peserta
+                        </button>
+                    @endif
                 @endif
 
                 @if($status == 0)
-                    <a href="{{ route('halaman.tukar', ['periode_id' => request('periode_id') ?? session('periode_id')]) }}"
-                        class="btn btn-warning">
-                        Tukar Peserta
-                    </a>
+                    @if($periode_id)
+                        <a href="{{ route('halaman.tukar', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
+                            Tukar Peserta
+                        </a>
+                    @else
+                        <button class="btn btn-secondary" disabled>
+                            Tukar Peserta
+                        </button>
+                    @endif
                 @endif
 
-                <a href="{{ route('export.excel', ['periode_id' => request('periode_id') ?? session('periode_id')]) }}"
-                    class="btn btn-success">
-                    Export Excel
-                </a>
+                @if($periode_id)
+                    <a href="{{ route('export.excel', ['periode_id' => $periode_id]) }}" class="btn btn-success">
+                        Export Excel
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Export Excel
+                    </button>
+                @endif
 
-                <a href="{{ route('export.pdf', ['periode_id' => request('periode_id') ?? session('periode_id')]) }}"
-                    class="btn btn-danger">
-                    Export PDF
-                </a>
+                @if($periode_id)
+                    <a href="{{ route('export.pdf', ['periode_id' => $periode_id]) }}" class="btn btn-danger">
+                        Export PDF
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Export PDF
+                    </button>
+                @endif
 
                 @if($status == 0)
                     <form action="{{ route('kelompok.publish') }}" method="POST">
                         @csrf
                         <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
-                        
+
                         <button class="btn btn-dark"
                             onclick="return confirm('Apakah anda yakin ingin publish? Data tidak dapat diubah setelah ini!')">
                             Publish

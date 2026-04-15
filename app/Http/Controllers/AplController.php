@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Kelompok;
 use App\Models\Apl;
 
@@ -60,13 +61,26 @@ class AplController extends Controller
         $request->merge([
             'nim' => preg_replace('/[^0-9]/', '', $request->nim),
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
-            'id_periode' => $periode_id // 🔥 INI WAJIB
+            'id_periode' => $periode_id
         ]);
 
         $request->validate([
-            'nim' => 'required|digits_between:8,15|unique:apl,nim',
+            'nim' => [
+                'required',
+                'digits_between:8,15',
+                Rule::unique('apl')->where(function ($q) use ($periode_id) {
+                    return $q->where('id_periode', $periode_id);
+                }),
+            ],
             'nama' => 'required',
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('apl')
+                    ->where(function ($q) use ($periode_id) {
+                        return $q->where('id_periode', $periode_id);
+                    })
+            ],
             'no_telp' => 'required|digits_between:10,15'
         ]);
 
@@ -77,7 +91,10 @@ class AplController extends Controller
 
     public function edit($nim)
     {
-        $data = Apl::findOrFail($nim);
+        $periode_id = $this->getPeriodeId();
+        $data = Apl::where('nim', $nim)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail();
         return view('apl.edit', compact('data'));
     }
 
@@ -94,13 +111,29 @@ class AplController extends Controller
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
+        // 🔥 ambil data dulu (PENTING buat ignore id)
+        $data = Apl::where('nim', $nim)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail();
+
         $request->validate([
+            'nim' => [
+                'required',
+                'digits_between:8,15',
+                Rule::unique('apl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+                    ->ignore($data->id) // ✅ FIX
+            ],
             'nama' => 'required',
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('apl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+                    ->ignore($data->id) // ✅ FIX
+            ],
             'no_telp' => 'required|digits_between:10,15'
         ]);
-
-        $data = Apl::findOrFail($nim);
 
         try {
             $data->update($request->all());
@@ -111,7 +144,6 @@ class AplController extends Controller
             return back()->withErrors(['error' => 'Gagal update data'])->withInput();
         }
     }
-
     public function delete($nim)
     {
         $periode_id = $this->getPeriodeId();
@@ -119,8 +151,11 @@ class AplController extends Controller
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
-        
-        Apl::destroy($nim);
+
+        Apl::where('nim', $nim)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail()
+            ->delete();
         return redirect('/apl')->with('success', 'Data APL berhasil dihapus');
     }
 

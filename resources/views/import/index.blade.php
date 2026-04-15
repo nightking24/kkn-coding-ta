@@ -5,16 +5,39 @@
     <div style="display:flex; justify-content:center; margin-top:50px;">
 
         <div style="
-                width:100%;
-                max-width:500px;
-                background:white;
-                padding:30px;
-                border-radius:12px;
-                box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                text-align:center;
-            ">
+                        width:100%;
+                        max-width:500px;
+                        background:white;
+                        padding:30px;
+                        border-radius:12px;
+                        box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                        text-align:center;
+                    ">
 
             <h2 style="margin-bottom:20px;">Import Data Peserta</h2>
+
+            @if(session('warning'))
+                <div style="background:#fff3cd; color:#856404; padding:10px; border-radius:6px; margin-bottom:15px;">
+                    <b>Beberapa data tidak disimpan:</b>
+                    <ul>
+                        @foreach(session('warning') as $w)
+                            <li>{{ $w }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div style="
+                            background:#f8d7da;
+                            color:#721c24;
+                            padding:10px;
+                            border-radius:6px;
+                            margin-bottom:15px;
+                        ">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             @if ($errors->any())
                 <div style="background:#f8d7da; color:#721c24; padding:10px; border-radius:6px; margin-bottom:15px;">
@@ -40,13 +63,13 @@
                 </div>
 
                 <button type="submit" style="
-                        background:#007bff;
-                        color:white;
-                        border:none;
-                        padding:10px 20px;
-                        border-radius:6px;
-                        cursor:pointer;
-                    ">
+                                background:#007bff;
+                                color:white;
+                                border:none;
+                                padding:10px 20px;
+                                border-radius:6px;
+                                cursor:pointer;
+                            ">
                     Preview
                 </button>
 

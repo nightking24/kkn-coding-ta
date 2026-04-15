@@ -13,7 +13,15 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('peserta.tukar', ['periode_id' => session('periode_id')]) }}">
+        @php
+            $periode_id = request('periode_id') ?? session('periode_id');
+        @endphp
+
+        @php
+            $periode_id = request('periode_id') ?? session('periode_id');
+        @endphp
+
+        <form method="POST" action="{{ route('peserta.tukar', ['periode_id' => $periode_id]) }}">
             @csrf
 
             <div class="mb-3">
@@ -41,7 +49,7 @@
             </div>
 
             <button class="btn btn-primary">Tukar</button>
-            <a href="{{ url('/hasil-pembagian?periode_id=' . session('periode_id')) }}" class="btn btn-secondary">
+            <a href="{{ url('/hasil-pembagian?periode_id=' . $periode_id) }}" class="btn btn-secondary">
                 Kembali
             </a>
         </form>

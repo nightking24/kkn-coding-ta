@@ -75,7 +75,7 @@ class KelompokController extends Controller
             'Tambah Kelompok',
             "Menambah kelompok K{$request->nomor_kelompok}"
         );
-            
+
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -355,20 +355,19 @@ class KelompokController extends Controller
         return redirect()->route('hasil.pembagian');
     }
 
+
     public function hasilPembagian(Request $request)
     {
-        if ($request->periode_id) {
-            session(['periode_id' => $request->periode_id]);
-        }
-
-        $periode_id = session('periode_id')
-            ?? $request->periode_id
-            ?? \App\Models\Periode::where('status_publish', 1)->value('id_periode');
+        $periode_id = $request->periode_id
+            ?? session('periode_id')
+            ?? Periode::latest()->value('id_periode');
 
         if (!$periode_id) {
-            $periode_id = \App\Models\Periode::latest()->value('id_periode');
-            session(['periode_id' => $periode_id]);
+            return redirect('/dashboard')
+                ->with('error', 'Belum ada data periode!');
         }
+
+        session(['periode_id' => $periode_id]);
 
         $peserta = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
             ->whereHas('kelompok', function ($q) use ($periode_id) {
@@ -377,14 +376,13 @@ class KelompokController extends Controller
             ->get();
 
         $kelompok = $peserta->whereNotNull('id_kelompok')->groupBy('id_kelompok');
-
         $belum = $peserta->whereNull('id_kelompok');
 
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
         $dplList = \App\Models\Dpl::all();
         $aplList = \App\Models\Apl::all();
 
-        $status = \App\Models\Periode::where('id_periode', $periode_id)
+        $status = Periode::where('id_periode', $periode_id)
             ->value('status_publish');
 
         return view('kelompok.hasil_pembagian', compact(
@@ -550,7 +548,7 @@ class KelompokController extends Controller
         try {
 
             $periode_id = $request->periode_id;
-            
+
             $peserta = \App\Models\Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
                 $q->where('id_periode', $periode_id);
             })->get();

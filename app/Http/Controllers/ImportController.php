@@ -36,6 +36,15 @@ class ImportController extends Controller
 
     public function preview(Request $request)
     {
+        $periode_id = request('periode_id') ?? session('periode_id');
+
+        $periode = \App\Models\Periode::find($periode_id);
+
+        if ($periode && $periode->status_publish == 1) {
+            return redirect('/import?periode_id=' . $periode_id)
+                ->with('error', 'Periode sudah dipublish, tidak bisa import data!');
+        }
+
         if (!$request->hasFile('file')) {
             return back()->withErrors(['error' => 'File harus diupload']);
         }
@@ -201,21 +210,27 @@ class ImportController extends Controller
 
         try {
             $jumlah = 0;
-            foreach ($data as $row) {
+            $errors = [];
 
+            foreach ($data as $i => $row) {
+
+                // ❌ skip jika kosong
                 if (empty($row['nama']) || empty($row['nim'])) {
                     continue;
                 }
 
+                // 🚫 VALIDASI DUPLIKAT PER PERIODE
                 if (
-                    Peserta::where('nim', trim($row['nim']))
+                    \App\Models\Peserta::where('nim', trim($row['nim']))
                         ->where('id_periode', $periode_id)
                         ->exists()
                 ) {
+                    $errors[] = "Baris " . ($i + 1) . ": NIM {$row['nim']} sudah ada di periode ini";
                     continue;
                 }
 
-                Peserta::create([
+                // 💾 SIMPAN DATA
+                \App\Models\Peserta::create([
                     'nama' => trim($row['nama']),
                     'nim' => trim($row['nim']),
                     'email' => isset($row['email']) ? trim($row['email']) : null,
@@ -226,14 +241,16 @@ class ImportController extends Controller
                     'detail_penyakit' => $row['detail_penyakit'] ?? null,
                     'berkebutuhan_khusus' => $row['berkebutuhan_khusus'],
                     'detail_khusus' => $row['detail_khusus'] ?? null,
-
                     'id_periode' => $periode_id
                 ]);
+
                 $jumlah++;
             }
 
-            return redirect('/import')->with('success', 'Data berhasil disimpan');
-
+            return redirect('/import')
+                ->with('success', "Data berhasil disimpan ($jumlah data)")
+                ->with('warning', $errors);
+                
         } catch (\Exception $e) {
 
             return back()->withErrors([

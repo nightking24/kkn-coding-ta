@@ -21,40 +21,61 @@
 
         .sidebar {
             width: 250px;
-            background: #2c3e50;
+            background: #1e7e34;
             color: white;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
 
         .sidebar h3 {
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
 
         .menu {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         .menu li {
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
 
         .menu a {
             color: white;
             text-decoration: none;
             display: block;
-            padding: 8px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 0;
         }
 
         .menu a:hover {
-            background: #34495e;
+            background: #0f5f37;
         }
 
         .submenu {
-            margin-left: 10px;
+            background-color: #0a1a0e;
+            margin-left: 0;
             font-size: 14px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .submenu a {
+            padding: 10px 20px 10px 40px !important;
+            color: #d4edda !important;
+            font-size: 14px;
+        }
+
+        .submenu a:hover {
+            background-color: #050d08 !important;
+            color: #ffffff !important;
+        }
+
+        .submenu a.active {
+            background-color: #050d08 !important;
+            color: #ffffff !important;
+            font-weight: 500;
         }
 
         .content {
@@ -111,11 +132,15 @@
         }
 
         .btn-green {
-            background: #28a745;
+            background: #1e7e34;
+        }
+        
+        .btn-green:hover {
+            background: #0f5f37;
         }
 
         .btn-blue {
-            background: #007bff;
+            background: #1e7e34;
         }
 
         .btn-red {

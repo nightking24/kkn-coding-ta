@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Kelompok;
 use App\Models\Dpl;
 
@@ -65,10 +66,21 @@ class DplController extends Controller
         ]);
 
         $request->validate([
-            'nik' => 'required|digits_between:10,20|unique:dpl,nik',
+            'nik' => [
+                'required',
+                Rule::unique('dpl')->where(function ($q) use ($periode_id) {
+                    return $q->where('id_periode', $periode_id);
+                }),
+            ],
             'nidn' => 'required|digits:10',
             'nama' => 'required',
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('dpl')->where(function ($q) use ($periode_id) {
+                    return $q->where('id_periode', $periode_id);
+                }),
+            ],
             'no_telp' => 'required|digits_between:10,15'
         ]);
 
@@ -79,7 +91,11 @@ class DplController extends Controller
 
     public function edit($nik)
     {
-        $data = Dpl::findOrFail($nik);
+        $periode_id = $this->getPeriodeId();
+        $data = Dpl::where('nik', $nik)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail();
+
         return view('dpl.edit', compact('data'));
     }
 
@@ -90,19 +106,35 @@ class DplController extends Controller
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
+
         $request->merge([
             'nik' => preg_replace('/[^0-9]/', '', $request->nik),
             'nidn' => preg_replace('/[^0-9]/', '', $request->nidn),
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
+        // 🔥 ambil data dulu
+        $data = Dpl::where('nik', $nik)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail();
+
         $request->validate([
+            'nik' => [
+                'required',
+                Rule::unique('dpl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+                    ->ignore($data->id)
+            ],
             'nama' => 'required',
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('dpl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+                    ->ignore($data->id)
+            ],
             'no_telp' => 'required|digits_between:10,15'
         ]);
-
-        $data = Dpl::findOrFail($nik);
 
         try {
             $data->update($request->all());
@@ -120,8 +152,12 @@ class DplController extends Controller
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
-        
-        Dpl::destroy($nik);
+
+        Dpl::where('nik', $nik)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail()
+            ->delete()
+        ;
         return redirect('/dpl')->with('success', 'Data DPL berhasil dihapus');
     }
 

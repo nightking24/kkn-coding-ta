@@ -10,8 +10,8 @@ class PesertaController extends Controller
 {
     private function getPeriodeId()
     {
-        return session('periode_id')
-            ?? request('periode_id')
+        return request('periode_id')
+            ?? session('periode_id')
             ?? \App\Models\Periode::where('status_publish', 1)->value('id_periode');
     }
 
@@ -195,7 +195,7 @@ class PesertaController extends Controller
         return back()->with('success', 'Peserta berhasil ditukar');
     }
 
-    public function halamanPindah()
+    public function halamanPindah(Request $request)
     {
         $this->setPeriodeSession();
 
@@ -211,7 +211,7 @@ class PesertaController extends Controller
         return view('peserta.pindah', compact('peserta', 'kelompok'));
     }
 
-    public function halamanTukar()
+    public function halamanTukar(Request $request)
     {
         $this->setPeriodeSession();
 
