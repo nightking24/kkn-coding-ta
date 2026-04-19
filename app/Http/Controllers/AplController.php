@@ -111,7 +111,6 @@ class AplController extends Controller
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
-        // 🔥 ambil data dulu (PENTING buat ignore id)
         $data = Apl::where('nim', $nim)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
@@ -122,7 +121,7 @@ class AplController extends Controller
                 'digits_between:8,15',
                 Rule::unique('apl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id) // ✅ FIX
+                    ->ignore($data->id_apl, 'id_apl')
             ],
             'nama' => 'required',
             'email' => [
@@ -130,7 +129,7 @@ class AplController extends Controller
                 'email',
                 Rule::unique('apl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id) // ✅ FIX
+                    ->ignore($data->id_apl, 'id_apl')
             ],
             'no_telp' => 'required|digits_between:10,15'
         ]);

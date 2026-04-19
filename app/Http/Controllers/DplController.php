@@ -54,6 +54,7 @@ class DplController extends Controller
     {
         $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
+
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
@@ -68,18 +69,16 @@ class DplController extends Controller
         $request->validate([
             'nik' => [
                 'required',
-                Rule::unique('dpl')->where(function ($q) use ($periode_id) {
-                    return $q->where('id_periode', $periode_id);
-                }),
+                Rule::unique('dpl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
             'nidn' => 'required|digits:10',
             'nama' => 'required',
             'email' => [
                 'required',
                 'email',
-                Rule::unique('dpl')->where(function ($q) use ($periode_id) {
-                    return $q->where('id_periode', $periode_id);
-                }),
+                Rule::unique('dpl')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
             'no_telp' => 'required|digits_between:10,15'
         ]);
@@ -113,7 +112,6 @@ class DplController extends Controller
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
-        // 🔥 ambil data dulu
         $data = Dpl::where('nik', $nik)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
@@ -123,7 +121,7 @@ class DplController extends Controller
                 'required',
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id)
+                    ->ignore($data->id_dpl, 'id_dpl')
             ],
             'nama' => 'required',
             'email' => [
@@ -131,7 +129,7 @@ class DplController extends Controller
                 'email',
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id)
+                    ->ignore($data->id_dpl, 'id_dpl')
             ],
             'no_telp' => 'required|digits_between:10,15'
         ]);

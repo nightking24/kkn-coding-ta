@@ -54,11 +54,12 @@
         }
 
         .submenu {
-            background-color: #0a1a0e;
+            background-color: #1a7d4f;
             margin-left: 0;
             font-size: 14px;
             padding: 0;
             margin: 0;
+            border-left: 3px solid #52d652;
         }
 
         .submenu a {
@@ -68,12 +69,12 @@
         }
 
         .submenu a:hover {
-            background-color: #050d08 !important;
+            background-color: #0f5a35 !important;
             color: #ffffff !important;
         }
 
         .submenu a.active {
-            background-color: #050d08 !important;
+            background-color: #0f5a35 !important;
             color: #ffffff !important;
             font-weight: 500;
         }
@@ -134,7 +135,7 @@
         .btn-green {
             background: #1e7e34;
         }
-        
+
         .btn-green:hover {
             background: #0f5f37;
         }
@@ -240,7 +241,6 @@
             border-color: #0d6efd;
             box-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
         }
-        
     </style>
 
 </head>

@@ -75,7 +75,7 @@
 
     .submenu {
         display: none;
-        background-color: #0a1a0e;
+        background-color: #0d5230;
         border-left: 3px solid #52d652;
     }
 
@@ -95,14 +95,14 @@
     }
 
     .submenu a:hover {
-        background-color: #050d08;
+        background-color: #0a3d24;
         color: #ffffff;
         border-left-color: #52d652;
         padding-left: 45px;
     }
 
     .submenu a.active {
-        background-color: #050d08;
+        background-color: #0a3d24;
         color: #ffffff;
         border-left-color: #52d652;
         font-weight: 500;
@@ -169,7 +169,7 @@
 </style>
 
 <div class="sidebar-header">
-    <h3>Pembagian Kelompok KKN</h3>
+    <h3>Pembagian Kelompok KKN Reguler</h3>
 </div>
 
 <ul class="menu">

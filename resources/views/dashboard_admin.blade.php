@@ -2,17 +2,15 @@
 
 @section('content')
 
-    <p style="text-align:center; margin-bottom:20px;">
-        Selamat Datang, <b>{{ session('user')->username ?? 'User' }}</b>
-    </p>
-
-    <h2 style="text-align:center; margin-bottom:20px;">
-        Dashboard KKN
-    </h2>
-
     <div class="card">
+        <div style="margin-bottom: 30px;">
+            <h3 style="margin-bottom: 10px; color: #000;">Selamat datang, <b style="color: #1e7e34;">{{ session('user')->username ?? 'User' }}</b></h3>
+            <p style="color: #666; font-size: 14px; margin: 0;">Portal Pembagian Kelompok KKN Reguler</p>
+        </div>
 
-        <h3>Data KKN</h3>
+        <h3 style="margin-bottom: 25px; color: #1e7e34; border-bottom: 3px solid #1e7e34; padding-bottom: 15px;">
+            📊 Dashboard KKN Reguler
+        </h3>
 
         <form method="GET" action="/dashboard">
             <div style="display:flex; flex-direction:column; gap:5px;">

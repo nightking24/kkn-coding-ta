@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Peserta;
 use App\Models\Kelompok;
+use App\Models\Dpl;
+use App\Models\Apl;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PesertaExport;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -306,6 +308,7 @@ class KelompokController extends Controller
 
     public function randomisasi()
     {
+        $this->setPeriodeSession();
         $data = session('hasil_generate');
 
         if (!$data) {
@@ -319,10 +322,17 @@ class KelompokController extends Controller
 
     public function simpanHasil()
     {
+        $this->setPeriodeSession();
+
+        $periode_id = session('periode_id')
+            ?? request('periode_id');
+
+        if (!$periode_id) {
+            return back()->withErrors(['error' => 'Periode tidak ditemukan']);
+        }
+
         $this->logAktivitas('Simpan Hasil', 'Menyimpan hasil pembagian kelompok');
         $data = session('hasil_generate');
-
-        $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
@@ -331,6 +341,19 @@ class KelompokController extends Controller
         if (!$data) {
             return back()->withErrors(['error' => 'Data tidak ditemukan']);
         }
+
+        $raw_periode = request('periode_id') ?? session('periode_id');
+
+        $periode_id = (int) preg_replace('/[^0-9]/', '', $raw_periode);
+
+        if (!$periode_id) {
+            dd('PERIODE ERROR:', $raw_periode);
+        }
+
+        $periode_id = (int) (
+            session('periode_id')
+            ?? request('periode_id')
+        );
 
         foreach ($data as $row) {
             Peserta::updateOrCreate(
@@ -379,8 +402,15 @@ class KelompokController extends Controller
         $belum = $peserta->whereNull('id_kelompok');
 
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
-        $dplList = \App\Models\Dpl::all();
-        $aplList = \App\Models\Apl::all();
+        $dplList = Dpl::where('id_periode', $periode_id)
+            ->select('nik', 'nama', 'no_telp')
+            ->distinct()
+            ->get();
+
+        $aplList = Apl::where('id_periode', $periode_id)
+            ->select('nim', 'nama', 'no_telp')
+            ->distinct()
+            ->get();
 
         $status = Periode::where('id_periode', $periode_id)
             ->value('status_publish');
@@ -478,11 +508,19 @@ class KelompokController extends Controller
             return $lock;
         }
 
+        // RESET PESERTA
         Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
             $q->where('id_periode', $periode_id);
         })->update([
                     'id_kelompok' => null
                 ]);
+
+        // 🔥 RESET DPL & APL DI KELOMPOK
+        Kelompok::where('id_periode', $periode_id)->update([
+            'nik' => null,
+            'nim' => null
+        ]);
+
 
         return redirect()->route('hasil.pembagian')
             ->with('success', 'Pembagian berhasil direset');
@@ -498,9 +536,17 @@ class KelompokController extends Controller
             return $lock;
         }
 
+        // HAPUS PESERTA
         Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
             $q->where('id_periode', $periode_id);
         })->delete();
+
+
+        // 🔥 RESET DPL & APL
+        Kelompok::where('id_periode', $periode_id)->update([
+            'nik' => null,
+            'nim' => null
+        ]);
 
         return redirect()->route('hasil.pembagian')
             ->with('success', 'Semua data peserta dihapus');
