@@ -366,9 +366,9 @@ class KelompokController extends Controller
                     'nama' => $row['nama'],
                     'prodi' => $row['prodi'],
                     'gender' => $row['gender'],
-                    'bahasa_jawa' => strtolower($row['bahasa_jawa']) == 'bisa' ? 1 : 0,
-                    'riwayat_penyakit' => strtolower($row['riwayat_penyakit']) == 'ya' ? 1 : 0,
-                    'berkebutuhan_khusus' => strtolower($row['berkebutuhan_khusus']) == 'ya' ? 1 : 0,
+                    'bahasa_jawa' => $row['bahasa_jawa'],
+                    'riwayat_penyakit' => $row['riwayat_penyakit'],
+                    'berkebutuhan_khusus' => $row['berkebutuhan_khusus'],
                     'id_kelompok' => $row['id_kelompok'] ?? null,
                 ]
             );

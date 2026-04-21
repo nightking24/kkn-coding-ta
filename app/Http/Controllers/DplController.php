@@ -35,6 +35,17 @@ class DplController extends Controller
         return null;
     }
 
+    private function validateSingleActivePeriode()
+    {
+        $count = \App\Models\Periode::where('status_publish', 1)->count();
+
+        if ($count > 1) {
+            return redirect('/dashboard')->with('error', 'Terdapat lebih dari 1 periode aktif! Silakan hubungi admin.');
+        }
+
+        return null;
+    }
+
     public function index()
     {
         $this->setPeriodeSession();
@@ -159,7 +170,7 @@ class DplController extends Controller
         return redirect('/dpl')->with('success', 'Data DPL berhasil dihapus');
     }
 
-    public function hasil()
+    public function hasilView()
     {
         $this->setPeriodeSession();
 
@@ -170,20 +181,20 @@ class DplController extends Controller
             ->where('id_periode', $periode_id)
             ->get();
 
-        return view('dpl.hasil_new', compact('kelompok'));
+        return view('dpl.hasil_dpl_view', compact('kelompok'));
     }
 
-    public function detail($id)
+    public function detailView($id)
     {
         $this->setPeriodeSession();
 
         $periode_id = $this->getPeriodeId();
 
-        $kelompok = \App\Models\Kelompok::with(['peserta', 'dpl', 'apl'])
+        $kelompok = \App\Models\Kelompok::with(['peserta', 'apl'])
             ->where('id_periode', $periode_id)
             ->findOrFail($id);
 
-        return view('dpl.detail_new', compact('kelompok'));
+        return view('dpl.detail_dpl_view', compact('kelompok'));
     }
 }
 

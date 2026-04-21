@@ -5,14 +5,16 @@
 <ul class="menu">
 
     <li>
-        <a href="/hasil-apl" class="{{ request()->is('hasil-apl') ? 'active' : '' }}" style="display: flex; align-items: center; padding: 14px 20px; border-left: 3px solid {{ request()->is('hasil-apl') ? '#1abc9c' : 'transparent' }};">
+        <a href="/hasil-apl-new" class="{{ request()->is('hasil-apl-new') ? 'active' : '' }}"
+            style="display: flex; align-items: center; padding: 14px 20px; border-left: 3px solid {{ request()->is('hasil-apl-new') ? '#1abc9c' : 'transparent' }};">
             <span style="margin-right: 12px; font-size: 18px;">📄</span>
             <span>Data Kelompok</span>
         </a>
     </li>
 
     <li style="margin-top: 40px; padding: 0 20px;">
-        <a href="/logout" style="display: block; background: #dc3545; color: white; padding: 12px 16px; text-decoration: none; border-radius: 6px; text-align: center; transition: 0.3s; font-weight: 500;">
+        <a href="/logout"
+            style="display: block; background: #dc3545; color: white; padding: 12px 16px; text-decoration: none; border-radius: 6px; text-align: center; transition: 0.3s; font-weight: 500;">
             🚪 Logout
         </a>
     </li>

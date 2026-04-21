@@ -144,7 +144,7 @@ class ImportController extends Controller
                 'email' => $rowData['email'] ?? '',
                 'prodi' => $rowData['prodi'] ?? '',
                 'gender' => $this->convertGender($rowData['gender'] ?? ''),
-                'bahasa_jawa' => $rowData['bahasa_jawa'] ?? '',
+                'bahasa_jawa' => $this->convertBahasaJawa($rowData['bahasa_jawa'] ?? ''),
                 'riwayat_penyakit' => $this->convertPenyakit($rowData['riwayat_penyakit'] ?? ''),
                 'detail_penyakit' => trim($rowData['riwayat_penyakit'] ?? ''),
                 'berkebutuhan_khusus' => $this->convertKhusus($rowData['berkebutuhan_khusus'] ?? ''),
@@ -168,6 +168,17 @@ class ImportController extends Controller
         }
 
         return null;
+    }
+
+    private function convertBahasaJawa($value)
+    {
+        $value = strtolower(trim($value));
+
+        if (in_array($value, ['bisa', 'ya', '1'])) {
+            return 1;
+        }
+
+        return 0;
     }
 
     private function convertKhusus($value)
@@ -250,7 +261,7 @@ class ImportController extends Controller
             return redirect('/import')
                 ->with('success', "Data berhasil disimpan ($jumlah data)")
                 ->with('warning', $errors);
-                
+
         } catch (\Exception $e) {
 
             return back()->withErrors([

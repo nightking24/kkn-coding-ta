@@ -16,9 +16,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['ceklogin', 'role:admin'])->group(function () {
-
     Route::get('/dashboard', [DashboardController::class, 'index']);
-
     Route::get('/periode', [PeriodeController::class, 'index']);
     Route::get('/periode/create', [PeriodeController::class, 'create']);
     Route::post('/periode/store', [PeriodeController::class, 'store']);
@@ -83,12 +81,14 @@ Route::middleware(['ceklogin', 'role:peserta'])->group(function () {
 });
 
 Route::middleware(['ceklogin', 'role:dpl'])->group(function () {
-    Route::get('/hasil-dpl', [DplController::class, 'hasil']);
-    Route::get('/hasil-dpl/detail/{id}', [DplController::class, 'detail']);
+    Route::get('/dpl-view', [DplController::class, 'hasilView']);
+    Route::get('/dpl-view/detail/{id}', [DplController::class, 'detailView']);
+
 });
 
 Route::middleware(['ceklogin', 'role:apl'])->group(function () {
-    Route::get('/hasil-apl', [AplController::class, 'hasil']);
-    Route::get('/hasil-apl/detail/{id}', [AplController::class, 'detail']);
+    Route::get('/hasil-apl-new', [AplController::class, 'hasilNew']);
+    Route::get('/hasil-apl-new/detail/{id}', [AplController::class, 'detailNew']);
+
 });
 

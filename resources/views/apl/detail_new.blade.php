@@ -3,7 +3,7 @@
 @section('content')
 
     <div style="margin-bottom: 15px;">
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+        <a href="{{ url('/hasil-apl-new') }}" class="btn btn-secondary mb-3">
             ← Kembali
         </a>
     </div>
@@ -27,7 +27,7 @@
             <!-- Dosen Section -->
             <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
                 <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">👨‍🏫 Pendamping</h5>
-                <p style="margin: 8px 0;"><b>APL:</b> <span style="color: #666;">{{ optional($kelompok->apl)->nama }}</span>
+                <p style="margin: 8px 0;"><b>DPL:</b> <span style="color: #666;">{{ optional($kelompok->dpl)->nama }}</span>
                 </p>
             </div>
         </div>
@@ -47,11 +47,11 @@
                             <th style="text-align: center; padding: 12px;">NIM</th>
                             <th style="padding: 12px;">Nama</th>
                             <th style="padding: 12px;">Prodi</th>
-                            <th style="text-align: center; padding: 12px;">Jenis Kelamin</th>
+                            <th style="text-align: center; padding: 12px;">Gender</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($kelompok->peserta as $i => $p)
+                        @foreach($kelompok->peserta as $i => $p)
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
                                 <td style="text-align: center; padding: 12px; font-weight: 500;">{{ $p->nim }}</td>
@@ -61,11 +61,7 @@
                                     {{ $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan' }}
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 20px; color: #666;">Tidak ada anggota</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>

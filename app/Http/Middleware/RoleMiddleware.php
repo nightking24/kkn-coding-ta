@@ -19,7 +19,10 @@ class RoleMiddleware
             return redirect('/');
         }
 
-        if (session('user')->role != $role) {
+        $userRole = trim(strtolower(session('user')->role ?? ''));
+        $requiredRole = trim(strtolower($role));
+
+        if ($userRole != $requiredRole) {
             abort(403);
         }
 

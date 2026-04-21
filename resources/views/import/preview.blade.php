@@ -6,23 +6,23 @@
 
         @if(session('error'))
             <div style="
-                background:#f8d7da;
-                color:#721c24;
-                padding:12px;
-                border-radius:8px;
-                margin-bottom:15px;
-                border-left:5px solid #dc3545;
-            ">
+                                        background:#f8d7da;
+                                        color:#721c24;
+                                        padding:12px;
+                                        border-radius:8px;
+                                        margin-bottom:15px;
+                                        border-left:5px solid #dc3545;
+                                    ">
                 {{ session('error') }}
             </div>
         @endif
 
         <div style="
-                                    background:white;
-                                    padding:25px;
-                                    border-radius:12px;
-                                    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                                ">
+                                                background:white;
+                                                padding:25px;
+                                                border-radius:12px;
+                                                box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                                            ">
 
             <h2 style="margin-bottom:20px;">Preview Data Peserta</h2>
 
@@ -39,10 +39,10 @@
 
             <div style="overflow-x:auto;">
                 <table style="
-                                            width:100%;
-                                            border-collapse:collapse;
-                                            text-align:center;
-                                        ">
+                                                        width:100%;
+                                                        border-collapse:collapse;
+                                                        text-align:center;
+                                                    ">
                     <thead style="background:#343a40; color:white;">
                         <tr>
                             <th style="padding:10px;">Nama</th>
@@ -64,9 +64,9 @@
                                 <td>{{ $p['nim'] }}</td>
                                 <td>{{ $p['prodi'] }}</td>
                                 <td>{{ $p['gender'] }}</td>
-                                <td>{{ $p['bahasa_jawa'] }}</td>
-                                <td>{{ $p['riwayat_penyakit'] }}</td>
-                                <td>{{ $p['berkebutuhan_khusus'] }}</td>
+                                <td>{{ $p['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}</td>
+                                <td>{{ $p['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}</td>
+                                <td>{{ $p['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}</td>
                                 <td>{{ $p['detail_penyakit'] }}</td>
                                 <td>{{ $p['detail_khusus'] }}</td>
                             </tr>

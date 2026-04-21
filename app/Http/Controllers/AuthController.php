@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -13,27 +13,33 @@ class AuthController extends Controller
         return view('login');
     }
 
-public function login(Request $request)
-{
-    $user = User::where('username', $request->username)->first();
+    public function login(Request $request)
+    {
+        $user = DB::table('users')
+            ->where('username', $request->username)
+            ->first();
 
-    if ($user && Hash::check($request->password, $user->password)) {
+        // ✅ validasi dulu
+        if ($user && Hash::check($request->password, $user->password)) {
 
-        session(['user' => $user]);
+            // ✅ set session SETELAH valid
+            session(['user' => $user]);
 
-        if ($user->role == 'admin') {
-            return redirect('/dashboard');
-        } elseif ($user->role == 'peserta') {
-            return redirect('/hasil-peserta');
-        } elseif ($user->role == 'dpl') {
-            return redirect('/hasil-dpl');
-        } elseif ($user->role == 'apl') {
-            return redirect('/hasil-apl');
+            $role = trim(strtolower($user->role ?? ''));
+
+            if ($role == 'admin') {
+                return redirect('/dashboard');
+            } elseif ($role == 'peserta') {
+                return redirect('/hasil-peserta');
+            } elseif ($role == 'dpl') {
+                return redirect('/dpl-view');
+            } elseif ($role == 'apl') {
+                return redirect('/hasil-apl-new');
+            }
         }
-    }
 
-    return back()->with('error', 'Login gagal');
-}
+        return back()->with('error', 'Login gagal');
+    }
 
     public function logout()
     {

@@ -61,77 +61,82 @@
 
                     @foreach($kelompok as $id => $items)
                         @foreach($items as $p)
-                            <tr>
-                                <td>{{ $no++ }}</td>
-                                <td>K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}</td>
-                                <td>{{ $p->nim }}</td>
-                                <td>{{ $p->nama }}</td>
-                                <td>{{ $p->prodi }}</td>
-                                <td>{{ $p->gender }}</td>
-                                <td>{{ $p->bahasa_jawa }}</td>
-                                <td>{{ $p->riwayat_penyakit }}</td>
-                                <td>{{ $p->berkebutuhan_khusus }}</td>
-                                <td>{{ optional($p->kelompok)->desa ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->dusun ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->nama_dukuh ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->nama_tuan_rumah ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->nomor_telepon ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->alamat ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->faskes ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->kapasitas ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->semester ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->tahun_kkn ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->latitude ?? '-' }}</td>
-                                <td>{{ optional($p->kelompok)->longitude ?? '-' }}</td>
-                                <td>
-                                    @if($status == 0)
-                                        <form action="{{ route('assign.dpl') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="id_kelompok" value="{{ optional($p->kelompok)->id_kelompok }}">
+                                <tr>
+                                    <td>{{ $no++ }}</td>
+                                    <td>K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}</td>
+                                    <td>{{ $p->nim }}</td>
+                                    <td>{{ $p->nama }}</td>
+                                    <td>{{ $p->prodi }}</td>
+                                    <td>{{ $p->gender }}</td>
+                                    <td>{{ $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak' }}</td>
+                                    <td>{{ $p->riwayat_penyakit == 1 ? 'Ya' : 'Tidak' }}</td>
+                                    <td>{{ $p->berkebutuhan_khusus == 1 ? 'Ya' : 'Tidak' }}</td>
+                                    <td>{{ optional($p->kelompok)->desa ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->dusun ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->nama_dukuh ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->nama_tuan_rumah ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->nomor_telepon ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->alamat ?? '-' }}</td>
+                                    <td>
+                                        {{
+                            optional($p->kelompok)->faskes === 1 ? 'Ada' :
+                            (optional($p->kelompok)->faskes === 0 ? 'Tidak Ada' : '-')
+                                                            }}
+                                    </td>
+                                    <td>{{ optional($p->kelompok)->kapasitas ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->semester ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->tahun_kkn ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->latitude ?? '-' }}</td>
+                                    <td>{{ optional($p->kelompok)->longitude ?? '-' }}</td>
+                                    <td>
+                                        @if($status == 0)
+                                            <form action="{{ route('assign.dpl') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="id_kelompok" value="{{ optional($p->kelompok)->id_kelompok }}">
 
-                                            <select name="nik" onchange="this.form.submit()">
-                                                <option value="">Pilih DPL</option>
-                                                @foreach($dplList as $dpl)
-                                                    <option value="{{ $dpl->nik }}" @selected(optional($p->kelompok)->nik == $dpl->nik)>
-                                                        {{ $dpl->nama }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                    @else
-                                        <span>{{ optional($p->kelompok?->dpl)->nama ?? '-' }}</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span>
-                                        {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($status == 0)
-                                        <form action="{{ route('assign.apl') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="id_kelompok" value="{{ optional($p->kelompok)->id_kelompok }}">
+                                                <select name="nik" onchange="this.form.submit()">
+                                                    <option value="">Pilih DPL</option>
+                                                    @foreach($dplList as $dpl)
+                                                        <option value="{{ $dpl->nik }}" @selected(optional($p->kelompok)->nik == $dpl->nik)>
+                                                            {{ $dpl->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
+                                        @else
+                                            <span>{{ optional($p->kelompok?->dpl)->nama ?? '-' }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($status == 0)
+                                            <form action="{{ route('assign.apl') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="id_kelompok" value="{{ optional($p->kelompok)->id_kelompok }}">
 
-                                            <select name="nim" onchange="this.form.submit()">
-                                                <option value="">Pilih APL</option>
-                                                @foreach($aplList as $apl)
-                                                    <option value="{{ $apl->nim }}" @selected($p->kelompok?->apl?->nim == $apl->nim)>
-                                                        {{ $apl->nama }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                    @else
-                                        <span>{{ optional($p->kelompok?->apl)->nama ?? '-' }}</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span>
-                                        {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
-                                    </span>
-                                </td>
-                            </tr>
+                                                <select name="nim" onchange="this.form.submit()">
+                                                    <option value="">Pilih APL</option>
+                                                    @foreach($aplList as $apl)
+                                                        <option value="{{ $apl->nim }}" @selected($p->kelompok?->apl?->nim == $apl->nim)>
+                                                            {{ $apl->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
+                                        @else
+                                            <span>{{ optional($p->kelompok?->apl)->nama ?? '-' }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
+                                        </span>
+                                    </td>
+                                </tr>
                         @endforeach
                     @endforeach
 
@@ -168,9 +173,9 @@
                             <td>{{ $p->nama }}</td>
                             <td>{{ $p->prodi }}</td>
                             <td>{{ $p->gender }}</td>
-                            <td>{{ $p->bahasa_jawa }}</td>
-                            <td>{{ $p->riwayat_penyakit }}</td>
-                            <td>{{ $p->berkebutuhan_khusus }}</td>
+                            <td>{{ $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak' }}</td>
+                            <td>{{ $p->riwayat_penyakit == 1 ? 'Ya' : 'Tidak' }}</td>
+                            <td>{{ $p->berkebutuhan_khusus == 1 ? 'Ya' : 'Tidak' }}</td>
                             <td>
                                 @if($status == 0)
                                     <form action="{{ route('peserta.tempatkan') }}" method="POST">
@@ -234,7 +239,7 @@
                 @php
                     $periode_id = request('periode_id') ?? session('periode_id');
                 @endphp
-                
+
                 @if($status == 0)
                     @if($periode_id)
                         <a href="{{ route('halaman.pindah', ['periode_id' => $periode_id]) }}" class="btn btn-warning">

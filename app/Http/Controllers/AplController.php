@@ -35,6 +35,17 @@ class AplController extends Controller
         return null;
     }
 
+    private function validateSingleActivePeriode()
+    {
+        $count = \App\Models\Periode::where('status_publish', 1)->count();
+
+        if ($count > 1) {
+            return redirect('/dashboard')->with('error', 'Terdapat lebih dari 1 periode aktif! Silakan hubungi admin.');
+        }
+
+        return null;
+    }
+
     public function index()
     {
         $this->setPeriodeSession();
@@ -158,7 +169,7 @@ class AplController extends Controller
         return redirect('/apl')->with('success', 'Data APL berhasil dihapus');
     }
 
-    public function hasil()
+    public function hasilNew()
     {
         $this->setPeriodeSession();
 
@@ -169,10 +180,10 @@ class AplController extends Controller
             ->where('id_periode', $periode_id)
             ->get();
 
-        return view('apl.hasil', compact('kelompok'));
+        return view('apl.hasil_new', compact('kelompok'));
     }
 
-    public function detail($id)
+    public function detailNew($id)
     {
         $this->setPeriodeSession();
 
@@ -182,6 +193,6 @@ class AplController extends Controller
             ->where('id_periode', $periode_id)
             ->findOrFail($id);
 
-        return view('apl.detail', compact('kelompok'));
+        return view('apl.detail_new', compact('kelompok'));
     }
 }

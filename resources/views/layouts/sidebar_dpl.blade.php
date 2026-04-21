@@ -5,8 +5,8 @@
 <ul class="menu">
 
     <li>
-        <a href="/hasil-dpl"
-           class="{{ request()->is('hasil-dpl') ? 'active' : '' }}" style="display: flex; align-items: center; padding: 14px 20px; border-left: 3px solid {{ request()->is('hasil-dpl') ? '#1abc9c' : 'transparent' }};">
+        <a href="/dpl-view"
+           class="{{ request()->is('dpl-view') ? 'active' : '' }}" style="display: flex; align-items: center; padding: 14px 20px; border-left: 3px solid {{ request()->is('dpl-view') ? '#1abc9c' : 'transparent' }};">
             <span style="margin-right: 12px; font-size: 18px;">📄</span>
             <span>Data Kelompok</span>
         </a>

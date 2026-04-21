@@ -4,7 +4,8 @@
 
     <div class="card">
         <div style="margin-bottom: 30px;">
-            <h3 style="margin-bottom: 10px; color: #000;">Selamat datang, <b style="color: #1e7e34;">{{ session('user')->username }}</b></h3>
+            <h3 style="margin-bottom: 10px; color: #000;">Selamat datang, <b
+                    style="color: #1e7e34;">{{ session('user')->username }}</b></h3>
             <p style="color: #666; font-size: 14px; margin: 0;">Portal Pembagian Kelompok KKN Reguler</p>
         </div>
 
@@ -24,23 +25,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($kelompok as $i => $k)
+                    @foreach($kelompok as $i => $k)
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
                             <td style="padding: 12px; font-weight: 500;">Kelompok {{ $k->nomor_kelompok }}</td>
                             <td style="padding: 12px;">{{ $k->desa }}</td>
                             <td style="padding: 12px;">{{ $k->dusun }}</td>
                             <td style="text-align: center; padding: 12px;">
-                                <a href="/hasil-dpl/detail/{{ $k->id_kelompok }}?periode_id={{ session('periode_id') }}" class="btn btn-sm" style="background: #1e7e34; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none;">
+                                <a href="{{ url('/hasil-apl-new/detail/' . $k->id_kelompok) }}" class="btn btn-sm" style="background: #1e7e34; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none;">
                                     Detail
                                 </a>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 20px; color: #666;">Data tidak ada</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
