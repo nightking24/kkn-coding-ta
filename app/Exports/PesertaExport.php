@@ -63,6 +63,10 @@ class PesertaExport implements WithEvents
                     $sheet->setCellValue("B{$row}", optional($k->apl)->no_telp);
                     $row++;
 
+                    $sheet->setCellValue("A{$row}", "Kecamatan :");
+                    $sheet->setCellValue("B{$row}", $k->nama_kecamatan);
+                    $row++;
+
                     $sheet->setCellValue("A{$row}", "Desa :");
                     $sheet->setCellValue("B{$row}", $k->desa);
                     $row++;

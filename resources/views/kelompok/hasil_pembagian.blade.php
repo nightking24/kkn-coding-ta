@@ -37,6 +37,7 @@
                         <th>Bahasa Jawa</th>
                         <th>Penyakit</th>
                         <th>Khusus</th>
+                        <th>Kecamatan</th>
                         <th>Desa</th>
                         <th>Dusun</th>
                         <th>Dukuh</th>
@@ -71,6 +72,7 @@
                                     <td>{{ $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak' }}</td>
                                     <td>{{ $p->riwayat_penyakit == 1 ? 'Ya' : 'Tidak' }}</td>
                                     <td>{{ $p->berkebutuhan_khusus == 1 ? 'Ya' : 'Tidak' }}</td>
+                                    <td>{{ optional($p->kelompok)->nama_kecamatan ?? '-' }}</td>
                                     <td>{{ optional($p->kelompok)->desa ?? '-' }}</td>
                                     <td>{{ optional($p->kelompok)->dusun ?? '-' }}</td>
                                     <td>{{ optional($p->kelompok)->nama_dukuh ?? '-' }}</td>

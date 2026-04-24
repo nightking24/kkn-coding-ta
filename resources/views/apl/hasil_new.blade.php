@@ -19,6 +19,7 @@
                     <tr>
                         <th style="text-align: center; padding: 12px;">No</th>
                         <th style="padding: 12px;">Kelompok</th>
+                        <th style="padding: 12px;">Kecamatan</th>
                         <th style="padding: 12px;">Desa</th>
                         <th style="padding: 12px;">Dusun</th>
                         <th style="text-align: center; padding: 12px;">Aksi</th>
@@ -29,6 +30,7 @@
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
                             <td style="padding: 12px; font-weight: 500;">Kelompok {{ $k->nomor_kelompok }}</td>
+                            <td style="padding: 12px;">{{ $k->nama_kecamatan }}</td>
                             <td style="padding: 12px;">{{ $k->desa }}</td>
                             <td style="padding: 12px;">{{ $k->dusun }}</td>
                             <td style="text-align: center; padding: 12px;">

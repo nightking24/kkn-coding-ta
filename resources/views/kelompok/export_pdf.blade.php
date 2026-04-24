@@ -80,6 +80,7 @@
                 <th>Nama</th>
                 <th>Prodi</th>
                 <th>Gender</th>
+                <th>Kecamatan</th>
                 <th>Desa</th>
                 <th>Dusun</th>
                 <th>DPL</th>
@@ -94,7 +95,7 @@
             @foreach($grouped as $kel => $items)
 
                 <tr>
-                    <td colspan="12" style="background:#ddd; font-weight:bold;">
+                    <td colspan="13" style="background:#ddd; font-weight:bold;">
                         Kelompok K{{ $kel }}
                     </td>
                 </tr>
@@ -107,8 +108,9 @@
                         <td>{{ $p->nama }}</td>
                         <td>{{ $p->prodi }}</td>
                         <td>{{ $p->gender }}</td>
-                        <td>{{ $p->kelompok->desa ?? '-' }}</td>
-                        <td>{{ $p->kelompok->dusun ?? '-' }}</td>
+                        <td>{{ optional($p->kelompok)->nama_kecamatan ?? '-' }}</td>
+                        <td>{{ optional($p->kelompok)->desa ?? '-' }}</td>
+                        <td>{{ optional($p->kelompok)->dusun ?? '-' }}</td>
                         <td>{{ optional($p->kelompok->dpl)->nama ?? '-' }}</td>
                         <td>{{ optional($p->kelompok->dpl)->no_telp ?? '-' }}</td>
                         <td>{{ optional($p->kelompok->apl)->nama ?? '-' }}</td>

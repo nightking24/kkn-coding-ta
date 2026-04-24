@@ -54,6 +54,7 @@
             <tr>
                 <th>No</th>
                 <th>Kelompok</th>
+                <th>Kecamatan</th>
                 <th>Desa</th>
                 <th>Dusun</th>
                 <th>DPL</th>
@@ -68,6 +69,7 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>K{{ $k->nomor_kelompok }}</td>
+                    <td>{{ $k->nama_kecamatan }}</td>
                     <td>{{ $k->desa }}</td>
                     <td>{{ $k->dusun }}</td>
                     <td>{{ optional($k->dpl)->nama ?? '-' }}</td>

@@ -21,6 +21,7 @@
                 <!-- Lokasi Section -->
                 <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
                     <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">📍 Lokasi</h5>
+                     <p style="margin: 8px 0;"><b>Kecamatan:</b> <span style="color: #666;">{{ $peserta->kelompok->nama_kecamatan }}</span></p>
                     <p style="margin: 8px 0;"><b>Desa:</b> <span style="color: #666;">{{ $peserta->kelompok->desa }}</span></p>
                     <p style="margin: 8px 0;"><b>Dusun:</b> <span style="color: #666;">{{ $peserta->kelompok->dusun }}</span></p>
                 </div>
