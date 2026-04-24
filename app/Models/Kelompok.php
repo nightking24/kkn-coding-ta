@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Peserta;
 use App\Models\Apl;
 use App\Models\Dpl;
+use App\Models\TuanRumah;
 
 class Kelompok extends Model
 {
@@ -14,10 +15,11 @@ class Kelompok extends Model
 
     protected $fillable = [
         'nomor_kelompok',
+        'nama_kecamatan',
         'desa',
         'dusun',
         'nama_dukuh',
-        'nama_tuan_rumah',
+        'id_tuan_rumah',
         'nomor_telepon',
         'alamat',
         'faskes',
@@ -50,5 +52,10 @@ class Kelompok extends Model
     public function peserta()
     {
         return $this->hasMany(\App\Models\Peserta::class, 'id_kelompok', 'id_kelompok');
+    }
+
+    public function tuanRumah()
+    {
+        return $this->belongsTo(TuanRumah::class, 'id_tuan_rumah');
     }
 }

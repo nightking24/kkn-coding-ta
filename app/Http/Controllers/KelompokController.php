@@ -68,7 +68,14 @@ class KelompokController extends Controller
 
     public function create()
     {
-        return view('kelompok.create');
+        $periode_id = $this->getPeriodeId();
+
+        $dpl = Dpl::where('id_periode', $periode_id)->get();
+        $apl = Apl::where('id_periode', $periode_id)->get();
+
+        $tuan_rumah = DB::table('tuan_rumah')->get();
+
+        return view('kelompok.create', compact('dpl', 'apl', 'tuan_rumah'));
     }
 
     public function store(Request $request)
@@ -84,12 +91,40 @@ class KelompokController extends Controller
             return $lock;
         }
 
+        if (!is_numeric($request->id_tuan_rumah)) {
+
+            $id_tuan_rumah = DB::table('tuan_rumah')->insertGetId([
+                'nama_tuan_rumah' => $request->id_tuan_rumah,
+                'dusun' => $request->dusun,
+                'desa' => $request->desa,
+                'nomor_telepon' => $request->nomor_telepon,
+                'alamat' => $request->alamat,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+            ]);
+
+        } else {
+
+            $id_tuan_rumah = $request->id_tuan_rumah;
+
+            DB::table('tuan_rumah')
+                ->where('id_tuan_rumah', $id_tuan_rumah)
+                ->update([
+                    'dusun' => $request->dusun,
+                    'desa' => $request->desa,
+                    'nomor_telepon' => $request->nomor_telepon,
+                    'alamat' => $request->alamat,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                ]);
+        }
+
         $request->validate([
             'nomor_kelompok' => 'required|integer|min:1',
             'desa' => 'required',
             'dusun' => 'required',
             'nama_dukuh' => 'required',
-            'nama_tuan_rumah' => 'required',
+            'id_tuan_rumah' => 'required',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required',
             'faskes' => 'required|in:Ya,Tidak',
@@ -98,6 +133,9 @@ class KelompokController extends Controller
             'tahun_kkn' => 'required|digits:4',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'nama_kecamatan' => 'required',
+            'nik' => 'required',
+            'nim' => 'required',
         ], [
             'latitude.required' => 'Latitude wajib diisi',
             'latitude.numeric' => 'Latitude harus angka',
@@ -116,7 +154,7 @@ class KelompokController extends Controller
                 'desa' => $request->desa,
                 'dusun' => $request->dusun,
                 'nama_dukuh' => $request->nama_dukuh,
-                'nama_tuan_rumah' => $request->nama_tuan_rumah,
+                'id_tuan_rumah' => $id_tuan_rumah,
                 'nomor_telepon' => $request->nomor_telepon,
                 'alamat' => $request->alamat,
                 'faskes' => $request->faskes == 'Ya' ? 1 : 0,
@@ -125,6 +163,9 @@ class KelompokController extends Controller
                 'tahun_kkn' => $request->tahun_kkn,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
+                'nama_kecamatan' => $request->nama_kecamatan,
+                'nik' => $request->nik,
+                'nim' => $request->nim,
                 'id_periode' => $id_periode
             ]);
 
@@ -138,7 +179,13 @@ class KelompokController extends Controller
     public function edit($id)
     {
         $data = Kelompok::findOrFail($id);
-        return view('kelompok.edit', compact('data'));
+
+        $periode_id = $this->getPeriodeId();
+
+        $dpl = Dpl::where('id_periode', $periode_id)->get();
+        $apl = Apl::where('id_periode', $periode_id)->get();
+
+        return view('kelompok.edit', compact('data', 'dpl', 'apl'));
     }
 
     public function update(Request $request, $id)
@@ -156,12 +203,40 @@ class KelompokController extends Controller
             return $lock;
         }
 
+        if (!is_numeric($request->id_tuan_rumah)) {
+
+            $id_tuan_rumah = DB::table('tuan_rumah')->insertGetId([
+                'nama_tuan_rumah' => $request->id_tuan_rumah,
+                'dusun' => $request->dusun,
+                'desa' => $request->desa,
+                'nomor_telepon' => $request->nomor_telepon,
+                'alamat' => $request->alamat,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+            ]);
+
+        } else {
+
+            $id_tuan_rumah = $request->id_tuan_rumah;
+
+            DB::table('tuan_rumah')
+                ->where('id_tuan_rumah', $id_tuan_rumah)
+                ->update([
+                    'dusun' => $request->dusun,
+                    'desa' => $request->desa,
+                    'nomor_telepon' => $request->nomor_telepon,
+                    'alamat' => $request->alamat,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                ]);
+        }
+
         $request->validate([
             'nomor_kelompok' => 'required|integer|min:1',
             'desa' => 'required|string|max:255',
             'dusun' => 'required|string|max:255',
             'nama_dukuh' => 'required|string|max:255',
-            'nama_tuan_rumah' => 'required|string|max:255',
+            'id_tuan_rumah' => 'required',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required|string|max:255',
             'faskes' => 'required|in:Ya,Tidak',
@@ -192,7 +267,7 @@ class KelompokController extends Controller
                 'desa' => $request->desa,
                 'dusun' => $request->dusun,
                 'nama_dukuh' => $request->nama_dukuh,
-                'nama_tuan_rumah' => $request->nama_tuan_rumah,
+                'id_tuan_rumah' => $id_tuan_rumah,
                 'nomor_telepon' => $request->nomor_telepon,
                 'alamat' => $request->alamat,
                 'faskes' => $request->faskes == 'Ya' ? 1 : 0,
@@ -200,7 +275,10 @@ class KelompokController extends Controller
                 'semester' => $request->semester,
                 'tahun_kkn' => $request->tahun_kkn,
                 'latitude' => $request->latitude,
-                'longitude' => $request->longitude
+                'longitude' => $request->longitude,
+                'nama_kecamatan' => $request->nama_kecamatan,
+                'nik' => $request->nik,
+                'nim' => $request->nim
             ]);
 
             return redirect('/kelompok')->with('success', 'Data kelompok berhasil diupdate');
@@ -441,79 +519,6 @@ class KelompokController extends Controller
         ));
     }
 
-    public function assignDpl(Request $request)
-    {
-        $this->logAktivitas(
-            'Assign DPL',
-            "Menentukan DPL ke kelompok {$request->id_kelompok}"
-        );
-
-        $periode_id = $this->getPeriodeId();
-
-        if ($lock = $this->checkPublishLock($periode_id)) {
-            return $lock;
-        }
-
-        $request->validate([
-            'id_kelompok' => 'required',
-            'nik' => 'required'
-        ]);
-
-        $kelompok = Kelompok::find($request->id_kelompok);
-
-        if (!$kelompok) {
-            return back()->with('error', 'Kelompok tidak ditemukan');
-        }
-
-        $dpl = \App\Models\Dpl::where('nik', $request->nik)->first();
-
-        if (!$dpl) {
-            return back()->with('error', 'DPL tidak ditemukan');
-        }
-
-        $kelompok->update([
-            'nik' => $request->nik
-        ]);
-
-        return back()->with('success', 'DPL berhasil ditambahkan');
-    }
-
-    public function assignApl(Request $request)
-    {
-        $this->logAktivitas(
-            'Assign APL',
-            "Menentukan APL ke kelompok {$request->id_kelompok}"
-        );
-
-        $periode_id = $this->getPeriodeId();
-
-        if ($lock = $this->checkPublishLock($periode_id)) {
-            return $lock;
-        }
-
-        $request->validate([
-            'id_kelompok' => 'required',
-            'nim' => 'required'
-        ]);
-
-        $kelompok = Kelompok::find($request->id_kelompok);
-
-        if (!$kelompok) {
-            return back()->with('error', 'Kelompok tidak ditemukan');
-        }
-
-        $apl = \App\Models\Apl::where('nim', $request->nim)->first();
-
-        if (!$apl) {
-            return back()->with('error', 'APL tidak ditemukan');
-        }
-
-        $kelompok->update([
-            'nim' => $request->nim
-        ]);
-
-        return back()->with('success', 'APL berhasil ditambahkan');
-    }
     public function resetPembagian()
     {
         $this->logAktivitas('Reset Pembagian', 'Semua peserta dihapus dari kelompok');

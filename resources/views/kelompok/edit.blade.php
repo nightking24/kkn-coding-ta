@@ -6,47 +6,14 @@
 
         <h2 style="margin-bottom:20px;">Edit Kelompok</h2>
 
-        @if(session('error'))
-            <div style="
-                                                background:#f8d7da;
-                                                color:#721c24;
-                                                padding:12px;
-                                                border-radius:8px;
-                                                margin-bottom:15px;
-                                                border-left:5px solid #dc3545;
-                                            ">
-                {{ session('error') }}
-            </div>
-        @endif
-
         @if ($errors->any())
-            <div style="
-                                                                                background:#f8d7da;
-                                                                                color:#721c24;
-                                                                                padding:12px;
-                                                                                border-radius:8px;
-                                                                                margin-bottom:15px;
-                                                                                border-left:5px solid #dc3545;
-                                                                            ">
+            <div style="background:#f8d7da; color:#721c24; padding:12px; margin-bottom:15px;">
                 <b>Terjadi kesalahan:</b>
-                <ul style="margin:5px 0 0 15px;">
+                <ul>
                     @foreach ($errors->all() as $e)
                         <li>{{ $e }}</li>
                     @endforeach
                 </ul>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div style="
-                                                                        background:#d4edda;
-                                                                        color:#155724;
-                                                                        padding:12px;
-                                                                        border-radius:8px;
-                                                                        margin-bottom:15px;
-                                                                        border-left:5px solid #28a745;
-                                                                    ">
-                {{ session('success') }}
             </div>
         @endif
 
@@ -58,7 +25,12 @@
                 <div class="form-group">
                     <label>Nomor Kelompok</label>
                     <input type="text" name="nomor_kelompok" class="form-control" value="{{ $data->nomor_kelompok }}"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+
+                <div class="form-group">
+                    <label>Kecamatan</label>
+                    <input type="text" name="nama_kecamatan" class="form-control" value="{{ $data->nama_kecamatan }}">
                 </div>
 
                 <div class="form-group">
@@ -76,15 +48,22 @@
                     <input type="text" name="nama_dukuh" class="form-control" value="{{ $data->nama_dukuh }}">
                 </div>
 
+                <!-- 🔥 AUTOCOMPLETE TUAN RUMAH -->
                 <div class="form-group">
                     <label>Nama Tuan Rumah</label>
-                    <input type="text" name="nama_tuan_rumah" class="form-control" value="{{ $data->nama_tuan_rumah }}">
+                    <select id="tuan_rumah" name="id_tuan_rumah" class="form-control" style="width:100%" required>
+                        @if($data->tuanRumah)
+                            <option value="{{ $data->tuanRumah->id_tuan_rumah }}" selected>
+                                {{ $data->tuanRumah->nama_tuan_rumah }}
+                            </option>
+                        @endif
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label>Nomor Telepon</label>
                     <input type="text" name="nomor_telepon" class="form-control" value="{{ $data->nomor_telepon }}"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="form-group">
@@ -121,28 +100,115 @@
                 <div class="form-group">
                     <label>Latitude</label>
                     <input type="number" step="any" name="latitude" class="form-control" value="{{ $data->latitude }}"
-                        required min="-90" max="90">
+                        min="-90" max="90">
                 </div>
 
                 <div class="form-group">
                     <label>Longitude</label>
                     <input type="number" step="any" name="longitude" class="form-control" value="{{ $data->longitude }}"
-                        required min="-180" max="180">
-                    <div style="margin-top:-10px; margin-bottom:10px;">
-                        <small style="color: gray;">
-                            Contoh koordinat: Latitude -7.7956, Longitude 110.3695
-                        </small>
-                    </div>
+                        min="-180" max="180">
 
+                    <small style="color:gray;">
+                        Contoh: Latitude -7.7956, Longitude 110.3695
+                    </small>
                 </div>
 
-                <div style="margin-top:25px; display:flex; gap:10px;">
-                    <a href="/kelompok" class="btn btn-gray">← Kembali</a>
-                    <button type="submit" class="btn btn-blue">Update</button>
+                <!-- 🔥 PINDAH KE LUAR (INI YANG ERROR KAMU TADI) -->
+                <div class="form-group">
+                    <label>DPL</label>
+                    <select name="nik" class="form-control">
+                        <option value="">-- Pilih DPL --</option>
+                        @foreach($dpl as $d)
+                            <option value="{{ $d->nik }}" {{ $data->nik == $d->nik ? 'selected' : '' }}>
+                                {{ $d->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
+
+                <div class="form-group">
+                    <label>APL</label>
+                    <select name="nim" class="form-control">
+                        <option value="">-- Pilih APL --</option>
+                        @foreach($apl as $a)
+                            <option value="{{ $a->nim }}" {{ $data->nim == $a->nim ? 'selected' : '' }}>
+                                {{ $a->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+            </div>
+
+            <div style="margin-top:25px;">
+                <a href="/kelompok" class="btn btn-gray">← Kembali</a>
+                <button type="submit" class="btn btn-blue">Update</button>
+            </div>
 
         </form>
 
     </div>
 
+@endsection
+
+
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+
+            $('#tuan_rumah').select2({
+                placeholder: 'Cari / ketik nama tuan rumah...',
+                allowClear: true,
+                minimumInputLength: 1,
+
+                ajax: {
+                    url: '/search-tuan-rumah',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(function (item) {
+                                return {
+                                    id: item.id_tuan_rumah,
+                                    text: item.nama_tuan_rumah,
+                                    data: item
+                                };
+                            })
+                        };
+                    }
+                },
+
+                tags: true
+            });
+
+            // 🔥 AUTO FILL SAAT DIPILIH
+            $('#tuan_rumah').on('select2:select', function (e) {
+                let data = e.params.data.data;
+
+                if (data) {
+                    $('input[name="dusun"]').val(data.dusun);
+                    $('input[name="desa"]').val(data.desa);
+                    $('input[name="nomor_telepon"]').val(data.nomor_telepon);
+                    $('input[name="alamat"]').val(data.alamat);
+                    $('input[name="latitude"]').val(data.latitude);
+                    $('input[name="longitude"]').val(data.longitude);
+                }
+            });
+
+            // Validasi form submission
+            $('form').on('submit', function () {
+                let nama = $('#tuan_rumah').val().trim();
+
+                if (!nama) {
+                    alert('Nama tuan rumah wajib diisi');
+                    return false;
+                }
+            });
+        });
+    </script>
 @endsection

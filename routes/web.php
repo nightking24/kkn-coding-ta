@@ -92,3 +92,15 @@ Route::middleware(['ceklogin', 'role:apl'])->group(function () {
 
 });
 
+Route::get('/get-tuan-rumah/{nama}', function ($nama) {
+    return DB::table('tuan_rumah')
+        ->where('nama_tuan_rumah', $nama)
+        ->first();
+});
+
+Route::get('/search-tuan-rumah', function (Request $request) {
+    return DB::table('tuan_rumah')
+        ->where('nama_tuan_rumah', 'like', '%' . $request->keyword . '%')
+        ->get();
+});
+

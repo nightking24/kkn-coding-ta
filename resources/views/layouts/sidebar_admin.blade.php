@@ -22,12 +22,12 @@
         background-color: #1e7e34;
     }
 
-    .menu > li {
+    .menu>li {
         margin: 0;
         border-bottom: none;
     }
 
-    .menu > li > a {
+    .menu>li>a {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -39,13 +39,13 @@
         cursor: pointer;
     }
 
-    .menu > li > a:hover {
+    .menu>li>a:hover {
         background-color: #0f5f37;
         color: #ffffff;
         padding-left: 25px;
     }
 
-    .menu > li > a.active {
+    .menu>li>a.active {
         background-color: #0f5f37;
         color: #ffffff;
         border-left: 4px solid #52d652;
@@ -125,7 +125,7 @@
         margin-bottom: 0;
     }
 
-    .menu-single-link > a {
+    .menu-single-link>a {
         display: flex !important;
         align-items: center;
         padding: 12px 20px !important;
@@ -134,13 +134,13 @@
         transition: all 0.3s ease;
     }
 
-    .menu-single-link > a:hover {
+    .menu-single-link>a:hover {
         background-color: #0f5f37;
         color: #ffffff;
         padding-left: 25px;
     }
 
-    .menu-single-link > a.active {
+    .menu-single-link>a.active {
         background-color: #0f5f37;
         color: #ffffff;
         border-left: 4px solid #52d652;
@@ -193,33 +193,14 @@
             <span class="dropdown-toggle">▼</span>
         </a>
         <div class="submenu {{ Request::is('periode*') ? 'active' : '' }}">
-            <a href="/periode" class="{{ request()->is('periode') && !request()->is('periode/create') ? 'active' : '' }}">
+            <a href="/periode"
+                class="{{ request()->is('periode') && !request()->is('periode/create') ? 'active' : '' }}">
                 <i class="bi bi-list-check menu-icon"></i>
                 <span>Data Periode</span>
             </a>
             <a href="/periode/create" class="{{ request()->is('periode/create') ? 'active' : '' }}">
                 <i class="bi bi-plus-circle menu-icon"></i>
                 <span>Tambah Periode</span>
-            </a>
-        </div>
-    </li>
-
-    <li>
-        <a href="#" class="dropdown-header" onclick="toggleDropdown(this, event)">
-            <span style="display: flex; align-items: center; flex: 1;">
-                <i class="bi bi-people menu-icon"></i>
-                <span class="menu-text">Kelompok</span>
-            </span>
-            <span class="dropdown-toggle">▼</span>
-        </a>
-        <div class="submenu {{ Request::is('kelompok*') ? 'active' : '' }}">
-            <a href="/kelompok" class="{{ request()->is('kelompok') && !request()->is('kelompok/create') ? 'active' : '' }}">
-                <i class="bi bi-list-check menu-icon"></i>
-                <span>Data Kelompok</span>
-            </a>
-            <a href="/kelompok/create" class="{{ request()->is('kelompok/create') ? 'active' : '' }}">
-                <i class="bi bi-plus-circle menu-icon"></i>
-                <span>Tambah Kelompok</span>
             </a>
         </div>
     </li>
@@ -264,6 +245,27 @@
         </div>
     </li>
 
+    <li>
+        <a href="#" class="dropdown-header" onclick="toggleDropdown(this, event)">
+            <span style="display: flex; align-items: center; flex: 1;">
+                <i class="bi bi-people menu-icon"></i>
+                <span class="menu-text">Kelompok</span>
+            </span>
+            <span class="dropdown-toggle">▼</span>
+        </a>
+        <div class="submenu {{ Request::is('kelompok*') ? 'active' : '' }}">
+            <a href="/kelompok"
+                class="{{ request()->is('kelompok') && !request()->is('kelompok/create') ? 'active' : '' }}">
+                <i class="bi bi-list-check menu-icon"></i>
+                <span>Data Kelompok</span>
+            </a>
+            <a href="/kelompok/create" class="{{ request()->is('kelompok/create') ? 'active' : '' }}">
+                <i class="bi bi-plus-circle menu-icon"></i>
+                <span>Tambah Kelompok</span>
+            </a>
+        </div>
+    </li>
+
     <!-- Data Peserta -->
     <li class="menu-category">Data Peserta</li>
 
@@ -285,16 +287,20 @@
             </span>
             <span class="dropdown-toggle">▼</span>
         </a>
-        <div class="submenu {{ Request::is('hasil*') || Request::is('tukar*') || Request::is('pindah*') ? 'active' : '' }}">
-            <a href="{{ route('hasil.pembagian') }}" class="{{ request()->routeIs('hasil.pembagian') ? 'active' : '' }}">
+        <div
+            class="submenu {{ Request::is('hasil*') || Request::is('tukar*') || Request::is('pindah*') ? 'active' : '' }}">
+            <a href="{{ route('hasil.pembagian') }}"
+                class="{{ request()->routeIs('hasil.pembagian') ? 'active' : '' }}">
                 <i class="bi bi-graph-up menu-icon"></i>
                 <span>Hasil Pembagian</span>
             </a>
-            <a href="{{ route('halaman.tukar', ['periode_id' => session('periode_id')]) }}" class="{{ request()->routeIs('halaman.tukar') ? 'active' : '' }}">
+            <a href="{{ route('halaman.tukar', ['periode_id' => session('periode_id')]) }}"
+                class="{{ request()->routeIs('halaman.tukar') ? 'active' : '' }}">
                 <i class="bi bi-arrow-left-right menu-icon"></i>
                 <span>Tukar Peserta</span>
             </a>
-            <a href="{{ route('halaman.pindah', ['periode_id' => session('periode_id')]) }}" class="{{ request()->routeIs('halaman.pindah') ? 'active' : '' }}">
+            <a href="{{ route('halaman.pindah', ['periode_id' => session('periode_id')]) }}"
+                class="{{ request()->routeIs('halaman.pindah') ? 'active' : '' }}">
                 <i class="bi bi-arrows-move menu-icon"></i>
                 <span>Pindah Peserta</span>
             </a>
@@ -323,7 +329,7 @@
         event.preventDefault();
         const submenu = element.nextElementSibling;
         const toggle = element.querySelector('.dropdown-toggle');
-        
+
         // Close other open submenus
         document.querySelectorAll('.submenu.active').forEach(menu => {
             if (menu !== submenu) {
@@ -331,14 +337,14 @@
                 menu.previousElementSibling.querySelector('.dropdown-toggle').classList.remove('active');
             }
         });
-        
+
         // Toggle current submenu
         submenu.classList.toggle('active');
         toggle.classList.toggle('active');
     }
 
     // Auto-open submenu jika ada menu item yang active
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.submenu.active').forEach(menu => {
             const toggle = menu.previousElementSibling.querySelector('.dropdown-toggle');
             if (toggle) toggle.classList.add('active');
