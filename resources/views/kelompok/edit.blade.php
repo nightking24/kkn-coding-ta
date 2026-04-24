@@ -8,19 +8,6 @@
 
         @if(session('error'))
             <div style="
-                background:#f8d7da;
-                color:#721c24;
-                padding:12px;
-                border-radius:8px;
-                margin-bottom:15px;
-                border-left:5px solid #dc3545;
-            ">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div style="
                                                 background:#f8d7da;
                                                 color:#721c24;
                                                 padding:12px;
@@ -28,6 +15,19 @@
                                                 margin-bottom:15px;
                                                 border-left:5px solid #dc3545;
                                             ">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div style="
+                                                                                background:#f8d7da;
+                                                                                color:#721c24;
+                                                                                padding:12px;
+                                                                                border-radius:8px;
+                                                                                margin-bottom:15px;
+                                                                                border-left:5px solid #dc3545;
+                                                                            ">
                 <b>Terjadi kesalahan:</b>
                 <ul style="margin:5px 0 0 15px;">
                     @foreach ($errors->all() as $e)
@@ -39,13 +39,13 @@
 
         @if(session('success'))
             <div style="
-                                        background:#d4edda;
-                                        color:#155724;
-                                        padding:12px;
-                                        border-radius:8px;
-                                        margin-bottom:15px;
-                                        border-left:5px solid #28a745;
-                                    ">
+                                                                        background:#d4edda;
+                                                                        color:#155724;
+                                                                        padding:12px;
+                                                                        border-radius:8px;
+                                                                        margin-bottom:15px;
+                                                                        border-left:5px solid #28a745;
+                                                                    ">
                 {{ session('success') }}
             </div>
         @endif
@@ -120,20 +120,26 @@
 
                 <div class="form-group">
                     <label>Latitude</label>
-                    <input type="text" name="latitude" class="form-control" value="{{ $data->latitude }}">
+                    <input type="number" step="any" name="latitude" class="form-control" value="{{ $data->latitude }}"
+                        required min="-90" max="90">
                 </div>
 
                 <div class="form-group">
                     <label>Longitude</label>
-                    <input type="text" name="longitude" class="form-control" value="{{ $data->longitude }}">
+                    <input type="number" step="any" name="longitude" class="form-control" value="{{ $data->longitude }}"
+                        required min="-180" max="180">
+                    <div style="margin-top:-10px; margin-bottom:10px;">
+                        <small style="color: gray;">
+                            Contoh koordinat: Latitude -7.7956, Longitude 110.3695
+                        </small>
+                    </div>
+
                 </div>
 
-            </div>
-
-            <div style="margin-top:25px; display:flex; gap:10px;">
-                <a href="/kelompok" class="btn btn-gray">← Kembali</a>
-                <button type="submit" class="btn btn-blue">Update</button>
-            </div>
+                <div style="margin-top:25px; display:flex; gap:10px;">
+                    <a href="/kelompok" class="btn btn-gray">← Kembali</a>
+                    <button type="submit" class="btn btn-blue">Update</button>
+                </div>
 
         </form>
 

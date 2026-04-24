@@ -93,8 +93,10 @@ class AplController extends Controller
                     })
             ],
             'no_telp' => 'required|digits_between:10,15'
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email harus mengandung @'
         ]);
-
         Apl::create($request->all());
 
         return redirect('/apl')->with('success', 'Data APL berhasil ditambahkan');
@@ -143,6 +145,9 @@ class AplController extends Controller
                     ->ignore($data->id_apl, 'id_apl')
             ],
             'no_telp' => 'required|digits_between:10,15'
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email harus mengandung @'
         ]);
 
         try {

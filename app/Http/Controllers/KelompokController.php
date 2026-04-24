@@ -85,18 +85,27 @@ class KelompokController extends Controller
         }
 
         $request->validate([
-            'nomor_kelompok' => 'required|numeric',
+            'nomor_kelompok' => 'required|integer|min:1',
             'desa' => 'required',
             'dusun' => 'required',
             'nama_dukuh' => 'required',
             'nama_tuan_rumah' => 'required',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required',
-            'kapasitas' => 'required|numeric',
+            'faskes' => 'required|in:Ya,Tidak',
+            'kapasitas' => 'required|integer|min:1',
             'semester' => 'required',
-            'tahun_kkn' => 'required|numeric',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'tahun_kkn' => 'required|digits:4',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ], [
+            'latitude.required' => 'Latitude wajib diisi',
+            'latitude.numeric' => 'Latitude harus angka',
+            'latitude.between' => 'Latitude harus antara -90 sampai 90',
+
+            'longitude.required' => 'Longitude wajib diisi',
+            'longitude.numeric' => 'Longitude harus angka',
+            'longitude.between' => 'Longitude harus antara -180 sampai 180',
         ]);
 
         try {
@@ -148,22 +157,29 @@ class KelompokController extends Controller
         }
 
         $request->validate([
-            'nomor_kelompok' => 'required|numeric',
+            'nomor_kelompok' => 'required|integer|min:1',
             'desa' => 'required|string|max:255',
             'dusun' => 'required|string|max:255',
             'nama_dukuh' => 'required|string|max:255',
             'nama_tuan_rumah' => 'required|string|max:255',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required|string|max:255',
+            'faskes' => 'required|in:Ya,Tidak',
             'kapasitas' => 'required|integer|min:1',
             'semester' => 'required|in:Gasal,Genap',
             'tahun_kkn' => 'required|digits:4',
 
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ], [
+            'latitude.required' => 'Latitude wajib diisi',
+            'latitude.numeric' => 'Latitude harus angka',
             'latitude.between' => 'Latitude harus antara -90 sampai 90',
+
+            'longitude.required' => 'Longitude wajib diisi',
+            'longitude.numeric' => 'Longitude harus angka',
             'longitude.between' => 'Longitude harus antara -180 sampai 180',
+
             'nomor_kelompok.numeric' => 'Nomor kelompok harus angka',
             'kapasitas.numeric' => 'Kapasitas harus angka',
         ]);
@@ -179,7 +195,7 @@ class KelompokController extends Controller
                 'nama_tuan_rumah' => $request->nama_tuan_rumah,
                 'nomor_telepon' => $request->nomor_telepon,
                 'alamat' => $request->alamat,
-                'faskes' => $request->faskes == '1' ? 1 : 0,
+                'faskes' => $request->faskes == 'Ya' ? 1 : 0,
                 'kapasitas' => $request->kapasitas,
                 'semester' => $request->semester,
                 'tahun_kkn' => $request->tahun_kkn,

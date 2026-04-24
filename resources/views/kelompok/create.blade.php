@@ -8,26 +8,26 @@
 
         @if(session('error'))
             <div style="
-                background:#f8d7da;
-                color:#721c24;
-                padding:12px;
-                border-radius:8px;
-                margin-bottom:15px;
-                border-left:5px solid #dc3545;
-            ">
+                                        background:#f8d7da;
+                                        color:#721c24;
+                                        padding:12px;
+                                        border-radius:8px;
+                                        margin-bottom:15px;
+                                        border-left:5px solid #dc3545;
+                                    ">
                 {{ session('error') }}
             </div>
         @endif
 
         @if ($errors->any())
             <div style="
-                                                background:#f8d7da;
-                                                color:#721c24;
-                                                padding:12px;
-                                                border-radius:8px;
-                                                margin-bottom:15px;
-                                                border-left:5px solid #dc3545;
-                                            ">
+                                                                        background:#f8d7da;
+                                                                        color:#721c24;
+                                                                        padding:12px;
+                                                                        border-radius:8px;
+                                                                        margin-bottom:15px;
+                                                                        border-left:5px solid #dc3545;
+                                                                    ">
                 <b>Terjadi kesalahan:</b>
                 <ul style="margin:5px 0 0 15px;">
                     @foreach ($errors->all() as $e)
@@ -39,13 +39,13 @@
 
         @if(session('success'))
             <div style="
-                                        background:#d4edda;
-                                        color:#155724;
-                                        padding:12px;
-                                        border-radius:8px;
-                                        margin-bottom:15px;
-                                        border-left:5px solid #28a745;
-                                    ">
+                                                                background:#d4edda;
+                                                                color:#155724;
+                                                                padding:12px;
+                                                                border-radius:8px;
+                                                                margin-bottom:15px;
+                                                                border-left:5px solid #28a745;
+                                                            ">
                 {{ session('success') }}
             </div>
         @endif
@@ -121,12 +121,15 @@
 
                 <div class="form-group">
                     <label>Latitude</label>
-                    <input type="text" name="latitude" class="form-control">
+                    <input type="number" step="any" name="latitude" class="form-control" required min="-90" max="90">
                 </div>
 
                 <div class="form-group">
                     <label>Longitude</label>
-                    <input type="text" name="longitude" class="form-control">
+                    <input type="number" step="any" name="longitude" class="form-control" required min="-180" max="180">
+                    <small style="color: gray;">
+                        Contoh: Latitude -7.7956, Longitude 110.3695
+                    </small>
                 </div>
 
             </div>

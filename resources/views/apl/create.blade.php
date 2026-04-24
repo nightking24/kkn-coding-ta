@@ -67,7 +67,7 @@
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="email" class="form-control" value="{{ old('email') }}">
+                    <input type="text" name="email" class="form-control" value="{{ old('email') }}" required>
                 </div>
 
                 <div class="form-group">

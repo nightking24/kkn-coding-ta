@@ -92,6 +92,9 @@ class DplController extends Controller
                     ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
             'no_telp' => 'required|digits_between:10,15'
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email harus mengandung @'
         ]);
 
         Dpl::create($request->all());
@@ -143,6 +146,9 @@ class DplController extends Controller
                     ->ignore($data->id_dpl, 'id_dpl')
             ],
             'no_telp' => 'required|digits_between:10,15'
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email harus mengandung @'
         ]);
 
         try {

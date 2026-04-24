@@ -73,7 +73,7 @@
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="email" value="{{ $data->email }}" class="form-control">
+                    <input type="text" name="email" value="{{ $data->email }}" class="form-control" required>
                 </div>
 
                 <div class="form-group">
