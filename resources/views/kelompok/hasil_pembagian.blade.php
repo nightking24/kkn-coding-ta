@@ -180,15 +180,6 @@
                 </form>
             @endif
 
-            @if($status == 0)
-                <form action="{{ route('reset.total') }}" method="POST">
-                    @csrf
-                    <button class="btn btn-danger" onclick="return confirm('INI AKAN MENGHAPUS SEMUA DATA!')">
-                        Reset Total
-                    </button>
-                </form>
-            @endif
-
             <div style="display:flex; gap:10px;">
                 @php
                     $periode_id = request('periode_id') ?? session('periode_id');

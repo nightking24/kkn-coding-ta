@@ -151,10 +151,6 @@ class PesertaController extends Controller
 
     public function tukar(Request $request)
     {
-        $this->logAktivitas(
-            'Tukar Peserta',
-            "Menukar {$request->nim1} dengan {$request->nim2}"
-        );
 
         $periode_id = $this->getPeriodeId();
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -186,9 +182,21 @@ class PesertaController extends Controller
             return back()->with('error', 'Peserta harus sudah memiliki kelompok');
         }
 
+        if ($p1->id_kelompok == $p2->id_kelompok) {
+            return back()->with('error', 'Tidak bisa tukar dalam kelompok yang sama');
+        }
+
+        // 🔥 SIMPAN DATA SEBELUM DITUKAR
         $kelompok1 = $p1->id_kelompok;
         $kelompok2 = $p2->id_kelompok;
 
+        // 🔥 LOG DETAIL (INI YANG BARU)
+        $this->logAktivitas(
+            'Tukar Peserta',
+            "Menukar {$p1->nim} ({$p1->nama}) [K{$kelompok1}] dengan {$p2->nim} ({$p2->nama}) [K{$kelompok2}]"
+        );
+
+        // 🔥 PROSES TUKAR
         $p1->update(['id_kelompok' => $kelompok2]);
         $p2->update(['id_kelompok' => $kelompok1]);
 
@@ -217,12 +225,14 @@ class PesertaController extends Controller
 
         $periode_id = $this->getPeriodeId();
 
+        $kelompok = Kelompok::where('id_periode', $periode_id)->get();
+
         $peserta = Peserta::with('kelompok')
             ->whereNotNull('id_kelompok')
             ->where('id_periode', $periode_id)
             ->get();
 
-        return view('peserta.tukar', compact('peserta'));
+        return view('peserta.tukar', compact('peserta', 'kelompok'));
     }
 
     private function logAktivitas($aksi, $deskripsi = null)
