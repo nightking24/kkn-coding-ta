@@ -15,7 +15,6 @@ class Kelompok extends Model
 
     protected $fillable = [
         'nomor_kelompok',
-        'nama_kecamatan',
         'desa',
         'dusun',
         'nama_dukuh',
@@ -26,11 +25,12 @@ class Kelompok extends Model
         'kapasitas',
         'semester',
         'tahun_kkn',
-        'id_periode',
         'latitude',
         'longitude',
+        'nama_kecamatan',
         'nik',
-        'nim'
+        'nim',
+        'id_periode'
     ];
 
     // Relasi ke Periode

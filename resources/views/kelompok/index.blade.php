@@ -70,6 +70,8 @@
                         <th>Tahun</th>
                         <th>Latitude</th>
                         <th>Longitude</th>
+                        <th>DPL</th>
+                        <th>APL</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -82,7 +84,7 @@
                             <td>{{ $d->desa }}</td>
                             <td>{{ $d->dusun }}</td>
                             <td class="col-wrap">{{ $d->nama_dukuh }}</td>
-                            <td class="col-wrap">{{ $d->nama_tuan_rumah }}</td>
+                            <td class="col-wrap">{{ optional($d->tuanRumah)->nama_tuan_rumah ?? '-' }}</td>
                             <td>{{ $d->nomor_telepon }}</td>
                             <td class="col-wrap" title="{{ $d->alamat }}">
                                 {{ $d->alamat }}
@@ -93,6 +95,8 @@
                             <td>{{ $d->tahun_kkn }}</td>
                             <td>{{ $d->latitude }}</td>
                             <td>{{ $d->longitude }}</td>
+                            <td>{{ optional($d->dpl)->nama ?? '-' }}</td>
+                            <td>{{ optional($d->apl)->nama ?? '-' }}</td>
                             <td>
                                 <a href="/kelompok/edit/{{ $d->id_kelompok }}" class="btn btn-blue">Edit</a>
                                 <a href="/kelompok/delete/{{ $d->id_kelompok }}" class="btn btn-red">Hapus</a>

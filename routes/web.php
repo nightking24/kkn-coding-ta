@@ -93,14 +93,66 @@ Route::middleware(['ceklogin', 'role:apl'])->group(function () {
 });
 
 Route::get('/get-tuan-rumah/{nama}', function ($nama) {
-    return DB::table('tuan_rumah')
-        ->where('nama_tuan_rumah', $nama)
+
+    $data = DB::table('tuan_rumah')
+        ->whereRaw('LOWER(nama_tuan_rumah) = ?', [strtolower($nama)])
         ->first();
+
+    if (!$data)
+        return response()->json(null);
+
+    // 🔥 AMBIL FASKES DARI KELOMPOK TERAKHIR
+    $kelompok = DB::table('kelompok')
+        ->where('id_tuan_rumah', $data->id_tuan_rumah)
+        ->orderBy('id_kelompok', 'desc')
+        ->first();
+
+    $faskes = $kelompok ? $kelompok->faskes : 1;
+
+    return response()->json([
+        'nama_tuan_rumah' => $data->nama_tuan_rumah,
+        'nomor_telepon' => $data->nomor_telepon,
+        'alamat' => $data->alamat,
+        'latitude' => $data->latitude,
+        'longitude' => $data->longitude,
+        'dusun' => $data->dusun,
+        'desa' => $data->desa,
+        'nama_kecamatan' => $data->nama_kecamatan,
+        'faskes' => $faskes,
+    ]);
 });
 
-Route::get('/search-tuan-rumah', function (Request $request) {
-    return DB::table('tuan_rumah')
-        ->where('nama_tuan_rumah', 'like', '%' . $request->keyword . '%')
-        ->get();
+Route::get('/get-kecamatan/{nama}', function ($nama) {
+
+    $data = DB::table('kelompok')
+        ->where('nama_kecamatan', $nama)
+        ->first();
+
+    if (!$data) {
+        return response()->json(null);
+    }
+
+    return response()->json([
+        'desa' => $data->desa,
+        'dusun' => $data->dusun,
+        'nama_dukuh' => $data->nama_dukuh,
+        'kapasitas' => $data->kapasitas,
+        'semester' => $data->semester,
+        'tahun_kkn' => $data->tahun_kkn,
+    ]);
 });
 
+Route::get('/get-dpl-apl-by-desa/{desa}', function ($desa) {
+
+    $desa = strtolower(trim($desa));
+
+    return [
+        'dpl' => DB::table('dpl')
+            ->whereRaw('LOWER(desa) = ?', [$desa])
+            ->get(),
+
+        'apl' => DB::table('apl')
+            ->whereRaw('LOWER(desa) = ?', [$desa])
+            ->get()
+    ];
+});

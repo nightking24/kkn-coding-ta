@@ -48,16 +48,17 @@
                     <input type="text" name="nama_dukuh" class="form-control" value="{{ $data->nama_dukuh }}">
                 </div>
 
-                <!-- 🔥 AUTOCOMPLETE TUAN RUMAH -->
                 <div class="form-group">
-                    <label>Nama Tuan Rumah</label>
-                    <select id="tuan_rumah" name="id_tuan_rumah" class="form-control" style="width:100%" required>
-                        @if($data->tuanRumah)
-                            <option value="{{ $data->tuanRumah->id_tuan_rumah }}" selected>
-                                {{ $data->tuanRumah->nama_tuan_rumah }}
-                            </option>
-                        @endif
-                    </select>
+                    <label>Tuan Rumah</label>
+
+                    <input list="list_tuan" id="tuan_rumah" name="id_tuan_rumah" class="form-control"
+                        value="{{ optional($data->tuanRumah)->nama_tuan_rumah }}" required>
+
+                    <datalist id="list_tuan">
+                        @foreach($tuan_rumah as $t)
+                            <option value="{{ $t->nama_tuan_rumah }}">
+                        @endforeach
+                    </datalist>
                 </div>
 
                 <div class="form-group">
@@ -73,12 +74,11 @@
 
                 <div class="form-group">
                     <label>Faskes</label>
-                    <select name="faskes" class="form-control">
-                        <option value="1" {{ $data->faskes ? 'selected' : '' }}>Ya</option>
-                        <option value="0" {{ !$data->faskes ? 'selected' : '' }}>Tidak</option>
+                    <select name="faskes" id="faskes" class="form-control">
+                        <option value="1" {{ $data->faskes == 1 ? 'selected' : '' }}>Ya</option>
+                        <option value="0" {{ $data->faskes == 0 ? 'selected' : '' }}>Tidak</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>Kapasitas</label>
                     <input type="number" name="kapasitas" class="form-control" value="{{ $data->kapasitas }}">
@@ -116,7 +116,7 @@
                 <!-- 🔥 PINDAH KE LUAR (INI YANG ERROR KAMU TADI) -->
                 <div class="form-group">
                     <label>DPL</label>
-                    <select name="nik" class="form-control">
+                    <select name="nik" id="nik" class="form-control">
                         <option value="">-- Pilih DPL --</option>
                         @foreach($dpl as $d)
                             <option value="{{ $d->nik }}" {{ $data->nik == $d->nik ? 'selected' : '' }}>
@@ -128,7 +128,7 @@
 
                 <div class="form-group">
                     <label>APL</label>
-                    <select name="nim" class="form-control">
+                    <select name="nim" id="nim" class="form-control">
                         <option value="">-- Pilih APL --</option>
                         @foreach($apl as $a)
                             <option value="{{ $a->nim }}" {{ $data->nim == $a->nim ? 'selected' : '' }}>
@@ -156,59 +156,111 @@
     <script>
         $(document).ready(function () {
 
-            $('#tuan_rumah').select2({
-                placeholder: 'Cari / ketik nama tuan rumah...',
-                allowClear: true,
-                minimumInputLength: 1,
+            let cacheKecamatan = {};
+            function getKecamatan(nama, callback) {
+                if (cacheKecamatan[nama]) {
+                    callback(cacheKecamatan[nama]);
+                    return;
+                }
 
-                ajax: {
-                    url: '/search-tuan-rumah',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            keyword: params.term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.map(function (item) {
-                                return {
-                                    id: item.id_tuan_rumah,
-                                    text: item.nama_tuan_rumah,
-                                    data: item
-                                };
-                            })
-                        };
+                $.get('/get-kecamatan/' + nama, function (data) {
+                    cacheKecamatan[nama] = data;
+                    callback(data);
+                });
+            }
+
+            // =========================
+            // AUTO FILL TUAN RUMAH
+            // =========================
+            $('#tuan_rumah').on('change', function () {
+
+                let nama = $(this).val();
+
+                if (!nama) return;
+
+                $.get('/get-tuan-rumah/' + nama, function (data) {
+
+                    if (data) {
+                        $('input[name="nomor_telepon"]').val(data.nomor_telepon ?? '');
+                        $('input[name="alamat"]').val(data.alamat ?? '');
+                        $('input[name="latitude"]').val(data.latitude ?? '');
+                        $('input[name="longitude"]').val(data.longitude ?? '');
+                        $('input[name="nama_dukuh"]').val(data.nama_tuan_rumah ?? '');
+                        $('select[name="faskes"]').val(data.faskes);
                     }
-                },
+                });
 
-                tags: true
             });
 
-            // 🔥 AUTO FILL SAAT DIPILIH
-            $('#tuan_rumah').on('select2:select', function (e) {
-                let data = e.params.data.data;
+            // =========================
+            // DESA MANUAL
+            // =========================
+            $('#desa').on('change', function () {
+                let desa = $(this).val();
 
-                if (data) {
-                    $('input[name="dusun"]').val(data.dusun);
-                    $('input[name="desa"]').val(data.desa);
-                    $('input[name="nomor_telepon"]').val(data.nomor_telepon);
-                    $('input[name="alamat"]').val(data.alamat);
-                    $('input[name="latitude"]').val(data.latitude);
-                    $('input[name="longitude"]').val(data.longitude);
+                if (desa) {
+                    loadDplApl(desa.trim());
+
                 }
             });
 
-            // Validasi form submission
-            $('form').on('submit', function () {
-                let nama = $('#tuan_rumah').val().trim();
+            // =========================
+            // AUTO FILL KECAMATAN (CACHE)
+            // =========================
+            $('input[name="nama_kecamatan"]').on('change', function () {
+                let kecamatan = $(this).val();
 
-                if (!nama) {
+                if (!kecamatan) return;
+
+                getKecamatan(kecamatan, function (data) {
+
+                    if (data) {
+                        $('#desa').val(data.desa.trim()).trigger('change');
+                        $('#dusun').val(data.dusun);
+                        $('input[name="kapasitas"]').val(data.kapasitas ?? '');
+                        $('#semester').val(data.semester ?? '');
+                        $('input[name="tahun_kkn"]').val(data.tahun_kkn ?? '');
+                    }
+                });
+            });
+
+            function loadDplApl(desa) {
+                $.get('/get-dpl-apl-by-desa/' + encodeURIComponent(desa), function (res) {
+
+                    let dpl = $('#nik');
+                    let apl = $('#nim');
+
+                    dpl.html('<option value="">-- Pilih DPL --</option>');
+                    apl.html('<option value="">-- Pilih APL --</option>');
+
+                    res.dpl.forEach(d => {
+                        dpl.append(`<option value="${d.nik}">${d.nama}</option>`);
+                    });
+
+                    res.apl.forEach(a => {
+                        apl.append(`<option value="${a.nim}">${a.nama}</option>`);
+                    });
+                });
+            }
+
+            // =========================
+            // VALIDASI FORM
+            // =========================
+            $('form').on('submit', function () {
+                let nama = $('#tuan_rumah').val();
+                let telepon = $('input[name="nomor_telepon"]').val();
+
+                if (!nama || nama.trim() === '') {
                     alert('Nama tuan rumah wajib diisi');
                     return false;
                 }
+
+                if (!telepon || telepon.length < 10) {
+                    alert('Nomor telepon tidak valid');
+                    return false;
+                }
             });
+
         });
     </script>
 @endsection
