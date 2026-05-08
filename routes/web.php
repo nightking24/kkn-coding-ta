@@ -29,6 +29,7 @@ Route::middleware(['ceklogin', 'role:admin'])->group(function () {
 
     Route::get('/kelompok', [KelompokController::class, 'index']);
     Route::get('/kelompok/create', [KelompokController::class, 'create']);
+    Route::get('/get-dusun/{dusun}', [KelompokController::class, 'getDusun']);
     Route::post('/kelompok/store', [KelompokController::class, 'store']);
     Route::get('/kelompok/edit/{id}', [KelompokController::class, 'edit']);
     Route::post('/kelompok/update/{id}', [KelompokController::class, 'update']);

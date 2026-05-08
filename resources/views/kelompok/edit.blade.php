@@ -30,17 +30,18 @@
 
                 <div class="form-group">
                     <label>Kecamatan</label>
-                    <input type="text" name="nama_kecamatan" class="form-control" value="{{ $data->nama_kecamatan }}">
+                    <input type="text" id="nama_kecamatan" name="nama_kecamatan" class="form-control"
+                        value="{{ $data->nama_kecamatan }}">
                 </div>
 
                 <div class="form-group">
                     <label>Desa</label>
-                    <input type="text" name="desa" class="form-control" value="{{ $data->desa }}">
+                    <input type="text" id="desa" name="desa" class="form-control" value="{{ $data->desa }}">
                 </div>
 
                 <div class="form-group">
                     <label>Dusun</label>
-                    <input type="text" name="dusun" class="form-control" value="{{ $data->dusun }}">
+                    <input type="text" id="dusun" name="dusun" class="form-control" value="{{ $data->dusun }}">
                 </div>
 
                 <div class="form-group">
@@ -86,7 +87,7 @@
 
                 <div class="form-group">
                     <label>Semester</label>
-                    <select name="semester" class="form-control">
+                    <select id="semester" name="semester" class="form-control">
                         <option value="Gasal" {{ $data->semester == 'Gasal' ? 'selected' : '' }}>Gasal</option>
                         <option value="Genap" {{ $data->semester == 'Genap' ? 'selected' : '' }}>Genap</option>
                     </select>
@@ -156,23 +157,10 @@
     <script>
         $(document).ready(function () {
 
-            let cacheKecamatan = {};
-            function getKecamatan(nama, callback) {
-                if (cacheKecamatan[nama]) {
-                    callback(cacheKecamatan[nama]);
-                    return;
-                }
-
-                $.get('/get-kecamatan/' + nama, function (data) {
-                    cacheKecamatan[nama] = data;
-                    callback(data);
-                });
-            }
-
             // =========================
             // AUTO FILL TUAN RUMAH
             // =========================
-            $('#tuan_rumah').on('change', function () {
+            $('#tuan_rumah').on('blur', function () {
 
                 let nama = $(this).val();
 
@@ -193,6 +181,36 @@
             });
 
             // =========================
+            // AUTO FILL DUSUN
+            // =========================
+
+            $('#dusun').on('change', function () {
+
+                let dusun = $(this).val();
+
+                if (!dusun) return;
+
+                $.get('/get-dusun/' + encodeURIComponent(dusun), function (data) {
+
+                    if (data) {
+
+                        $('#desa').val(data.desa);
+
+                        $('#nama_kecamatan').val(data.nama_kecamatan);
+
+                        $('input[name="kapasitas"]').val(data.kapasitas);
+
+                        $('#semester').val(data.semester);
+
+                        $('input[name="tahun_kkn"]').val(data.tahun_kkn);
+
+                    }
+
+                });
+
+            });
+
+            // =========================
             // DESA MANUAL
             // =========================
             $('#desa').on('change', function () {
@@ -202,26 +220,6 @@
                     loadDplApl(desa.trim());
 
                 }
-            });
-
-            // =========================
-            // AUTO FILL KECAMATAN (CACHE)
-            // =========================
-            $('input[name="nama_kecamatan"]').on('change', function () {
-                let kecamatan = $(this).val();
-
-                if (!kecamatan) return;
-
-                getKecamatan(kecamatan, function (data) {
-
-                    if (data) {
-                        $('#desa').val(data.desa.trim()).trigger('change');
-                        $('#dusun').val(data.dusun);
-                        $('input[name="kapasitas"]').val(data.kapasitas ?? '');
-                        $('#semester').val(data.semester ?? '');
-                        $('input[name="tahun_kkn"]').val(data.tahun_kkn ?? '');
-                    }
-                });
             });
 
             function loadDplApl(desa) {

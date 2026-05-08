@@ -47,13 +47,15 @@
                 {{-- Kecamatan --}}
                 <div class="form-group">
                     <label for="nama_kecamatan">Kecamatan</label>
-                    <input type="text" id="nama_kecamatan" name="nama_kecamatan" class="form-control">
+                    <input type="text" id="nama_kecamatan" name="nama_kecamatan" class="form-control"
+                        value="{{ old('nama_kecamatan', session('retain_kelompok.nama_kecamatan')) }}">
                 </div>
 
                 {{-- Desa --}}
                 <div class="form-group">
                     <label for="desa">Desa</label>
-                    <input type="text" id="desa" name="desa" class="form-control">
+                    <input type="text" id="desa" name="desa" class="form-control"
+                        value="{{ old('desa', session('retain_kelompok.desa')) }}">
                 </div>
 
                 {{-- Dusun --}}
@@ -96,35 +98,51 @@
                 </div>
 
                 {{-- Faskes --}}
-                {{-- Faskes --}}
                 <div class="form-group">
                     <label for="faskes">Faskes</label>
                     <select id="faskes" name="faskes" class="form-control">
-                        <option value="1">Ya</option>
-                        <option value="0">Tidak</option>
+
+                        <option value="1" {{ old('faskes', session('retain_kelompok.faskes')) == '1' ? 'selected' : '' }}>
+                            Ya
+                        </option>
+
+                        <option value="0" {{ old('faskes', session('retain_kelompok.faskes')) == '0' ? 'selected' : '' }}>
+                            Tidak
+                        </option>
+
                     </select>
                 </div>
 
                 {{-- Kapasitas --}}
                 <div class="form-group">
                     <label for="kapasitas">Kapasitas</label>
-                    <input type="number" id="kapasitas" name="kapasitas" class="form-control">
+                    <input type="number" id="kapasitas" name="kapasitas" class="form-control"
+                        value="{{ old('kapasitas', session('retain_kelompok.kapasitas')) }}">
                 </div>
 
                 {{-- Semester --}}
                 <div class="form-group">
                     <label for="semester">Semester</label>
                     <select id="semester" name="semester" class="form-control">
+
                         <option value="">-- Pilih Semester --</option>
-                        <option value="Gasal">Gasal</option>
-                        <option value="Genap">Genap</option>
+
+                        <option value="Gasal" {{ old('semester', session('retain_kelompok.semester')) == 'Gasal' ? 'selected' : '' }}>
+                            Gasal
+                        </option>
+
+                        <option value="Genap" {{ old('semester', session('retain_kelompok.semester')) == 'Genap' ? 'selected' : '' }}>
+                            Genap
+                        </option>
+
                     </select>
                 </div>
 
                 {{-- Tahun KKN --}}
                 <div class="form-group">
                     <label for="tahun_kkn">Tahun KKN</label>
-                    <input type="number" id="tahun_kkn" name="tahun_kkn" class="form-control">
+                    <input type="number" id="tahun_kkn" name="tahun_kkn" class="form-control"
+                        value="{{ old('tahun_kkn', session('retain_kelompok.tahun_kkn')) }}">
                 </div>
 
                 {{-- Latitude --}}
@@ -180,24 +198,10 @@
     <script>
         $(document).ready(function () {
 
-            let cacheKecamatan = {};
-
-            function getKecamatan(nama, callback) {
-                if (cacheKecamatan[nama]) {
-                    callback(cacheKecamatan[nama]);
-                    return;
-                }
-
-                $.get('/get-kecamatan/' + nama, function (data) {
-                    cacheKecamatan[nama] = data;
-                    callback(data);
-                });
-            }
-
             // =========================
             // AUTO FILL TUAN RUMAH
             // =========================
-            $('#tuan_rumah').on('change', function () {
+            $('#tuan_rumah').on('blur', function () {
 
                 let nama = $(this).val();
 
@@ -219,6 +223,36 @@
             });
 
             // =========================
+            // AUTO FILL DUSUN
+            // =========================
+
+            $('#dusun').on('change', function () {
+
+                let dusun = $(this).val();
+
+                if (!dusun) return;
+
+                $.get('/get-dusun/' + encodeURIComponent(dusun), function (data) {
+
+                    if (data) {
+
+                        $('#desa').val(data.desa);
+
+                        $('#nama_kecamatan').val(data.nama_kecamatan);
+
+                        $('input[name="kapasitas"]').val(data.kapasitas);
+
+                        $('#semester').val(data.semester);
+
+                        $('input[name="tahun_kkn"]').val(data.tahun_kkn);
+
+                    }
+
+                });
+
+            });
+
+            // =========================
             // DESA MANUAL
             // =========================
             $('#desa').on('change', function () {
@@ -227,24 +261,6 @@
                 if (desa) {
                     loadDplApl(desa.trim());
                 }
-            });
-            // =========================
-            // AUTO FILL KECAMATAN
-            // =========================
-            $('#nama_kecamatan').on('change', function () {
-                let kecamatan = $(this).val();
-                if (!kecamatan) return;
-
-                getKecamatan(kecamatan, function (data) {
-
-                    if (data) {
-                        $('#desa').val(data.desa.trim()).trigger('change');
-                        $('#dusun').val(data.dusun);
-                        $('input[name="kapasitas"]').val(data.kapasitas ?? '');
-                        $('#semester').val(data.semester ?? '');
-                        $('input[name="tahun_kkn"]').val(data.tahun_kkn ?? '');
-                    }
-                });
             });
 
             function loadDplApl(desa) {
@@ -278,12 +294,7 @@
                     return false;
                 }
 
-                if (!telepon || telepon.length < 10) {
-                    alert('Nomor telepon tidak valid');
-                    return false;
-                }
+                if (!telepon || telepon.length < 10) { alert('Nomor telepon tidak valid'); return false; }
             });
-
-        });
-    </script>
+        }); </script>
 @endsection
