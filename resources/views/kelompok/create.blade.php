@@ -203,21 +203,34 @@
             // =========================
             $('#tuan_rumah').on('blur', function () {
 
-                let nama = $(this).val();
+                let nama = $(this).val().trim();
 
                 if (!nama) return;
 
-                $.get('/get-tuan-rumah/' + nama, function (data) {
+                $.get('/get-tuan-rumah/' + encodeURIComponent(nama), function (data) {
 
-                    if (data) {
+                    // kalau data tidak ditemukan
+                    if (!data) return;
+
+                    // hanya isi field kalau masih kosong
+                    if (!$('input[name="nomor_telepon"]').val()) {
                         $('input[name="nomor_telepon"]').val(data.nomor_telepon ?? '');
-                        $('input[name="alamat"]').val(data.alamat ?? '');
-                        $('input[name="latitude"]').val(data.latitude ?? '');
-                        $('input[name="longitude"]').val(data.longitude ?? '');
-                        $('input[name="nama_dukuh"]').val(data.nama_tuan_rumah ?? '');
-                        let faskes = (data.faskes == 1) ? "1" : "0";
-                        $('#faskes').val(faskes).trigger('change');
                     }
+
+                    if (!$('input[name="alamat"]').val()) {
+                        $('input[name="alamat"]').val(data.alamat ?? '');
+                    }
+
+                    if (!$('input[name="latitude"]').val()) {
+                        $('input[name="latitude"]').val(data.latitude ?? '');
+                    }
+
+                    if (!$('input[name="longitude"]').val()) {
+                        $('input[name="longitude"]').val(data.longitude ?? '');
+                    }
+
+                    $('#faskes').val(data.faskes == 1 ? "1" : "0");
+
                 });
 
             });
@@ -225,33 +238,52 @@
             // =========================
             // AUTO FILL DUSUN
             // =========================
+            $('#dusun').on('blur', function () {
 
-            $('#dusun').on('change', function () {
-
-                let dusun = $(this).val();
+                let dusun = $(this).val().trim();
 
                 if (!dusun) return;
 
                 $.get('/get-dusun/' + encodeURIComponent(dusun), function (data) {
 
-                    if (data) {
+                    // kalau data tidak ditemukan
+                    if (!data) return;
 
-                        $('#desa').val(data.desa);
+                    // isi field TANPA menghapus manual input
+                    $('#desa').val(data.desa ?? $('#desa').val());
 
-                        $('#nama_kecamatan').val(data.nama_kecamatan);
+                    $('#nama_kecamatan').val(
+                        data.nama_kecamatan ?? $('#nama_kecamatan').val()
+                    );
 
-                        $('input[name="kapasitas"]').val(data.kapasitas);
+                    $('input[name="nama_dukuh"]').val(
+                        data.nama_dukuh ?? $('input[name="nama_dukuh"]').val()
+                    );
 
-                        $('#semester').val(data.semester);
+                    $('input[name="kapasitas"]').val(
+                        data.kapasitas ?? $('input[name="kapasitas"]').val()
+                    );
 
-                        $('input[name="tahun_kkn"]').val(data.tahun_kkn);
+                    $('#semester').val(
+                        data.semester ?? $('#semester').val()
+                    );
 
+                    $('input[name="tahun_kkn"]').val(
+                        data.tahun_kkn ?? $('input[name="tahun_kkn"]').val()
+                    );
+
+                    $('#faskes').val(
+                        data.faskes == 1 ? "1" : "0"
+                    );
+
+                    // load otomatis DPL APL
+                    if (data.desa) {
+                        loadDplApl(data.desa);
                     }
 
                 });
 
             });
-
             // =========================
             // DESA MANUAL
             // =========================

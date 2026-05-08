@@ -81,6 +81,7 @@ class KelompokController extends Controller
 
     public function getDusun($dusun)
     {
+        // ambil data kelompok berdasarkan dusun
         $data = Kelompok::where('dusun', $dusun)->first();
 
         if (!$data) {
@@ -88,14 +89,22 @@ class KelompokController extends Controller
         }
 
         return response()->json([
+
+            // lokasi
             'desa' => $data->desa,
             'nama_kecamatan' => $data->nama_kecamatan,
+            'dusun' => $data->dusun,
+
+            // data kelompok
+            'nama_dukuh' => $data->nama_dukuh,
+            'faskes' => $data->faskes,
             'kapasitas' => $data->kapasitas,
             'semester' => $data->semester,
             'tahun_kkn' => $data->tahun_kkn,
+
         ]);
     }
-
+    
     public function store(Request $request)
     {
         $this->logAktivitas(
