@@ -39,7 +39,26 @@ class PesertaController extends Controller
         $user = session('user');
 
         $periode_id = $this->getPeriodeId();
-        $peserta = Peserta::with('kelompok.dpl', 'kelompok.apl', 'kelompok.peserta')
+
+        // ======================================
+        // CEK STATUS PUBLISH
+        // ======================================
+
+        $status_publish = \App\Models\Periode::where('id_periode', $periode_id)
+            ->value('status_publish');
+
+        // JIKA BELUM DIPUBLISH
+        if ($status_publish == 0) {
+
+            return view('peserta.belum_publish');
+
+        }
+
+        $peserta = Peserta::with(
+            'kelompok.dpl',
+            'kelompok.apl',
+            'kelompok.peserta'
+        )
             ->where('nim', $user->username)
             ->where('id_periode', $periode_id)
             ->first();

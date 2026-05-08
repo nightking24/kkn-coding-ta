@@ -2,17 +2,27 @@
 
 <style>
     .sidebar-header {
-        padding: 20px;
-        background-color: #1e7e34;
+        padding: 25px 20px;
+        background: linear-gradient(135deg, #1e7e34 0%, #0f5f37 100%);
         margin-bottom: 0;
+        border-bottom: 4px solid #52d652;
     }
 
     .sidebar-header h3 {
         margin: 0;
         color: #ffffff;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 18px;
+        font-weight: 800;
         line-height: 1.4;
+        letter-spacing: 0.5px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .sidebar-header p {
+        margin: 8px 0 0 0;
+        font-size: 12px;
+        color: #e0f2f1;
+        font-weight: 500;
     }
 
     .menu {
@@ -24,7 +34,7 @@
 
     .menu>li {
         margin: 0;
-        border-bottom: none;
+        border-bottom: 1px solid rgba(82, 214, 82, 0.2);
     }
 
     .menu>li>a {
@@ -37,19 +47,22 @@
         font-weight: 500;
         transition: all 0.3s ease;
         cursor: pointer;
+        border-left: 4px solid transparent;
     }
 
     .menu>li>a:hover {
-        background-color: #0f5f37;
+        background-color: #1a7d4f;
         color: #ffffff;
-        padding-left: 25px;
+        padding-left: 20px;
+        border-left-color: #52d652;
     }
 
     .menu>li>a.active {
-        background-color: #0f5f37;
+        background-color: #14a855;
         color: #ffffff;
         border-left: 4px solid #52d652;
-        padding-left: 16px;
+        padding-left: 20px;
+        box-shadow: inset 2px 0 0 #52d652;
     }
 
     .menu-icon {
@@ -73,10 +86,17 @@
         transform: rotate(180deg);
     }
 
+    .dropdown-header.active {
+        background-color: #14a855 !important;
+        border-left: 4px solid #52d652 !important;
+        box-shadow: inset 2px 0 0 #52d652 !important;
+    }
+
     .submenu {
         display: none;
-        background-color: #0d5230;
+        background-color: #1e7e34;
         border-left: 3px solid #52d652;
+        border-bottom: 2px solid #52d652;
     }
 
     .submenu.active {
@@ -88,24 +108,30 @@
         align-items: center;
         padding: 10px 20px 10px 40px;
         text-decoration: none;
-        color: #d4edda;
+        color: #ffffff;
         font-size: 14px;
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
+        border-bottom: 1px solid rgba(82, 214, 82, 0.1);
+    }
+
+    .submenu a:last-child {
+        border-bottom: none;
     }
 
     .submenu a:hover {
-        background-color: #0a3d24;
-        color: #ffffff;
+        background-color: transparent;
+        color: #52d652;
         border-left-color: #52d652;
         padding-left: 45px;
     }
 
     .submenu a.active {
-        background-color: #0a3d24;
-        color: #ffffff;
+        background-color: transparent;
+        color: #52d652;
         border-left-color: #52d652;
-        font-weight: 500;
+        font-weight: 600;
+        box-shadow: none;
     }
 
     .submenu .menu-icon {
@@ -132,19 +158,22 @@
         color: #ffffff !important;
         text-decoration: none;
         transition: all 0.3s ease;
+        border-left: 4px solid transparent !important;
     }
 
     .menu-single-link>a:hover {
-        background-color: #0f5f37;
+        background-color: #1a7d4f;
         color: #ffffff;
-        padding-left: 25px;
+        padding-left: 20px !important;
+        border-left-color: #52d652 !important;
     }
 
     .menu-single-link>a.active {
-        background-color: #0f5f37;
-        color: #ffffff;
-        border-left: 4px solid #52d652;
-        padding-left: 16px;
+        background-color: #14a855 !important;
+        color: #ffffff !important;
+        border-left: 4px solid #52d652 !important;
+        padding-left: 20px !important;
+        box-shadow: inset 2px 0 0 #52d652 !important;
     }
 
     .btn-logout {
@@ -169,7 +198,8 @@
 </style>
 
 <div class="sidebar-header">
-    <h3>Pembagian Kelompok KKN Reguler</h3>
+    <h3>⚙️ Pembagian Kelompok KKN Reguler</h3>
+    <p>Administrator</p>
 </div>
 
 <ul class="menu">
@@ -334,20 +364,25 @@
         document.querySelectorAll('.submenu.active').forEach(menu => {
             if (menu !== submenu) {
                 menu.classList.remove('active');
-                menu.previousElementSibling.querySelector('.dropdown-toggle').classList.remove('active');
+                const header = menu.previousElementSibling;
+                header.querySelector('.dropdown-toggle').classList.remove('active');
+                header.classList.remove('active');
             }
         });
 
         // Toggle current submenu
         submenu.classList.toggle('active');
         toggle.classList.toggle('active');
+        element.classList.toggle('active');
     }
 
     // Auto-open submenu jika ada menu item yang active
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.submenu.active').forEach(menu => {
-            const toggle = menu.previousElementSibling.querySelector('.dropdown-toggle');
+            const header = menu.previousElementSibling;
+            const toggle = header.querySelector('.dropdown-toggle');
             if (toggle) toggle.classList.add('active');
+            header.classList.add('active');
         });
     });
 </script>

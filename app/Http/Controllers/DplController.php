@@ -183,6 +183,20 @@ class DplController extends Controller
         $user = session('user');
         $periode_id = $this->getPeriodeId();
 
+        // ======================================
+        // CEK STATUS PUBLISH
+        // ======================================
+
+        $status_publish = \App\Models\Periode::where('id_periode', $periode_id)
+            ->value('status_publish');
+
+        // JIKA BELUM DIPUBLISH
+        if ($status_publish == 0) {
+
+            return view('dpl.belum_publish');
+
+        }
+
         $kelompok = \App\Models\Kelompok::where('nik', $user->username)
             ->where('id_periode', $periode_id)
             ->get();
