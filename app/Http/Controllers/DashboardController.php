@@ -120,16 +120,28 @@ class DashboardController extends Controller
             compact('periode', 'kelompok')
         )->setPaper('a4', 'landscape');
 
-        return $pdf->download('laporan_kkn.pdf');
+        $namaFile =
+            'laporan_kkn_reguler_' .
+            $periode->tahun_kkn .
+            '.pdf';
+
+        return $pdf->download($namaFile);
     }
 
     public function exportExcelPeriode($id)
     {
         $this->logAktivitas('Export Excel dari Halaman Dashboard');
 
+        $periode = Periode::findOrFail($id);
+
+        $namaFile =
+            'laporan_kkn_reguler_' .
+            $periode->tahun_kkn .
+            '.xlsx';
+
         return \Maatwebsite\Excel\Facades\Excel::download(
             new \App\Exports\PesertaExport($id),
-            'laporan_kkn.xlsx'
+            $namaFile
         );
     }
 

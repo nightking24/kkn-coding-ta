@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Periode;
+use App\Exports\HasilPembagianExport;
 use App\Models\LogActivity;
 
 class KelompokController extends Controller
@@ -104,7 +105,7 @@ class KelompokController extends Controller
 
         ]);
     }
-    
+
     public function store(Request $request)
     {
         $this->logAktivitas(
@@ -647,7 +648,17 @@ class KelompokController extends Controller
         $periode_id = request('periode_id')
             ?? session('periode_id');
 
-        return Excel::download(new PesertaExport($periode_id), 'laporan.xlsx');
+        $periode = Periode::find($periode_id);
+
+        $namaFile =
+            'hasil_pembagian_kkn_reguler_' .
+            ($periode->tahun_kkn ?? date('Y')) .
+            '.xlsx';
+
+        return Excel::download(
+            new HasilPembagianExport($periode_id),
+            $namaFile
+        );
     }
 
     public function exportPDF($periode_id)
@@ -670,7 +681,14 @@ class KelompokController extends Controller
         $pdf = Pdf::loadView('kelompok.export_pdf', compact('grouped'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('hasil_pembagian.pdf');
+        $periode = Periode::find($periode_id);
+
+        $namaFile =
+            'hasil_pembagian_kkn_reguler_' .
+            ($periode->tahun_kkn ?? date('Y')) .
+            '.pdf';
+
+        return $pdf->download($namaFile);
     }
 
     public function publish(Request $request)

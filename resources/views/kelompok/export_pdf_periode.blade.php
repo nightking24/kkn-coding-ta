@@ -3,27 +3,28 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan KKN</title>
+    <title>Laporan Kelompok KKN</title>
+
     <style>
         body {
-            font-family: Arial;
-            font-size: 11px;
+            font-family: Arial, sans-serif;
+            font-size: 10px;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .header {
+            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th {
-            background-color: #2c3e50;
-            color: white;
+            margin-bottom: 25px;
+            table-layout: fixed;
         }
 
         th,
@@ -31,17 +32,21 @@
             border: 1px solid black;
             padding: 5px;
             text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        .header {
-            margin-bottom: 10px;
+        thead th {
+            background-color: #b7dee8;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
 
-    <h2>LAPORAN KELOMPOK KKN</h2>
+    <h2>LAPORAN KELOMPOK KKN REGULER</h2>
 
     <div class="header">
         <p><b>Nama KKN:</b> {{ $periode->nama_kkn }}</p>
@@ -49,38 +54,116 @@
         <p><b>Lokasi:</b> {{ $periode->lokasi }}</p>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kelompok</th>
-                <th>Kecamatan</th>
-                <th>Desa</th>
-                <th>Dusun</th>
-                <th>DPL</th>
-                <th>No Telp DPL</th>
-                <th>APL</th>
-                <th>No Telp APL</th>
-                <th>Jumlah Peserta</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($kelompok as $i => $k)
+    @foreach($kelompok as $k)
+
+        <table>
+
+            <thead>
                 <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td>K{{ $k->nomor_kelompok }}</td>
-                    <td>{{ $k->nama_kecamatan }}</td>
-                    <td>{{ $k->desa }}</td>
-                    <td>{{ $k->dusun }}</td>
-                    <td>{{ optional($k->dpl)->nama ?? '-' }}</td>
-                    <td>{{ optional($k->dpl)->no_telp ?? '-' }}</td>
-                    <td>{{ optional($k->apl)->nama ?? '-' }}</td>
-                    <td>{{ optional($k->apl)->no_telp ?? '-' }}</td>
-                    <td>{{ $k->peserta->count() }}</td>
+                    <th>Kelompok</th>
+                    <th>NIM</th>
+                    <th>Nama Lengkap</th>
+                    <th>Prodi</th>
+                    <th>Gender</th>
+                    <th>Bahasa Jawa</th>
+                    <th>DPL</th>
+                    <th>Kontak DPL</th>
+                    <th>APL</th>
+                    <th>Kontak APL</th>
+                    <th>Desa</th>
+                    <th>Dusun</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+
+                @foreach($k->peserta as $p)
+
+                    <tr>
+
+                        {{-- KELOMPOK --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ $k->nomor_kelompok }}
+                            </td>
+                        @endif
+
+                        {{-- NIM --}}
+                        <td>
+                            {{ $p->nim }}
+                        </td>
+
+                        {{-- NAMA --}}
+                        <td>
+                            {{ $p->nama }}
+                        </td>
+
+                        {{-- PRODI --}}
+                        <td>
+                            {{ $p->prodi }}
+                        </td>
+
+                        {{-- GENDER --}}
+                        <td>
+                            {{ $p->gender }}
+                        </td>
+
+                        {{-- BAHASA JAWA --}}
+                        <td>
+                            {{ $p->bahasa_jawa ? 'Bisa' : 'Tidak' }}
+                        </td>
+
+                        {{-- DPL --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ optional($k->dpl)->nama ?? '-' }}
+                            </td>
+                        @endif
+
+                        {{-- KONTAK DPL --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ optional($k->dpl)->no_telp ?? '-' }}
+                            </td>
+                        @endif
+
+                        {{-- APL --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ optional($k->apl)->nama ?? '-' }}
+                            </td>
+                        @endif
+
+                        {{-- KONTAK APL --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ optional($k->apl)->no_telp ?? '-' }}
+                            </td>
+                        @endif
+
+                        {{-- DESA --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ $k->desa }}
+                            </td>
+                        @endif
+
+                        {{-- DUSUN --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($k->peserta) }}">
+                                {{ $k->dusun }}
+                            </td>
+                        @endif
+
+                    </tr>
+
+                @endforeach
+
+            </tbody>
+
+        </table>
+
+    @endforeach
 
 </body>
 

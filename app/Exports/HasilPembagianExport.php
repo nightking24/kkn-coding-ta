@@ -3,14 +3,13 @@
 namespace App\Exports;
 
 use App\Models\Kelompok;
-use App\Models\Periode;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class PesertaExport implements WithEvents
+class HasilPembagianExport implements WithEvents
 {
     protected $periode_id;
 
@@ -28,12 +27,6 @@ class PesertaExport implements WithEvents
                 $sheet = $event->sheet->getDelegate();
 
                 // ======================================
-                // DATA PERIODE
-                // ======================================
-    
-                $periode = Periode::find($this->periode_id);
-
-                // ======================================
                 // JUDUL
                 // ======================================
     
@@ -41,7 +34,7 @@ class PesertaExport implements WithEvents
 
                 $sheet->setCellValue(
                     'A1',
-                    'LAPORAN KELOMPOK KKN REGULER'
+                    'HASIL PEMBAGIAN KELOMPOK KKN REGULER'
                 );
 
                 $sheet->getStyle('A1')->applyFromArray([
@@ -55,41 +48,7 @@ class PesertaExport implements WithEvents
                     ]
                 ]);
 
-                // ======================================
-                // INFORMASI KKN
-                // ======================================
-    
-                $sheet->mergeCells('A2:L2');
-                $sheet->mergeCells('A3:L3');
-                $sheet->mergeCells('A4:L4');
-
-                $sheet->setCellValue(
-                    'A2',
-                    'Nama KKN : ' . ($periode->nama_kkn ?? '-')
-                );
-
-                $sheet->setCellValue(
-                    'A3',
-                    'Tahun : ' . ($periode->tahun_kkn ?? '-')
-                );
-
-                $sheet->setCellValue(
-                    'A4',
-                    'Lokasi : ' . ($periode->lokasi ?? '-')
-                );
-
-                $sheet->getStyle('A2:A4')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'size' => 11,
-                    ],
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_LEFT,
-                        'vertical' => Alignment::VERTICAL_CENTER,
-                    ]
-                ]);
-
-                $row = 6;
+                $row = 3;
 
                 // ======================================
                 // DATA KELOMPOK
@@ -110,7 +69,7 @@ class PesertaExport implements WithEvents
                     $startRow = $row;
 
                     // ======================================
-                    // HEADER KOLOM
+                    // HEADER
                     // ======================================
     
                     $headers = [
@@ -169,7 +128,7 @@ class PesertaExport implements WithEvents
                     $endRow = $row + $jumlahPeserta - 1;
 
                     // ======================================
-                    // MERGE CELL
+                    // MERGE
                     // ======================================
     
                     $mergeCols = ['A', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -179,13 +138,11 @@ class PesertaExport implements WithEvents
                     }
 
                     // ======================================
-                    // ISI INFO KELOMPOK
+                    // INFO KELOMPOK
                     // ======================================
     
-                    // nomor kelompok
                     $sheet->setCellValue("A{$row}", $k->nomor_kelompok);
 
-                    // DPL
                     $sheet->setCellValue(
                         "G{$row}",
                         optional($k->dpl)->nama
@@ -196,7 +153,6 @@ class PesertaExport implements WithEvents
                         optional($k->dpl)->no_telp
                     );
 
-                    // APL
                     $sheet->setCellValue(
                         "I{$row}",
                         optional($k->apl)->nama
@@ -207,15 +163,10 @@ class PesertaExport implements WithEvents
                         optional($k->apl)->no_telp
                     );
 
-                    // lokasi
                     $sheet->setCellValue("K{$row}", $k->desa);
 
                     $sheet->setCellValue("L{$row}", $k->dusun);
 
-                    // ======================================
-                    // STYLE INFO TENGAH
-                    // ======================================
-    
                     $sheet->getStyle("A{$row}:L{$endRow}")
                         ->applyFromArray([
                             'alignment' => [
@@ -234,7 +185,7 @@ class PesertaExport implements WithEvents
                         ]);
 
                     // ======================================
-                    // ISI PESERTA
+                    // PESERTA
                     // ======================================
     
                     foreach ($peserta as $index => $p) {
@@ -272,18 +223,10 @@ class PesertaExport implements WithEvents
                             ]);
                     }
 
-                    // ======================================
-                    // TINGGI ROW
-                    // ======================================
-    
                     for ($r = $startRow; $r <= $endRow; $r++) {
                         $sheet->getRowDimension($r)->setRowHeight(30);
                     }
 
-                    // ======================================
-                    // BORDER LUAR
-                    // ======================================
-    
                     $sheet->getStyle("A{$startRow}:L{$endRow}")
                         ->applyFromArray([
                             'borders' => [
@@ -305,10 +248,8 @@ class PesertaExport implements WithEvents
                         ->setAutoSize(true);
                 }
 
-                // khusus nama
                 $sheet->getColumnDimension('C')->setWidth(35);
 
-                // zoom
                 $sheet->getSheetView()->setZoomScale(85);
             }
         ];
