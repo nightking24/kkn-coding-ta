@@ -26,6 +26,10 @@
                                 <th>NIM</th>
                                 <th>Nama</th>
                                 <th>Prodi</th>
+                                <th>Gender</th>
+                                <th>Bahasa Jawa</th>
+                                <th>Riwayat Penyakit</th>
+                                <th>Kebutuhan Khusus</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -37,6 +41,21 @@
                                     <td>{{ $d['nim'] }}</td>
                                     <td>{{ $d['nama'] }}</td>
                                     <td>{{ $d['prodi'] }}</td>
+
+                                    <td>{{ $d['gender'] }}</td>
+
+                                    <td>
+                                        {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $d['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $d['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}
+                                    </td>
+
                                     <td>
                                         <span class="badge bg-success">OK</span>
                                     </td>
@@ -56,6 +75,10 @@
                                 <th>NIM</th>
                                 <th>Nama</th>
                                 <th>Prodi</th>
+                                <th>Gender</th>
+                                <th>Bahasa Jawa</th>
+                                <th>Riwayat Penyakit</th>
+                                <th>Kebutuhan Khusus</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -66,8 +89,25 @@
                                     <td>{{ $d['nim'] }}</td>
                                     <td>{{ $d['nama'] }}</td>
                                     <td>{{ $d['prodi'] }}</td>
+
+                                    <td>{{ $d['gender'] }}</td>
+
                                     <td>
-                                        <span class="badge bg-danger">Belum dapat kelompok</span>
+                                        {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $d['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $d['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            Belum dapat kelompok
+                                        </span>
                                     </td>
                                 </tr>
                             @endforeach
