@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Peserta extends Model
 {
     protected $table = 'peserta';
-    protected $primaryKey = 'nim';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    protected $primaryKey = 'id_peserta';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = true;
 
     protected $fillable = [
+        'id_peserta',
         'nim',
         'nama',
         'email',

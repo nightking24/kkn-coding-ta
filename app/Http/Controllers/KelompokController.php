@@ -472,7 +472,9 @@ class KelompokController extends Controller
 
         $melanggar = collect($result)->where('status', 'melanggar_rule')->count();
 
-        session(['hasil_generate' => $result]);
+        session([
+            'hasil_generate_' . $periode_id => $result
+        ]);
 
         if ($melanggar > 0) {
             return redirect('/randomisasi')
@@ -485,7 +487,9 @@ class KelompokController extends Controller
     public function randomisasi()
     {
         $this->setPeriodeSession();
-        $data = session('hasil_generate');
+        $periode_id = $this->getPeriodeId();
+
+        $data = session('hasil_generate_' . $periode_id);
 
         if (!$data) {
             return redirect('/import')->withErrors([
@@ -508,7 +512,7 @@ class KelompokController extends Controller
         }
 
         $this->logAktivitas('Simpan Hasil', 'Menyimpan hasil pembagian kelompok');
-        $data = session('hasil_generate');
+        $data = session('hasil_generate_' . $periode_id);
 
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
@@ -530,6 +534,8 @@ class KelompokController extends Controller
             session('periode_id')
             ?? request('periode_id')
         );
+
+        Peserta::where('id_periode', $periode_id)->delete();
 
         foreach ($data as $row) {
             Peserta::updateOrCreate(
@@ -569,9 +575,7 @@ class KelompokController extends Controller
         session(['periode_id' => $periode_id]);
 
         $peserta = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
-            ->whereHas('kelompok', function ($q) use ($periode_id) {
-                $q->where('id_periode', $periode_id);
-            })
+            ->where('id_periode', $periode_id)
             ->get();
 
         $kelompok = $peserta->whereNotNull('id_kelompok')->groupBy('id_kelompok');
@@ -611,34 +615,17 @@ class KelompokController extends Controller
             return $lock;
         }
 
-        // RESET PESERTA SAJA (JANGAN HAPUS DPL & APL)
-        Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
-            $q->where('id_periode', $periode_id);
-        })->update([
-                    'id_kelompok' => null
-                ]);
+        // RESET SEMUA PESERTA BERDASARKAN PERIODE (JANGAN HAPUS DPL & APL)
+        Peserta::where('id_periode', $periode_id)
+            ->update([
+                'id_kelompok' => null
+            ]);
+
+        // HAPUS SESSION RANDOMISASI
+        session()->forget('hasil_generate_' . $periode_id);
 
         return redirect()->route('hasil.pembagian')
             ->with('success', 'Pembagian berhasil direset');
-    }
-
-    public function resetTotal()
-    {
-        $this->logAktivitas('Reset Total', 'Semua data peserta dihapus');
-
-        $periode_id = $this->getPeriodeId();
-
-        if ($lock = $this->checkPublishLock($periode_id)) {
-            return $lock;
-        }
-
-        // HAPUS PESERTA SAJA (JANGAN HAPUS DPL & APL)
-        Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
-            $q->where('id_periode', $periode_id);
-        })->delete();
-
-        return redirect()->route('hasil.pembagian')
-            ->with('success', 'Semua data peserta dihapus');
     }
 
     public function exportExcel($periode_id)
@@ -712,9 +699,13 @@ class KelompokController extends Controller
                 return back()->with('error', 'Masih terdapat peserta yang belum mendapat kelompok.');
             }
 
-            $double = $peserta->groupBy('nim')->filter(function ($p) {
-                return $p->count() > 1;
-            });
+            $double = $peserta
+                ->groupBy(function ($p) {
+                    return $p->nim . '_' . $p->id_periode;
+                })
+                ->filter(function ($p) {
+                    return $p->count() > 1;
+                });
 
             if ($double->count() > 0) {
                 DB::rollback();
