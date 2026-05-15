@@ -74,11 +74,11 @@ class HasilPembagianExport implements WithEvents
     
                     $headers = [
                         'A' => 'Kelompok',
-                        'B' => 'NIM',
-                        'C' => 'Nama Lengkap',
-                        'D' => 'Prodi',
-                        'E' => 'Gender',
-                        'F' => 'Bahasa Jawa',
+                        'B' => 'No',
+                        'C' => 'NIM',
+                        'D' => 'Nama Lengkap',
+                        'E' => 'Prodi',
+                        'F' => 'Gender',
                         'G' => 'DPL',
                         'H' => 'Kontak DPL',
                         'I' => 'APL',
@@ -117,10 +117,6 @@ class HasilPembagianExport implements WithEvents
 
                     $row++;
 
-                    // ======================================
-                    // DATA PESERTA
-                    // ======================================
-    
                     $peserta = $k->peserta;
 
                     $jumlahPeserta = max($peserta->count(), 1);
@@ -192,17 +188,17 @@ class HasilPembagianExport implements WithEvents
 
                         $currentRow = $row + $index;
 
-                        $sheet->setCellValue("B{$currentRow}", $p->nim);
+                        $sheet->setCellValue("B{$currentRow}", $index + 1);
 
-                        $sheet->setCellValue("C{$currentRow}", $p->nama);
+                        $sheet->setCellValue("C{$currentRow}", $p->nim);
 
-                        $sheet->setCellValue("D{$currentRow}", $p->prodi);
+                        $sheet->setCellValue("D{$currentRow}", $p->nama);
 
-                        $sheet->setCellValue("E{$currentRow}", $p->gender);
+                        $sheet->setCellValue("E{$currentRow}", $p->prodi);
 
                         $sheet->setCellValue(
                             "F{$currentRow}",
-                            $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak'
+                            $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan'
                         );
 
                         $sheet->getStyle("B{$currentRow}:F{$currentRow}")
@@ -239,16 +235,12 @@ class HasilPembagianExport implements WithEvents
                     $row = $endRow + 2;
                 }
 
-                // ======================================
-                // AUTO SIZE
-                // ======================================
-    
                 foreach (range('A', 'L') as $col) {
                     $sheet->getColumnDimension($col)
                         ->setAutoSize(true);
                 }
 
-                $sheet->getColumnDimension('C')->setWidth(35);
+                $sheet->getColumnDimension('D')->setWidth(35);
 
                 $sheet->getSheetView()->setZoomScale(85);
             }

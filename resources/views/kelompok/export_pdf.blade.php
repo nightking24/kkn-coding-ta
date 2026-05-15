@@ -51,11 +51,11 @@
             <thead>
                 <tr>
                     <th>Kelompok</th>
+                    <th>No</th>
                     <th>NIM</th>
                     <th>Nama Lengkap</th>
                     <th>Prodi</th>
                     <th>Gender</th>
-                    <th>Bahasa Jawa</th>
                     <th>DPL</th>
                     <th>Kontak DPL</th>
                     <th>APL</th>
@@ -78,6 +78,10 @@
                             </td>
                         @endif
 
+                        <td>
+                            {{ $loop->iteration }}
+                        </td>
+
                         {{-- NIM --}}
                         <td>
                             {{ $p->nim }}
@@ -95,12 +99,7 @@
 
                         {{-- GENDER --}}
                         <td>
-                            {{ $p->gender }}
-                        </td>
-
-                        {{-- BAHASA JAWA --}}
-                        <td>
-                            {{ $p->bahasa_jawa ? 'Bisa' : 'Tidak' }}
+                            {{ $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan' }}
                         </td>
 
                         {{-- DPL --}}

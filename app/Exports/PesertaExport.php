@@ -115,11 +115,11 @@ class PesertaExport implements WithEvents
     
                     $headers = [
                         'A' => 'Kelompok',
-                        'B' => 'NIM',
-                        'C' => 'Nama Lengkap',
-                        'D' => 'Prodi',
-                        'E' => 'Gender',
-                        'F' => 'Bahasa Jawa',
+                        'B' => 'No',
+                        'C' => 'NIM',
+                        'D' => 'Nama Lengkap',
+                        'E' => 'Prodi',
+                        'F' => 'Gender',
                         'G' => 'DPL',
                         'H' => 'Kontak DPL',
                         'I' => 'APL',
@@ -241,17 +241,17 @@ class PesertaExport implements WithEvents
 
                         $currentRow = $row + $index;
 
-                        $sheet->setCellValue("B{$currentRow}", $p->nim);
+                        $sheet->setCellValue("B{$currentRow}", $index + 1);
 
-                        $sheet->setCellValue("C{$currentRow}", $p->nama);
+                        $sheet->setCellValue("C{$currentRow}", $p->nim);
 
-                        $sheet->setCellValue("D{$currentRow}", $p->prodi);
+                        $sheet->setCellValue("D{$currentRow}", $p->nama);
 
-                        $sheet->setCellValue("E{$currentRow}", $p->gender);
+                        $sheet->setCellValue("E{$currentRow}", $p->prodi);
 
                         $sheet->setCellValue(
                             "F{$currentRow}",
-                            $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak'
+                            $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan'
                         );
 
                         $sheet->getStyle("B{$currentRow}:F{$currentRow}")
