@@ -212,24 +212,14 @@
                     // kalau data tidak ditemukan
                     if (!data) return;
 
-                    // hanya isi field kalau masih kosong
-                    if (!$('input[name="nomor_telepon"]').val()) {
-                        $('input[name="nomor_telepon"]').val(data.nomor_telepon ?? '');
-                    }
+                    // isi field TANPA menghapus manual input
+                    $('input[name="nomor_telepon"]').val(data.nomor_telepon ?? $('input[name="nomor_telepon"]').val());
 
-                    if (!$('input[name="alamat"]').val()) {
-                        $('input[name="alamat"]').val(data.alamat ?? '');
-                    }
+                    $('input[name="alamat"]').val(data.alamat ?? $('input[name="alamat"]').val());
 
-                    if (!$('input[name="latitude"]').val()) {
-                        $('input[name="latitude"]').val(data.latitude ?? '');
-                    }
+                    $('input[name="latitude"]').val(data.latitude ?? $('input[name="latitude"]').val());
 
-                    if (!$('input[name="longitude"]').val()) {
-                        $('input[name="longitude"]').val(data.longitude ?? '');
-                    }
-
-                    $('#faskes').val(data.faskes == 1 ? "1" : "0");
+                    $('input[name="longitude"]').val(data.longitude ?? $('input[name="longitude"]').val());
 
                 });
 

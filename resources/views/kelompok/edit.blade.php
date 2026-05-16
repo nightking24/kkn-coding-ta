@@ -186,8 +186,6 @@
                         data.longitude ?? $('input[name="longitude"]').val()
                     );
 
-                    $('select[name="faskes"]').val(data.faskes);
-
                 });
 
             });
