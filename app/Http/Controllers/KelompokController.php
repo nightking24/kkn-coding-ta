@@ -578,7 +578,11 @@ class KelompokController extends Controller
             ->where('id_periode', $periode_id)
             ->get();
 
-        $kelompok = $peserta->whereNotNull('id_kelompok')->groupBy('id_kelompok');
+        $kelompok = $peserta->whereNotNull('id_kelompok')
+            ->groupBy('id_kelompok')
+            ->sortBy(function ($group) {
+                return optional($group->first()->kelompok)->nomor_kelompok ?? 0;
+            });
         $belum = $peserta->whereNull('id_kelompok');
 
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();

@@ -19,7 +19,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
             <!-- Lokasi Section -->
             <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
-                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">📍 Lokasi</h5>
+                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">📍 Detail Lokasi</h5>
                 <p style="margin: 8px 0;"><b>Kecamatan:</b> <span style="color: #666;">{{ $kelompok->nama_kecamatan }}</span></p>
                 <p style="margin: 8px 0;"><b>Desa:</b> <span style="color: #666;">{{ $kelompok->desa }}</span></p>
                 <p style="margin: 8px 0;"><b>Dusun:</b> <span style="color: #666;">{{ $kelompok->dusun }}</span></p>
@@ -27,9 +27,9 @@
 
             <!-- APL Section -->
             <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
-                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">👨‍🏫 Pendamping</h5>
-                <p style="margin: 8px 0;"><b>APL:</b> <span style="color: #666;">{{ optional($kelompok->apl)->nama }}</span>
-                </p>
+                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">👨‍🏫 Asisten Pembimbing Lapangan (APL)</h5>
+                <p style="margin: 8px 0;"><b>APL:</b> <span style="color: #666;">{{ optional($kelompok->apl)->nama }}</span></p>
+                <p style="margin: 8px 0;"><b>No HP:</b> <span style="color: #666;">{{ optional($kelompok->apl)->no_telp }}</span></p>
             </div>
         </div>
     </div>
