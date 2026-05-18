@@ -25,7 +25,7 @@
                 <div class="form-group">
                     <label>Nomor Kelompok</label>
                     <input type="text" name="nomor_kelompok" class="form-control" value="{{ $data->nomor_kelompok }}"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="3">
                 </div>
 
                 <div class="form-group">
@@ -39,9 +39,15 @@
                     <input type="text" id="desa" name="desa" class="form-control" value="{{ $data->desa }}">
                 </div>
 
+                {{-- Dusun --}}
                 <div class="form-group">
                     <label>Dusun</label>
+
                     <input type="text" id="dusun" name="dusun" class="form-control" value="{{ $data->dusun }}">
+
+                    <small style="color:gray; display:block; margin-top:5px;">
+                        *Autofill data lokasi
+                    </small>
                 </div>
 
                 <div class="form-group">
@@ -60,17 +66,21 @@
                             <option value="{{ $t->nama_tuan_rumah }}">
                         @endforeach
                     </datalist>
+
+                    <small style="color:gray; display:block; margin-top:5px;">
+                        *Autofill data tuan rumah
+                    </small>
                 </div>
 
                 <div class="form-group">
                     <label>Nomor Telepon</label>
                     <input type="text" name="nomor_telepon" class="form-control" value="{{ $data->nomor_telepon }}"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
                 </div>
 
                 <div class="form-group">
                     <label>Alamat</label>
-                    <input type="text" name="alamat" class="form-control" value="{{ $data->alamat }}">
+                    <input type="text" name="alamat" class="form-control" value="{{ $data->alamat }}" maxlength="255">
                 </div>
 
                 <div class="form-group">
@@ -95,7 +105,7 @@
 
                 <div class="form-group">
                     <label>Tahun KKN</label>
-                    <input type="number" name="tahun_kkn" class="form-control" value="{{ $data->tahun_kkn }}">
+                    <input type="number" name="tahun_kkn" class="form-control" value="{{ $data->tahun_kkn }}" maxlength="4">
                 </div>
 
                 <div class="form-group">

@@ -41,7 +41,8 @@
                 <div class="form-group">
                     <label for="nomor_kelompok">Nomor Kelompok</label>
                     <input type="text" id="nomor_kelompok" name="nomor_kelompok" class="form-control"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric"
+                        maxlength="3">
                 </div>
 
                 {{-- Kecamatan --}}
@@ -61,7 +62,12 @@
                 {{-- Dusun --}}
                 <div class="form-group">
                     <label for="dusun">Dusun</label>
+
                     <input type="text" id="dusun" name="dusun" class="form-control">
+
+                    <small style="color: gray; display: block; margin-top: 5px;">
+                        *Autofill lokasi (kecamatan, desa, nama dukuh, kapasitas, semester, tahun kkn, faskes)
+                    </small>
                 </div>
 
                 {{-- Nama Dukuh --}}
@@ -75,26 +81,31 @@
                     <label>Tuan Rumah</label>
 
                     <input list="list_tuan" id="tuan_rumah" name="id_tuan_rumah" class="form-control"
-                        placeholder="Ketik nama tuan rumah..." required>
+                        placeholder="Ketik nama tuan rumah...">
 
                     <datalist id="list_tuan">
                         @foreach($tuan_rumah as $t)
                             <option value="{{ $t->nama_tuan_rumah }}">
                         @endforeach
                     </datalist>
+
+                    <small style="color: gray; display: block; margin-top: 5px;">
+                        *Autofill data tuan rumah (nomor telepon, alamat, latitude, longitude)
+                    </small>
                 </div>
 
                 {{-- Nomor Telepon --}}
                 <div class="form-group">
                     <label for="nomor_telepon">Nomor Telepon</label>
                     <input type="text" id="nomor_telepon" name="nomor_telepon" class="form-control"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric"
+                        maxlength="15">
                 </div>
 
                 {{-- Alamat --}}
                 <div class="form-group">
                     <label for="alamat">Alamat</label>
-                    <input type="text" id="alamat" name="alamat" class="form-control">
+                    <input type="text" id="alamat" name="alamat" class="form-control" maxlength="255">
                 </div>
 
                 {{-- Faskes --}}
@@ -142,23 +153,25 @@
                 <div class="form-group">
                     <label for="tahun_kkn">Tahun KKN</label>
                     <input type="number" id="tahun_kkn" name="tahun_kkn" class="form-control"
-                        value="{{ old('tahun_kkn', session('retain_kelompok.tahun_kkn')) }}">
+                        value="{{ old('tahun_kkn', session('retain_kelompok.tahun_kkn')) }}" maxlength="4">
                 </div>
 
                 {{-- Latitude --}}
                 <div class="form-group">
                     <label for="latitude">Latitude</label>
-                    <input type="number" id="latitude" name="latitude" class="form-control" step="any" required min="-90"
-                        max="90">
+                    <input type="number" id="latitude" name="latitude" class="form-control" step="any" min="-90" max="90">
+                    <small style="color: gray; display: block; margin-top: 5px;">
+                        Contoh latitude: -7.7956
+                    </small>
                 </div>
 
                 {{-- Longitude --}}
                 <div class="form-group">
                     <label for="longitude">Longitude</label>
-                    <input type="number" id="longitude" name="longitude" class="form-control" step="any" required min="-180"
+                    <input type="number" id="longitude" name="longitude" class="form-control" step="any" min="-180"
                         max="180">
                     <small style="color: gray; display: block; margin-top: 5px;">
-                        Contoh koordinat: Latitude -7.7956, Longitude 110.3695
+                        Contoh longitude: 110.3695
                     </small>
                 </div>
 
@@ -307,16 +320,24 @@
             // =========================
             // VALIDASI FORM
             // =========================
+            // =========================
+            // VALIDASI FORM
+            // =========================
             $('form').on('submit', function () {
-                let nama = $('#tuan_rumah').val();
+
                 let telepon = $('input[name="nomor_telepon"]').val();
 
-                if (!nama || nama.trim() === '') {
-                    alert('Nama tuan rumah wajib diisi');
+                // VALIDASI NOMOR TELEPON SAJA
+                // karena ini frontend helper
+                // validasi utama tetap di Laravel
+
+                if (telepon && telepon.length > 0 && telepon.length < 10) {
+
+                    alert('Nomor telepon harus 10 sampai 15 digit');
+
                     return false;
                 }
 
-                if (!telepon || telepon.length < 10) { alert('Nomor telepon tidak valid'); return false; }
             });
         }); </script>
 @endsection

@@ -109,7 +109,7 @@
 
                         {{-- GENDER --}}
                         <td>
-                            {{ $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan' }}
+                            {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
                         </td>
 
                         {{-- DPL --}}

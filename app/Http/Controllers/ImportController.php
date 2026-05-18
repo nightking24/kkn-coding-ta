@@ -159,12 +159,35 @@ class ImportController extends Controller
     {
         $value = strtolower(trim($value));
 
-        if (in_array($value, ['l', 'laki-laki', 'laki laki', 'male'])) {
-            return 'L';
+        // =========================
+        // LAKI-LAKI / PRIA
+        // =========================
+        if (
+            in_array($value, [
+                'l',
+                'laki-laki',
+                'laki laki',
+                'pria',
+                'male',
+                'cowok'
+            ])
+        ) {
+            return 'Pria';
         }
 
-        if (in_array($value, ['p', 'perempuan', 'female'])) {
-            return 'P';
+        // =========================
+        // PEREMPUAN / WANITA
+        // =========================
+        if (
+            in_array($value, [
+                'p',
+                'perempuan',
+                'wanita',
+                'female',
+                'cewe'
+            ])
+        ) {
+            return 'Wanita';
         }
 
         return null;
@@ -174,7 +197,16 @@ class ImportController extends Controller
     {
         $value = strtolower(trim($value));
 
-        if (in_array($value, ['bisa', 'ya', '1'])) {
+        if (
+            in_array($value, [
+                'bisa',
+                'ya',
+                'y',
+                'yes',
+                '1',
+                'true'
+            ])
+        ) {
             return 1;
         }
 
@@ -185,18 +217,38 @@ class ImportController extends Controller
     {
         $value = strtolower(trim($value));
 
-        if ($value == '' || $value == '-' || $value == 'tidak') {
+        if (
+            in_array($value, [
+                '',
+                '-',
+                'tidak',
+                'tidak ada',
+                'no',
+                '0',
+                'false'
+            ])
+        ) {
             return 0;
         }
 
-        return 1; // apapun isi dianggap "ya"
+        return 1;
     }
 
     private function convertPenyakit($value)
     {
         $value = strtolower(trim($value));
 
-        if ($value == '' || $value == '-' || $value == 'tidak') {
+        if (
+            in_array($value, [
+                '',
+                '-',
+                'tidak',
+                'tidak ada',
+                'no',
+                '0',
+                'false'
+            ])
+        ) {
             return 0;
         }
 
@@ -246,8 +298,8 @@ class ImportController extends Controller
                     'nim' => trim($row['nim']),
                     'email' => isset($row['email']) ? trim($row['email']) : null,
                     'prodi' => isset($row['prodi']) ? trim($row['prodi']) : null,
-                    'gender' => strtoupper($row['gender']) == 'L' ? 'L' : 'P',
-                    'bahasa_jawa' => isset($row['bahasa_jawa']) ? trim($row['bahasa_jawa']) : null,
+                    'gender' => $row['gender'] ?? null,
+                    'bahasa_jawa' => $row['bahasa_jawa'] ?? 0,
                     'riwayat_penyakit' => $row['riwayat_penyakit'],
                     'detail_penyakit' => $row['detail_penyakit'] ?? null,
                     'berkebutuhan_khusus' => $row['berkebutuhan_khusus'],

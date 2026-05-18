@@ -135,16 +135,63 @@ class KelompokController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'nama_kecamatan' => 'required',
-            'nik' => 'nullable',
-            'nim' => 'nullable',
+            'nik' => 'required',
+            'nim' => 'required',
         ], [
+            // NOMOR KELOMPOK
+            'nomor_kelompok.required' => 'Nomor Kelompok wajib diisi',
+            'nomor_kelompok.integer' => 'Nomor Kelompok harus angka',
+            'nomor_kelompok.min' => 'Nomor Kelompok minimal 1',
+
+            // KECAMATAN
+            'nama_kecamatan.required' => 'Nama Kecamatan wajib diisi',
+
+            // DESA
+            'desa.required' => 'Desa wajib diisi',
+
+            // DUSUN
+            'dusun.required' => 'Dusun wajib diisi',
+
+            // NAMA DUKUH
+            'nama_dukuh.required' => 'Nama Dukuh wajib diisi',
+
+            // TUAN RUMAH
+            'id_tuan_rumah.required' => 'Nama Tuan Rumah wajib diisi',
+
+            // ALAMAT
+            'alamat.required' => 'Alamat wajib diisi',
+
+            // SEMESTER
+            'semester.required' => 'Semester wajib dipilih',
+
+            // TAHUN KKN
+            'tahun_kkn.required' => 'Tahun KKN wajib diisi',
+            'tahun_kkn.digits' => 'Tahun KKN harus 4 digit',
+
+            // NOMOR TELEPON
+            'nomor_telepon.required' => 'Nomor Telepon wajib diisi',
+            'nomor_telepon.digits_between' => 'Nomor Telepon harus 10 sampai 15 digit',
+
+            // KAPASITAS
+            'kapasitas.required' => 'Kapasitas wajib diisi',
+            'kapasitas.integer' => 'Kapasitas harus angka',
+            'kapasitas.min' => 'Kapasitas minimal 1',
+
+            // LATITUDE
             'latitude.required' => 'Latitude wajib diisi',
             'latitude.numeric' => 'Latitude harus angka',
             'latitude.between' => 'Latitude harus antara -90 sampai 90',
 
+            // LONGITUDE
             'longitude.required' => 'Longitude wajib diisi',
             'longitude.numeric' => 'Longitude harus angka',
             'longitude.between' => 'Longitude harus antara -180 sampai 180',
+
+            // DPL
+            'nik.required' => 'DPL wajib dipilih',
+
+            // APL
+            'nim.required' => 'APL wajib dipilih',
         ]);
 
         // HANDLE TUAN RUMAH (FIX AMAN)
@@ -246,9 +293,13 @@ class KelompokController extends Controller
 
     public function edit($id)
     {
-        $data = Kelompok::findOrFail($id);
+        $this->setPeriodeSession();
 
         $periode_id = $this->getPeriodeId();
+
+        $data = Kelompok::where('id_periode', $periode_id)
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
 
         $dpl = Dpl::where('id_periode', $periode_id)->get();
         $apl = Apl::where('id_periode', $periode_id)->get();
@@ -285,25 +336,71 @@ class KelompokController extends Controller
             'semester' => 'required|in:Gasal,Genap',
             'tahun_kkn' => 'required|digits:4',
             'nama_kecamatan' => 'required|string|max:255',
-            'nik' => 'nullable',
-            'nim' => 'nullable',
+            'nik' => 'required',
+            'nim' => 'required',
 
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ], [
+            // NOMOR KELOMPOK
+            'nomor_kelompok.required' => 'Nomor Kelompok wajib diisi',
+            'nomor_kelompok.integer' => 'Nomor Kelompok harus angka',
+            'nomor_kelompok.min' => 'Nomor Kelompok minimal 1',
+
+            // KECAMATAN
+            'nama_kecamatan.required' => 'Nama Kecamatan wajib diisi',
+
+            // DESA
+            'desa.required' => 'Desa wajib diisi',
+
+            // DUSUN
+            'dusun.required' => 'Dusun wajib diisi',
+
+            // NAMA DUKUH
+            'nama_dukuh.required' => 'Nama Dukuh wajib diisi',
+
+            // TUAN RUMAH
+            'id_tuan_rumah.required' => 'Nama Tuan Rumah wajib diisi',
+
+            // ALAMAT
+            'alamat.required' => 'Alamat wajib diisi',
+
+            // SEMESTER
+            'semester.required' => 'Semester wajib dipilih',
+
+            // TAHUN KKN
+            'tahun_kkn.required' => 'Tahun KKN wajib diisi',
+            'tahun_kkn.digits' => 'Tahun KKN harus 4 digit',
+
+            // NOMOR TELEPON
+            'nomor_telepon.required' => 'Nomor Telepon wajib diisi',
+            'nomor_telepon.digits_between' => 'Nomor Telepon harus 10 sampai 15 digit',
+
+            // KAPASITAS
+            'kapasitas.required' => 'Kapasitas wajib diisi',
+            'kapasitas.integer' => 'Kapasitas harus angka',
+            'kapasitas.min' => 'Kapasitas minimal 1',
+
+            // LATITUDE
             'latitude.required' => 'Latitude wajib diisi',
             'latitude.numeric' => 'Latitude harus angka',
             'latitude.between' => 'Latitude harus antara -90 sampai 90',
 
+            // LONGITUDE
             'longitude.required' => 'Longitude wajib diisi',
             'longitude.numeric' => 'Longitude harus angka',
             'longitude.between' => 'Longitude harus antara -180 sampai 180',
 
-            'nomor_kelompok.numeric' => 'Nomor kelompok harus angka',
-            'kapasitas.numeric' => 'Kapasitas harus angka',
+            // DPL
+            'nik.required' => 'DPL wajib dipilih',
+
+            // APL
+            'nim.required' => 'APL wajib dipilih',
         ]);
 
-        $data = Kelompok::findOrFail($id);
+        $data = Kelompok::where('id_periode', $periode_id)
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
 
         // ==========================
 // HANDLE TUAN RUMAH (UPDATE TANPA INSERT BARU)
@@ -377,13 +474,18 @@ class KelompokController extends Controller
             "Menghapus kelompok ID $id"
         );
 
+        $this->setPeriodeSession();
+
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
 
-        Kelompok::destroy($id);
+        Kelompok::where('id_periode', $periode_id)
+            ->where('id_kelompok', $id)
+            ->delete();
+
         return redirect('/kelompok');
     }
 
@@ -410,6 +512,35 @@ class KelompokController extends Controller
         $result = [];
 
         foreach ($data as $peserta) {
+            // =========================
+// NORMALISASI GENDER
+// =========================
+
+            $gender = strtolower(trim(
+                $peserta['gender']
+                ?? $peserta['Gender']
+                ?? $peserta['jenis_kelamin']
+                ?? $peserta['Jenis Kelamin']
+                ?? $peserta['jk']
+                ?? ''
+            ));
+
+            if (
+                $gender == 'l' ||
+                $gender == 'laki-laki' ||
+                $gender == 'laki laki' ||
+                $gender == 'pria'
+            ) {
+                $peserta['gender'] = 'Pria';
+            } elseif (
+                $gender == 'p' ||
+                $gender == 'perempuan' ||
+                $gender == 'wanita'
+            ) {
+                $peserta['gender'] = 'Wanita';
+            } else {
+                $peserta['gender'] = null;
+            }
 
             $kandidat = [];
 
@@ -435,7 +566,90 @@ class KelompokController extends Controller
                         continue;
                 }
 
-                $kandidat[] = $kelompok;
+                // =========================
+                // SOFT RULE SCORING
+                // =========================
+                $score = 0;
+
+                // =========================
+                // PRIORITAS FASKES
+                // peserta khusus diprioritaskan
+                // ke kelompok yang punya faskes
+                // =========================
+                if (
+                    $isKhusus &&
+                    $kelompok->faskes == 1
+                ) {
+                    $score += 5;
+                }
+
+                // =========================
+                // SEBARAN PRODI
+                // jika belum ada prodi sama
+                // maka tambah score
+                // =========================
+                $jumlahProdiSama = collect($result)
+                    ->where('id_kelompok', $kelompok->id_kelompok)
+                    ->where('prodi', $peserta['prodi'])
+                    ->count();
+
+                if ($jumlahProdiSama == 0) {
+                    $score += 2;
+                }
+
+                // =========================
+                // SEBARAN BAHASA JAWA
+                // minimal ada 1 orang
+                // bisa bahasa jawa tiap kelompok
+                // =========================
+                $jumlahBisaJawa = collect($result)
+                    ->where('id_kelompok', $kelompok->id_kelompok)
+                    ->where('bahasa_jawa', 1)
+                    ->count();
+
+                if (
+                    $peserta['bahasa_jawa'] == 1 &&
+                    $jumlahBisaJawa == 0
+                ) {
+                    $score += 3;
+                }
+
+                // =========================
+                // KESEIMBANGAN GENDER
+                // =========================
+                $laki = collect($result)
+                    ->where('id_kelompok', $kelompok->id_kelompok)
+                    ->where('gender', 'Pria')
+                    ->count();
+
+                $perempuan = collect($result)
+                    ->where('id_kelompok', $kelompok->id_kelompok)
+                    ->where('gender', 'Wanita')
+                    ->count();
+
+                // peserta laki
+                if (
+                    $peserta['gender'] == 'Pria' &&
+                    $laki <= $perempuan
+                ) {
+                    $score += 1;
+                }
+
+                // peserta perempuan
+                if (
+                    $peserta['gender'] == 'Wanita' &&
+                    $perempuan <= $laki
+                ) {
+                    $score += 1;
+                }
+
+                // =========================
+                // SIMPAN KANDIDAT + SCORE
+                // =========================
+                $kandidat[] = [
+                    'kelompok' => $kelompok,
+                    'score' => $score
+                ];
             }
 
             if (count($kandidat) == 0) {
@@ -454,7 +668,16 @@ class KelompokController extends Controller
                 continue;
             }
 
-            $pilih = $kandidat[array_rand($kandidat)];
+            // =========================
+            // URUTKAN BERDASARKAN SCORE
+            // SCORE TERBESAR DIPILIH
+            // =========================
+            $kandidat = collect($kandidat)
+                ->sortByDesc('score')
+                ->values();
+
+            // ambil kandidat terbaik
+            $pilih = $kandidat[0]['kelompok'];
 
             $result[] = [
                 'nim' => $peserta['nim'],

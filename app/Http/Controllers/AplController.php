@@ -58,6 +58,7 @@ class AplController extends Controller
 
     public function create()
     {
+        $this->setPeriodeSession();
         return view('apl.create');
     }
 
@@ -94,8 +95,21 @@ class AplController extends Controller
             ],
             'no_telp' => 'required|digits_between:10,15'
         ], [
+            'nim.required' => 'NIM wajib diisi',
+            'nim.digits_between' => 'NIM harus 8 sampai 15 digit',
+            'nim.unique' => 'NIM sudah digunakan pada periode ini',
+
+            // NAMA
+            'nama.required' => 'Nama wajib diisi',
+
+            // EMAIL
             'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email harus mengandung @'
+            'email.email' => 'Format email harus mengandung @',
+            'email.unique' => 'Email sudah digunakan pada periode ini',
+
+            // NO TELP
+            'no_telp.required' => 'Nomor telepon wajib diisi',
+            'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
         Apl::create($request->all());
 
@@ -104,6 +118,7 @@ class AplController extends Controller
 
     public function edit($nim)
     {
+        $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
         $data = Apl::where('nim', $nim)
             ->where('id_periode', $periode_id)
@@ -113,6 +128,7 @@ class AplController extends Controller
 
     public function update(Request $request, $nim)
     {
+        $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -146,8 +162,22 @@ class AplController extends Controller
             ],
             'no_telp' => 'required|digits_between:10,15'
         ], [
+            // NIM
+            'nim.required' => 'NIM wajib diisi',
+            'nim.digits_between' => 'NIM harus 8 sampai 15 digit',
+            'nim.unique' => 'NIM sudah digunakan pada periode ini',
+
+            // NAMA
+            'nama.required' => 'Nama wajib diisi',
+
+            // EMAIL
             'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email harus mengandung @'
+            'email.email' => 'Format email harus mengandung @',
+            'email.unique' => 'Email sudah digunakan pada periode ini',
+
+            // NO TELP
+            'no_telp.required' => 'Nomor telepon wajib diisi',
+            'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
 
         try {
@@ -210,7 +240,8 @@ class AplController extends Controller
 
         $kelompok = \App\Models\Kelompok::with('peserta', 'dpl')
             ->where('id_periode', $periode_id)
-            ->findOrFail($id);
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
 
         return view('apl.detail_new', compact('kelompok'));
     }

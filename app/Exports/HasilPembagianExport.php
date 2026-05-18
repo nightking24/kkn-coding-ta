@@ -198,7 +198,9 @@ class HasilPembagianExport implements WithEvents
 
                         $sheet->setCellValue(
                             "F{$currentRow}",
-                            $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan'
+                            in_array($p->gender, ['L', 'Pria'])
+                            ? 'Laki-Laki'
+                            : 'Perempuan'
                         );
 
                         $sheet->getStyle("B{$currentRow}:F{$currentRow}")

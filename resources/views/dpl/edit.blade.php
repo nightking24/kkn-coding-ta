@@ -49,7 +49,7 @@
             </div>
         @endif
 
-        <form action="/dpl/update/{{ $data->nik }}" method="POST">
+        <form action="/dpl/update/{{ $data->id_dpl }}" method="POST">
             @csrf
 
             <div class="form-grid">
@@ -57,13 +57,13 @@
                 <div class="form-group">
                     <label>NIK</label>
                     <input type="text" name="nik" class="form-control" value="{{ $data->nik }}" pattern="[0-9]*"
-                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '') "maxlength="16">
                 </div>
 
                 <div class="form-group">
                     <label>NIDN</label>
-                    <input type="text" name="nidn" value="{{ $data->nidn }}" class="form-control" value="{{ $data->nik }}"
-                        pattern="[0-9]*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <input type="text" name="nidn" value="{{ $data->nidn }}" class="form-control"
+                        pattern="[0-9]*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '') "maxlength="10">
                 </div>
 
                 <div class="form-group">
@@ -73,13 +73,13 @@
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="email" value="{{ $data->email }}" class="form-control" required>
+                    <input type="text" name="email" value="{{ $data->email }}" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label>No Telepon</label>
                     <input type="text" name="no_telp" class="form-control" value="{{ $data->no_telp }}" pattern="[0-9]*"
-                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
                 </div>
 
             </div>

@@ -58,6 +58,7 @@ class DplController extends Controller
 
     public function create()
     {
+        $this->setPeriodeSession();
         return view('dpl.create');
     }
 
@@ -91,10 +92,22 @@ class DplController extends Controller
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
-            'no_telp' => 'required|digits_between:10,15'
+            'no_telp' => 'required|digits_between:10,15',
         ], [
+            'nik.required' => 'NIK wajib diisi',
+            'nik.unique' => 'NIK sudah digunakan pada periode ini',
+
+            'nidn.required' => 'NIDN wajib diisi',
+            'nidn.digits' => 'NIDN harus 10 digit',
+
+            'nama.required' => 'Nama wajib diisi',
+
             'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email harus mengandung @'
+            'email.email' => 'Format email harus mengandung @',
+            'email.unique' => 'Email sudah digunakan pada periode ini',
+
+            'no_telp.required' => 'Nomor telepon wajib diisi',
+            'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
 
         Dpl::create($request->all());
@@ -104,6 +117,7 @@ class DplController extends Controller
 
     public function edit($nik)
     {
+        $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
         $data = Dpl::where('nik', $nik)
             ->where('id_periode', $periode_id)
@@ -112,8 +126,9 @@ class DplController extends Controller
         return view('dpl.edit', compact('data'));
     }
 
-    public function update(Request $request, $nik)
+    public function update(Request $request, $id)
     {
+        $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -126,7 +141,7 @@ class DplController extends Controller
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
-        $data = Dpl::where('nik', $nik)
+        $data = Dpl::where('id_dpl', $id)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
 
@@ -137,6 +152,7 @@ class DplController extends Controller
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
                     ->ignore($data->id_dpl, 'id_dpl')
             ],
+            'nidn' => 'required|digits:10',
             'nama' => 'required',
             'email' => [
                 'required',
@@ -145,14 +161,32 @@ class DplController extends Controller
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
                     ->ignore($data->id_dpl, 'id_dpl')
             ],
-            'no_telp' => 'required|digits_between:10,15'
+            'no_telp' => 'required|digits_between:10,15',
         ], [
+            'nik.required' => 'NIK wajib diisi',
+            'nik.unique' => 'NIK sudah digunakan pada periode ini',
+
+            'nidn.required' => 'NIDN wajib diisi',
+            'nidn.digits' => 'NIDN harus 10 digit',
+
+            'nama.required' => 'Nama wajib diisi',
+
             'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email harus mengandung @'
+            'email.email' => 'Format email harus mengandung @',
+            'email.unique' => 'Email sudah digunakan pada periode ini',
+
+            'no_telp.required' => 'Nomor telepon wajib diisi',
+            'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
 
         try {
-            $data->update($request->all());
+            $data->update([
+                'nik' => $request->nik,
+                'nidn' => $request->nidn,
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'no_telp' => $request->no_telp,
+            ]);
 
             return redirect('/dpl')->with('success', 'Data DPL berhasil diupdate');
 
@@ -160,8 +194,10 @@ class DplController extends Controller
             return back()->withErrors(['error' => 'Gagal update data'])->withInput();
         }
     }
+    
     public function delete($nik)
     {
+        $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -212,7 +248,8 @@ class DplController extends Controller
 
         $kelompok = \App\Models\Kelompok::with(['peserta', 'apl'])
             ->where('id_periode', $periode_id)
-            ->findOrFail($id);
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
 
         return view('dpl.detail_dpl_view', compact('kelompok'));
     }

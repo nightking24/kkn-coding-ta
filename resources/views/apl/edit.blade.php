@@ -57,7 +57,7 @@
                 <div class="form-group">
                     <label>NIM</label>
                     <input type="text" name="nim" class="form-control" value="{{ $data->nim }}" pattern="[0-9]*"
-                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
                 </div>
 
                 <div class="form-group">
@@ -67,13 +67,13 @@
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="email" value="{{ $data->email }}" class="form-control" required>
+                    <input type="text" name="email" value="{{ $data->email }}" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label>No Telepon</label>
                     <input type="text" name="no_telp" class="form-control" value="{{ $data->no_telp }}" pattern="[0-9]*"
-                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
 
                 </div>
 
