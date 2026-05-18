@@ -263,16 +263,24 @@
 
         <div class="sidebar">
 
-            @if(session('user')->role == 'admin')
-                @include('layouts.sidebar_admin')
-            @elseif(session('user')->role == 'peserta')
-                @include('layouts.sidebar_peserta')
-            @elseif(session('user')->role == 'dpl')
-                @include('layouts.sidebar_dpl')
-            @elseif(session('user')->role == 'apl')
-                @include('layouts.sidebar_apl')
-            @endif
+            @if(session()->has('user'))
 
+                @if(session('user')->role == 'admin')
+                    @include('layouts.sidebar_admin')
+
+                @elseif(session('user')->role == 'peserta')
+                    @include('layouts.sidebar_peserta')
+
+                @elseif(session('user')->role == 'dpl')
+                    @include('layouts.sidebar_dpl')
+
+                @elseif(session('user')->role == 'apl')
+                    @include('layouts.sidebar_apl')
+
+                @endif
+
+            @endif
+            
         </div>
 
         <div class="content">

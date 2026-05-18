@@ -402,34 +402,54 @@ class KelompokController extends Controller
             ->where('id_kelompok', $id)
             ->firstOrFail();
 
+        $data = Kelompok::where('id_periode', $periode_id)
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
+
         // ==========================
-        // HANDLE TUAN RUMAH (UPDATE TANPA INSERT BARU)
+        // HANDLE TUAN RUMAH ANTI DUPLIKAT
         // ==========================
 
-        // ambil id tuan rumah lama dari kelompok
-        $id_tuan_rumah = $data->id_tuan_rumah;
+        $nama_tuan_rumah = trim($request->id_tuan_rumah);
 
-        // update langsung data lama
-        DB::table('tuan_rumah')
-            ->where('id_tuan_rumah', $id_tuan_rumah)
-            ->update([
+        // cek apakah nama sudah ada
+        $tuanRumahExist = DB::table('tuan_rumah')
+            ->whereRaw(
+                'LOWER(nama_tuan_rumah) = ?',
+                [strtolower($nama_tuan_rumah)]
+            )
+            ->first();
 
-                // 🔥 JANGAN PAKAI ucwords
-                // supaya DD tidak berubah jadi Dd
-                'nama_tuan_rumah' => trim($request->id_tuan_rumah),
+        if ($tuanRumahExist) {
 
-                'dusun' => $request->dusun,
-                'desa' => $request->desa,
-                'nomor_telepon' => $request->nomor_telepon,
-                'alamat' => $request->alamat,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'nama_kecamatan' => $request->nama_kecamatan,
-                'faskes' => $request->faskes
-            ]);
+            // pakai ID yang sudah ada
+            $id_tuan_rumah = $tuanRumahExist->id_tuan_rumah;
 
+        } else {
+
+            // pakai ID lama
+            $id_tuan_rumah = $data->id_tuan_rumah;
+
+            // update data lama
+            DB::table('tuan_rumah')
+                ->where('id_tuan_rumah', $id_tuan_rumah)
+                ->update([
+
+                    'nama_tuan_rumah' => $nama_tuan_rumah,
+
+                    'dusun' => $request->dusun,
+                    'desa' => $request->desa,
+                    'nomor_telepon' => $request->nomor_telepon,
+                    'alamat' => $request->alamat,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'nama_kecamatan' => $request->nama_kecamatan,
+                    'faskes' => $request->faskes
+                ]);
+        }
 
         try {
+
             $data->update([
                 'nomor_kelompok' => $request->nomor_kelompok,
                 'desa' => $request->desa,
@@ -460,33 +480,17 @@ class KelompokController extends Controller
                 ]
             ]);
 
-            return redirect('/kelompok')->with('success', 'Data kelompok berhasil diupdate');
+            return redirect('/kelompok')
+                ->with('success', 'Data kelompok berhasil diupdate');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal update data'])->withInput();
+
+            return back()
+                ->withErrors([
+                    'error' => 'Gagal update data'
+                ])
+                ->withInput();
         }
-    }
-
-    public function delete($id)
-    {
-        $this->logAktivitas(
-            'Hapus Kelompok',
-            "Menghapus kelompok ID $id"
-        );
-
-        $this->setPeriodeSession();
-
-        $periode_id = $this->getPeriodeId();
-
-        if ($lock = $this->checkPublishLock($periode_id)) {
-            return $lock;
-        }
-
-        Kelompok::where('id_periode', $periode_id)
-            ->where('id_kelompok', $id)
-            ->delete();
-
-        return redirect('/kelompok');
     }
 
     public function generate(Request $request)
@@ -915,16 +919,32 @@ class KelompokController extends Controller
 
             $periode_id = $request->periode_id;
 
-            $peserta = \App\Models\Peserta::whereHas('kelompok', function ($q) use ($periode_id) {
-                $q->where('id_periode', $periode_id);
-            })->get();
+            // =========================
+            // AMBIL SEMUA PESERTA PERIODE
+            // =========================
+
+            $peserta = \App\Models\Peserta::where('id_periode', $periode_id)
+                ->get();
+
+            // =========================
+            // CEK ADA YANG BELUM KELOMPOK?
+            // =========================
 
             $belum = $peserta->whereNull('id_kelompok');
 
             if ($belum->count() > 0) {
+
                 DB::rollback();
-                return back()->with('error', 'Masih terdapat peserta yang belum mendapat kelompok.');
+
+                return back()->with(
+                    'error',
+                    'Masih terdapat peserta yang belum mendapat kelompok.'
+                );
             }
+
+            // =========================
+            // CEK DUPLIKAT
+            // =========================
 
             $double = $peserta
                 ->groupBy(function ($p) {
@@ -935,47 +955,56 @@ class KelompokController extends Controller
                 });
 
             if ($double->count() > 0) {
+
                 DB::rollback();
-                return back()->with('error', 'Terdapat data peserta ganda.');
+
+                return back()->with(
+                    'error',
+                    'Terdapat data peserta ganda.'
+                );
             }
+
+            // =========================
+            // CEK STATUS PUBLISH
+            // =========================
 
             $status = Periode::where('id_periode', $periode_id)
                 ->value('status_publish');
 
             if ($status == 1) {
+
                 DB::rollback();
-                return back()->with('error', 'Data sudah dipublish sebelumnya!');
+
+                return back()->with(
+                    'error',
+                    'Data sudah dipublish sebelumnya!'
+                );
             }
 
-            $warning = [];
+            // =========================
+            // UPDATE STATUS PUBLISH
+            // =========================
 
-            $kelompok = \App\Models\Kelompok::with('peserta')
-                ->where('id_periode', $periode_id)
-                ->get();
-
-            foreach ($kelompok as $k) {
-                $jumlah = $k->peserta->count();
-
-                if ($jumlah > $k->kapasitas) {
-                    $warning[] = "Kelompok K{$k->nomor_kelompok} melebihi kapasitas";
-                }
-            }
-
-            \App\Models\Periode::where('id_periode', $periode_id)
-                ->update(['status_publish' => 1]);
+            Periode::where('id_periode', $periode_id)
+                ->update([
+                    'status_publish' => 1
+                ]);
 
             DB::commit();
 
-            if (!empty($warning)) {
-                return back()->with('warning', implode(', ', $warning));
-            }
-
-            return redirect()->back()->with('success', 'Hasil pembagian berhasil dipublish!');
+            return back()->with(
+                'success',
+                'Hasil pembagian berhasil dipublish!'
+            );
 
         } catch (\Exception $e) {
+
             DB::rollback();
 
-            return back()->with('error', 'Terjadi kesalahan saat publish.');
+            return back()->with(
+                'error',
+                'Terjadi kesalahan saat publish: ' . $e->getMessage()
+            );
         }
     }
     private function logAktivitas($aksi, $deskripsi = null)

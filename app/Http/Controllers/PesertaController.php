@@ -36,34 +36,79 @@ class PesertaController extends Controller
 
     public function hasil()
     {
-        $user = session('user');
+        try {
 
-        $periode_id = $this->getPeriodeId();
+            $user = session('user');
 
-        // ======================================
-        // CEK STATUS PUBLISH
-        // ======================================
+            // ==============================
+            // VALIDASI SESSION USER
+            // ==============================
 
-        $status_publish = \App\Models\Periode::where('id_periode', $periode_id)
-            ->value('status_publish');
+            if (!$user || !isset($user->username)) {
+                return redirect('/login')
+                    ->with('error', 'Session login tidak ditemukan');
+            }
 
-        // JIKA BELUM DIPUBLISH
-        if ($status_publish == 0) {
+            // ==============================
+            // AMBIL PERIODE PUBLISH
+            // ==============================
 
-            return view('peserta.belum_publish');
+            $periode_id = \App\Models\Periode::where('status_publish', 1)
+                ->latest('id_periode')
+                ->value('id_periode');
 
+            if (!$periode_id) {
+                return view('peserta.belum_publish');
+            }
+
+            // ==============================
+            // CARI PESERTA BERDASARKAN NIM
+            // ==============================
+
+            $nim = trim((string) $user->username);
+
+            $peserta = Peserta::with([
+                'kelompok.periode',
+                'kelompok.dpl',
+                'kelompok.apl',
+                'kelompok.peserta'
+            ])
+                ->where('nim', $nim)
+                ->where('id_periode', $periode_id)
+                ->first();
+
+            // DEBUG CEK
+            if (!$peserta) {
+
+                return response()->json([
+                    'error' => 'Peserta tidak ditemukan',
+                    'nim_login' => $nim,
+                    'periode_id' => $periode_id
+                ]);
+            }
+
+            // ==============================
+            // BELUM DAPAT KELOMPOK
+            // ==============================
+
+            if (!$peserta->id_kelompok) {
+                return view('peserta.belum_publish');
+            }
+
+            // ==============================
+            // TAMPILKAN VIEW
+            // ==============================
+
+            return view('peserta.hasil_peserta', compact('peserta'));
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
         }
-
-        $peserta = Peserta::with(
-            'kelompok.dpl',
-            'kelompok.apl',
-            'kelompok.peserta'
-        )
-            ->where('nim', $user->username)
-            ->where('id_periode', $periode_id)
-            ->first();
-
-        return view('peserta.hasil', compact('peserta'));
     }
 
     public function tempatkan(Request $request)
