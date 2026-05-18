@@ -10,9 +10,10 @@ class PesertaController extends Controller
 {
     private function getPeriodeId()
     {
-        return request('periode_id')
-            ?? session('periode_id')
-            ?? \App\Models\Periode::where('status_publish', 1)->value('id_periode');
+        return session('periode_id')
+            ?? request('periode_id')
+            ?? \App\Models\Periode::where('status_publish', 1)
+                ->value('id_periode');
     }
 
     private function checkPublishLock($periode_id)
@@ -38,46 +39,70 @@ class PesertaController extends Controller
     {
         try {
 
+            $this->setPeriodeSession();
+
             $user = session('user');
 
             // ==============================
-            // VALIDASI SESSION USER
+            // VALIDASI LOGIN
             // ==============================
 
             if (!$user || !isset($user->username)) {
+
                 return redirect('/login')
                     ->with('error', 'Session login tidak ditemukan');
             }
 
             // ==============================
-            // AMBIL PERIODE PUBLISH
+            // AMBIL PERIODE
+            // SAMA SEPERTI DPL & APL
             // ==============================
 
-            $periode_id = \App\Models\Periode::where('status_publish', 1)
-                ->latest('id_periode')
-                ->value('id_periode');
+            $periode_id = $this->getPeriodeId();
 
             if (!$periode_id) {
+
                 return view('peserta.belum_publish');
             }
 
             // ==============================
-            // CARI PESERTA BERDASARKAN NIM
+            // CEK STATUS PUBLISH
+            // ==============================
+
+            $status_publish = \App\Models\Periode::where('id_periode', $periode_id)
+                ->value('status_publish');
+
+            // JIKA BELUM DIPUBLISH
+            if ($status_publish == 0) {
+
+                return view('peserta.belum_publish');
+            }
+
+            // ==============================
+            // AMBIL NIM LOGIN
             // ==============================
 
             $nim = trim((string) $user->username);
+
+            // ==============================
+            // CARI PESERTA
+            // ==============================
 
             $peserta = Peserta::with([
                 'kelompok.periode',
                 'kelompok.dpl',
                 'kelompok.apl',
-                'kelompok.peserta'
+                'kelompok.peserta',
+                'kelompok.tuanRumah'
             ])
                 ->where('nim', $nim)
                 ->where('id_periode', $periode_id)
                 ->first();
 
-            // DEBUG CEK
+            // ==============================
+            // JIKA TIDAK DITEMUKAN
+            // ==============================
+
             if (!$peserta) {
 
                 return response()->json([
@@ -92,6 +117,7 @@ class PesertaController extends Controller
             // ==============================
 
             if (!$peserta->id_kelompok) {
+
                 return view('peserta.belum_publish');
             }
 
