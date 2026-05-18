@@ -403,8 +403,8 @@ class KelompokController extends Controller
             ->firstOrFail();
 
         // ==========================
-// HANDLE TUAN RUMAH (UPDATE TANPA INSERT BARU)
-// ==========================
+        // HANDLE TUAN RUMAH (UPDATE TANPA INSERT BARU)
+        // ==========================
 
         // ambil id tuan rumah lama dari kelompok
         $id_tuan_rumah = $data->id_tuan_rumah;
