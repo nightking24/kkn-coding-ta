@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Peserta;
+use App\Models\Periode;
 use App\Imports\PesertaImport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -14,7 +15,8 @@ class ImportController extends Controller
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? \App\Models\Periode::where('status_publish', 1)->value('id_periode');
+            ?? Periode::where('status', 'aktif')
+                ->value('id_periode');
     }
 
     private function checkPublishLock($periode_id)

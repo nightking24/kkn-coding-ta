@@ -5,17 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Peserta;
 use App\Models\Kelompok;
+use App\Models\Periode;
 use App\Models\LogActivity;
+
 class PesertaController extends Controller
 {
     private function getPeriodeId()
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? \App\Models\Periode::where('status_publish', 1)
+            ?? Periode::where('status', 'aktif')
                 ->value('id_periode');
     }
-
     private function checkPublishLock($periode_id)
     {
         $status = \App\Models\Periode::where('id_periode', $periode_id)

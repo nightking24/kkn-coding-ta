@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Kelompok;
+use App\Models\Periode;
 use App\Models\Dpl;
 
 class DplController extends Controller
@@ -20,7 +21,8 @@ class DplController extends Controller
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? \App\Models\Periode::where('status_publish', 1)->value('id_periode');
+            ?? Periode::where('status', 'aktif')
+                ->value('id_periode');
     }
 
     private function checkPublishLock($periode_id)
@@ -194,7 +196,7 @@ class DplController extends Controller
             return back()->withErrors(['error' => 'Gagal update data'])->withInput();
         }
     }
-    
+
     public function delete($nik)
     {
         $this->setPeriodeSession();
@@ -233,7 +235,10 @@ class DplController extends Controller
 
         }
 
-        $kelompok = \App\Models\Kelompok::where('nik', $user->username)
+        $nik = trim((string) $user->username);
+
+        $kelompok = \App\Models\Kelompok::with('dpl')
+            ->where('nik', $nik)
             ->where('id_periode', $periode_id)
             ->get();
 

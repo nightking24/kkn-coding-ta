@@ -28,7 +28,8 @@ class KelompokController extends Controller
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? Periode::where('status_publish', 1)->value('id_periode');
+            ?? Periode::where('status', 'aktif')
+                ->value('id_periode');
     }
 
     private function checkPublishLock($periode_id)
