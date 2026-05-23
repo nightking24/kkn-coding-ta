@@ -85,7 +85,7 @@
             </div>
 
             <div style="margin-top:20px;">
-                <button class="btn btn-green">Simpan</button>
+                <button class="btn btn-green">Update</button>
                 <a href="/dpl" class="btn btn-red">Batal</a>
             </div>
         </form>

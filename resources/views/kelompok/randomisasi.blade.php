@@ -8,12 +8,17 @@
             <div class="card-body">
 
                 <h4 class="mb-3">Hasil Randomisasi Kelompok</h4>
-                <p class="text-muted">Total Peserta: <b>{{ count($data) }}</b></p>
-
+                
                 @php
                     $berhasil = collect($data)->where('status', 'ok');
                     $gagal = collect($data)->where('status', 'melanggar_rule');
+                    $total_kelompok = $berhasil->pluck('nomor_kelompok')->unique()->count();
                 @endphp
+
+                <div style="display:flex; gap:30px; margin-bottom:15px;">
+                    <p class="text-muted">Total Peserta: <b>{{ count($data) }}</b></p>
+                    <p class="text-muted">Total Kelompok: <b>{{ $total_kelompok }}</b></p>
+                </div>
 
                 <h5 class="text-success mt-4">✔ Peserta Berhasil</h5>
 
