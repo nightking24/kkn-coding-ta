@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Kelompok;
 use App\Models\Periode;
 use App\Models\Apl;
+use App\Models\LogActivity;
 
 class AplController extends Controller
 {
@@ -113,7 +114,13 @@ class AplController extends Controller
             'no_telp.required' => 'Nomor telepon wajib diisi',
             'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
-        Apl::create($request->all());
+        $apl = Apl::create($request->all());
+
+        // 🔥 LOG ACTIVITY
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => 'Tambah APL - ' . $apl->nama
+        ]);
 
         return redirect('/apl')->with('success', 'Data APL berhasil ditambahkan');
     }
@@ -185,6 +192,12 @@ class AplController extends Controller
         try {
             $data->update($request->all());
 
+            // 🔥 LOG ACTIVITY
+            LogActivity::create([
+                'username' => session('user')->username ?? 'Admin',
+                'aktivitas' => 'Edit APL - ' . $request->nama
+            ]);
+
             return redirect('/apl')->with('success', 'Data APL berhasil diupdate');
 
         } catch (\Exception $e) {
@@ -199,10 +212,19 @@ class AplController extends Controller
             return $lock;
         }
 
-        Apl::where('nim', $nim)
+        $apl = Apl::where('nim', $nim)
             ->where('id_periode', $periode_id)
-            ->firstOrFail()
-            ->delete();
+            ->firstOrFail();
+
+        $nama_apl = $apl->nama;
+        $apl->delete();
+
+        // 🔥 LOG ACTIVITY
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => 'Hapus APL - ' . $nama_apl
+        ]);
+
         return redirect('/apl')->with('success', 'Data APL berhasil dihapus');
     }
 

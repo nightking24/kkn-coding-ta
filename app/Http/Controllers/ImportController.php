@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Peserta;
 use App\Models\Periode;
+use App\Models\LogActivity;
 use App\Imports\PesertaImport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -310,6 +311,14 @@ class ImportController extends Controller
                 ]);
 
                 $jumlah++;
+            }
+
+            // 🔥 LOG ACTIVITY - HANYA JIKA ADA DATA YANG BERHASIL DISIMPAN
+            if ($jumlah > 0) {
+                LogActivity::create([
+                    'username' => session('user')->username ?? 'Admin',
+                    'aktivitas' => "Import Peserta - $jumlah peserta berhasil diimport"
+                ]);
             }
 
             return redirect('/import')

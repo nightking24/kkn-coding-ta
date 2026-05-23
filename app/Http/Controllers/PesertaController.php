@@ -191,11 +191,6 @@ class PesertaController extends Controller
 
     public function pindah(Request $request)
     {
-        $this->logAktivitas(
-            'Pindah Peserta',
-            "NIM {$request->nim} dipindah ke kelompok {$request->id_kelompok}"
-        );
-
         $periode_id = $this->getPeriodeId();
 
         if ($lock = $this->checkPublishLock($periode_id)) {
@@ -232,6 +227,16 @@ class PesertaController extends Controller
         if ($jumlah >= $kelompok->kapasitas) {
             return back()->with('error', 'Kelompok sudah penuh');
         }
+
+        // 🔥 SIMPAN DATA KELOMPOK ASAL SEBELUM DIPINDAH
+        $kelompok_asal_num = optional(Kelompok::find($peserta->id_kelompok))->nomor_kelompok ?? '-';
+        $kelompok_tujuan_num = $kelompok->nomor_kelompok;
+
+        // 🔥 LOG DETAIL
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => "Pindah Peserta - {$peserta->nim} ({$peserta->nama}) dari Kelompok {$kelompok_asal_num} ke Kelompok {$kelompok_tujuan_num}"
+        ]);
 
         $peserta->update([
             'id_kelompok' => $request->id_kelompok
@@ -282,10 +287,10 @@ class PesertaController extends Controller
         $kelompok2 = $p2->id_kelompok;
 
         // 🔥 LOG DETAIL (INI YANG BARU)
-        $this->logAktivitas(
-            'Tukar Peserta',
-            "Menukar {$p1->nim} ({$p1->nama}) [K{$kelompok1}] dengan {$p2->nim} ({$p2->nama}) [K{$kelompok2}]"
-        );
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => "Tukar Peserta - Menukar {$p1->nim} ({$p1->nama}) [K{$kelompok1}] dengan {$p2->nim} ({$p2->nama}) [K{$kelompok2}]"
+        ]);
 
         // 🔥 PROSES TUKAR
         $p1->update(['id_kelompok' => $kelompok2]);

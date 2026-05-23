@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Kelompok;
 use App\Models\Periode;
 use App\Models\Dpl;
+use App\Models\LogActivity;
 
 class DplController extends Controller
 {
@@ -112,7 +113,13 @@ class DplController extends Controller
             'no_telp.digits_between' => 'Nomor telepon harus 10 sampai 15 digit'
         ]);
 
-        Dpl::create($request->all());
+        $dpl = Dpl::create($request->all());
+
+        // 🔥 LOG ACTIVITY
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => 'Tambah DPL - ' . $dpl->nama
+        ]);
 
         return redirect('/dpl')->with('success', 'Data DPL berhasil ditambahkan');
     }
@@ -190,6 +197,12 @@ class DplController extends Controller
                 'no_telp' => $request->no_telp,
             ]);
 
+            // 🔥 LOG ACTIVITY
+            LogActivity::create([
+                'username' => session('user')->username ?? 'Admin',
+                'aktivitas' => 'Edit DPL - ' . $request->nama
+            ]);
+
             return redirect('/dpl')->with('success', 'Data DPL berhasil diupdate');
 
         } catch (\Exception $e) {
@@ -206,11 +219,19 @@ class DplController extends Controller
             return $lock;
         }
 
-        Dpl::where('nik', $nik)
+        $dpl = Dpl::where('nik', $nik)
             ->where('id_periode', $periode_id)
-            ->firstOrFail()
-            ->delete()
-        ;
+            ->firstOrFail();
+
+        $nama_dpl = $dpl->nama;
+        $dpl->delete();
+
+        // 🔥 LOG ACTIVITY
+        LogActivity::create([
+            'username' => session('user')->username ?? 'Admin',
+            'aktivitas' => 'Hapus DPL - ' . $nama_dpl
+        ]);
+
         return redirect('/dpl')->with('success', 'Data DPL berhasil dihapus');
     }
 

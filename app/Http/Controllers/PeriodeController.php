@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Periode;
+use App\Models\LogActivity;
 use Illuminate\Http\Request;
 
 class PeriodeController extends Controller
@@ -45,6 +46,12 @@ class PeriodeController extends Controller
             // 🔥 SET SESSION PERIODE AKTIF (PENTING)
             session(['periode_id' => $periode->id_periode]);
 
+            // 🔥 LOG ACTIVITY
+            LogActivity::create([
+                'username' => session('user')->username ?? 'Admin',
+                'aktivitas' => 'Tambah Periode - ' . $request->nama_kkn
+            ]);
+
             return redirect('/periode')->with('success', 'Periode berhasil ditambahkan');
 
         } catch (\Exception $e) {
@@ -83,6 +90,12 @@ class PeriodeController extends Controller
                 'status' => $request->status
             ]);
 
+            // 🔥 LOG ACTIVITY
+            LogActivity::create([
+                'username' => session('user')->username ?? 'Admin',
+                'aktivitas' => 'Edit Periode - ' . $request->nama_kkn
+            ]);
+
             return redirect('/periode')->with('success', 'Periode berhasil diupdate');
 
         } catch (\Exception $e) {
@@ -95,7 +108,15 @@ class PeriodeController extends Controller
     public function destroy($id)
     {
         try {
+            $periode = Periode::findOrFail($id);
             Periode::destroy($id);
+
+            // 🔥 LOG ACTIVITY
+            LogActivity::create([
+                'username' => session('user')->username ?? 'Admin',
+                'aktivitas' => 'Hapus Periode - ' . $periode->nama_kkn
+            ]);
+
             return redirect('/periode')->with('success', 'Data berhasil dihapus');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menghapus data']);

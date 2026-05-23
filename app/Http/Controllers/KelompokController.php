@@ -496,12 +496,13 @@ class KelompokController extends Controller
 
     public function generate(Request $request)
     {
-        $this->logAktivitas('Generate', 'Randomisasi kelompok');
         $data = json_decode($request->data, true);
 
         if (!$data) {
             return redirect('/import')->with('error', 'Silakan upload ulang');
         }
+
+        $this->logAktivitas('Generate', 'Randomisasi kelompok');
 
         $periode_id = session('periode_id')
             ?? request('periode_id')
@@ -1008,6 +1009,30 @@ class KelompokController extends Controller
             );
         }
     }
+    public function delete($id)
+    {
+        $periode_id = $this->getPeriodeId();
+
+        if ($lock = $this->checkPublishLock($periode_id)) {
+            return $lock;
+        }
+
+        $kelompok = Kelompok::where('id_kelompok', $id)
+            ->where('id_periode', $periode_id)
+            ->firstOrFail();
+
+        $nomor_kelompok = $kelompok->nomor_kelompok;
+        $kelompok->delete();
+
+        // 🔥 LOG ACTIVITY
+        $this->logAktivitas(
+            'Hapus Kelompok',
+            "Menghapus kelompok K{$nomor_kelompok}"
+        );
+
+        return redirect('/kelompok')->with('success', 'Data kelompok berhasil dihapus');
+    }
+
     private function logAktivitas($aksi, $deskripsi = null)
     {
         LogActivity::create([
