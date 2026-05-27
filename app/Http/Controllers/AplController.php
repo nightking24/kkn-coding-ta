@@ -129,6 +129,11 @@ class AplController extends Controller
     {
         $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
+
+        if ($lock = $this->checkPublishLock($periode_id)) {
+            return $lock;
+        }
+
         $data = Apl::where('nim', $nim)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
@@ -251,12 +256,18 @@ class AplController extends Controller
 
         $nim = trim((string) $user->username);
 
+        // Fetch APL nama
+        $apl = \App\Models\Apl::where('nim', $nim)
+            ->value('nama');
+
+        $apl_nama = $apl ?? 'APL';
+
         $kelompok = \App\Models\Kelompok::with('apl')
             ->where('nim', $nim)
             ->where('id_periode', $periode_id)
             ->get();
 
-        return view('apl.hasil_new', compact('kelompok'));
+        return view('apl.hasil_new', compact('kelompok', 'apl_nama'));
     }
 
     public function detailNew($id)

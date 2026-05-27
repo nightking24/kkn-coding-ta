@@ -37,36 +37,50 @@
 
         <h3>Daftar Kelompok</h3>
 
-        <table width="100%" border="1" cellpadding="8" cellspacing="0">
-            <tr style="background:#343a40; color:white;">
-                <th>No</th>
-                <th>Kelompok</th>
-                <th>Desa</th>
-                <th>Dusun</th>
-                <th>DPL</th>
-                <th>APL</th>
-                <th>Jumlah Peserta</th>
-            </tr>
+        <div style="overflow-x: auto;">
+            <table id="table-kelompok" class="display">
+                <thead>
+                    <tr style="background:#343a40; color:white;">
+                        <th style="text-align: center; padding: 12px;">No</th>
+                        <th style="text-align: center; padding: 12px;">Kelompok</th>
+                        <th style="text-align: center; padding: 12px;">Desa</th>
+                        <th style="text-align: center; padding: 12px;">Dusun</th>
+                        <th style="text-align: center; padding: 12px;">DPL</th>
+                        <th style="text-align: center; padding: 12px;">APL</th>
+                        <th style="text-align: center; padding: 12px;">Jumlah Peserta</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                @forelse($kelompok as $i => $k)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>K{{ $k->nomor_kelompok }}</td>
-                        <td>{{ $k->desa }}</td>
-                        <td>{{ $k->dusun }}</td>
-                        <td>{{ optional($k->dpl)->nama ?? '-' }}</td>
-                        <td>{{ optional($k->apl)->nama ?? '-' }}</td>
-                        <td>{{ $k->peserta->count() }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" align="center">Belum ada data kelompok</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                <tbody>
+                    @forelse($kelompok as $i => $k)
+                        <tr>
+                            <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
+                            <td style="text-align: center; padding: 12px;">K{{ $k->nomor_kelompok }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->desa }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->dusun }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ optional($k->dpl)->nama ?? '-' }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ optional($k->apl)->nama ?? '-' }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->peserta->count() }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" align="center">Belum ada data kelompok</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
     </div>
 
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $('#table-kelompok').DataTable({
+                scrollX: true
+            });
+        });
+    </script>
 @endsection

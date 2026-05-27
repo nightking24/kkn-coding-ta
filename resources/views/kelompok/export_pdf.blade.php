@@ -60,6 +60,7 @@
                     <th>Kontak DPL</th>
                     <th>APL</th>
                     <th>Kontak APL</th>
+                    <th>Kecamatan</th>
                     <th>Desa</th>
                     <th>Dusun</th>
                 </tr>
@@ -127,6 +128,13 @@
                         @if($loop->first)
                             <td rowspan="{{ count($items) }}">
                                 {{ optional($p->kelompok->apl)->no_telp ?? '-' }}
+                            </td>
+                        @endif
+
+                        {{-- KECAMATAN --}}
+                        @if($loop->first)
+                            <td rowspan="{{ count($items) }}">
+                                {{ $p->kelompok->nama_kecamatan ?? '-' }}
                             </td>
                         @endif
 

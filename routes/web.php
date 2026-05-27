@@ -72,6 +72,7 @@ Route::middleware(['ceklogin', 'role:admin'])->group(function () {
 
     Route::post('/generate', [KelompokController::class, 'generate']);
     Route::post('/publish', [KelompokController::class, 'publish'])->name('kelompok.publish');
+    Route::post('/unpublish', [KelompokController::class, 'unpublish'])->name('kelompok.unpublish');
 
     Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']);
 

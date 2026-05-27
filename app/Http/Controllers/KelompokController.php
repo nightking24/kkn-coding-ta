@@ -11,6 +11,7 @@ use App\Exports\PesertaExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use App\Models\Periode;
 use App\Exports\HasilPembagianExport;
 use App\Models\LogActivity;
@@ -107,6 +108,49 @@ class KelompokController extends Controller
         ]);
     }
 
+    public function getTuanRumah($nama)
+    {
+        $tuan = DB::table('tuan_rumah')
+            ->where('nama_tuan_rumah', $nama)
+            ->first();
+
+        if (!$tuan) {
+            return response()->json(null);
+        }
+
+        // ambil kelompok terakhir berdasarkan dusun/desa
+        $kelompok = Kelompok::where('dusun', $tuan->dusun)
+            ->where('desa', $tuan->desa)
+            ->latest('id_kelompok')
+            ->first();
+
+        return response()->json([
+
+            // =========================
+            // DATA TUAN RUMAH
+            // =========================
+            'nomor_telepon' => $tuan->nomor_telepon,
+            'alamat' => $tuan->alamat,
+            'latitude' => $tuan->latitude,
+            'longitude' => $tuan->longitude,
+
+            // =========================
+            // DATA LOKASI
+            // =========================
+            'desa' => $tuan->desa,
+            'dusun' => $tuan->dusun,
+            'nama_kecamatan' => $tuan->nama_kecamatan,
+
+            // =========================
+            // DATA KELOMPOK
+            // =========================
+            'kapasitas' => $kelompok->kapasitas ?? null,
+            'semester' => $kelompok->semester ?? null,
+            'tahun_kkn' => $kelompok->tahun_kkn ?? null,
+            'faskes' => $kelompok->faskes ?? null,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $this->logAktivitas(
@@ -122,19 +166,25 @@ class KelompokController extends Controller
 
         // ✅ VALIDASI
         $validated = $request->validate([
-            'nomor_kelompok' => 'required|integer|min:1',
+            'nomor_kelompok' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('kelompok')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+            ],
             'desa' => 'required',
             'dusun' => 'required',
             'nama_dukuh' => 'required',
-            'id_tuan_rumah' => 'required|string|max:255',
+            'tuan_rumah' => 'required|string|max:255',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required',
             'faskes' => 'required|in:0,1',
             'kapasitas' => 'required|integer|min:1',
             'semester' => 'required',
             'tahun_kkn' => 'required|digits:4',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'nama_kecamatan' => 'required',
             'nik' => 'required',
             'nim' => 'required',
@@ -143,6 +193,7 @@ class KelompokController extends Controller
             'nomor_kelompok.required' => 'Nomor Kelompok wajib diisi',
             'nomor_kelompok.integer' => 'Nomor Kelompok harus angka',
             'nomor_kelompok.min' => 'Nomor Kelompok minimal 1',
+            'nomor_kelompok.unique' => 'Nomor kelompok sudah digunakan pada periode ini',
 
             // KECAMATAN
             'nama_kecamatan.required' => 'Nama Kecamatan wajib diisi',
@@ -179,12 +230,10 @@ class KelompokController extends Controller
             'kapasitas.min' => 'Kapasitas minimal 1',
 
             // LATITUDE
-            'latitude.required' => 'Latitude wajib diisi',
             'latitude.numeric' => 'Latitude harus angka',
             'latitude.between' => 'Latitude harus antara -90 sampai 90',
 
             // LONGITUDE
-            'longitude.required' => 'Longitude wajib diisi',
             'longitude.numeric' => 'Longitude harus angka',
             'longitude.between' => 'Longitude harus antara -180 sampai 180',
 
@@ -210,7 +259,7 @@ class KelompokController extends Controller
         } else {
 
             // ✅ ARTINYA INPUT MANUAL (NAMA)
-            $nama = trim($request->id_tuan_rumah);
+            $nama = trim($request->tuan_rumah);
 
             // 🔥 CEK DUPLIKAT (CASE INSENSITIVE)
             $tuan = DB::table('tuan_rumah')
@@ -221,14 +270,28 @@ class KelompokController extends Controller
 
                 // 🔥 INSERT BARU
                 $id_tuan_rumah = DB::table('tuan_rumah')->insertGetId([
+
                     'nama_tuan_rumah' => $nama,
+
+                    // LOKASI
                     'dusun' => $request->dusun,
                     'desa' => $request->desa,
+                    'nama_kecamatan' => $request->nama_kecamatan,
+
+                    // TUAN RUMAH
                     'nomor_telepon' => $request->nomor_telepon,
                     'alamat' => $request->alamat,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
-                    'nama_kecamatan' => $request->nama_kecamatan
+
+                    // DATA KELOMPOK
+                    'kapasitas' => $request->kapasitas,
+                    'semester' => $request->semester,
+                    'tahun_kkn' => $request->tahun_kkn,
+                    'faskes' => $request->faskes,
+
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
 
             } else {
@@ -240,21 +303,43 @@ class KelompokController extends Controller
 
         // UPDATE hanya kalau DATA SUDAH ADA
         if (isset($id_tuan_rumah)) {
+
             DB::table('tuan_rumah')
                 ->where('id_tuan_rumah', $id_tuan_rumah)
                 ->update([
+
+                    // DATA LOKASI
                     'dusun' => $request->dusun,
                     'desa' => $request->desa,
+                    'nama_kecamatan' => $request->nama_kecamatan,
+
+                    // DATA TUAN RUMAH
                     'nomor_telepon' => $request->nomor_telepon,
                     'alamat' => $request->alamat,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
-                    'nama_kecamatan' => $request->nama_kecamatan
+
+                    // DATA KELOMPOK
+                    'kapasitas' => $request->kapasitas,
+                    'semester' => $request->semester,
+                    'tahun_kkn' => $request->tahun_kkn,
+                    'faskes' => $request->faskes,
+
+                    'updated_at' => now()
+
                 ]);
         }
+
         try {
 
             $id_periode = $this->getPeriodeId();
+
+            if (!$id_periode) {
+
+                $id_periode = Periode::where('status_publish', 0)
+                    ->value('id_periode');
+            }
+
             Kelompok::create([
                 'nomor_kelompok' => $request->nomor_kelompok,
                 'desa' => $request->desa,
@@ -288,7 +373,7 @@ class KelompokController extends Controller
             return redirect()->back()->with('success', 'Data kelompok berhasil ditambahkan');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menyimpan data'])->withInput();
+            return back()->withErrors(['error' => 'Gagal menyimpan data']);
         }
     }
 
@@ -297,6 +382,10 @@ class KelompokController extends Controller
         $this->setPeriodeSession();
 
         $periode_id = $this->getPeriodeId();
+
+        if ($lock = $this->checkPublishLock($periode_id)) {
+            return $lock;
+        }
 
         $data = Kelompok::where('id_periode', $periode_id)
             ->where('id_kelompok', $id)
@@ -324,12 +413,23 @@ class KelompokController extends Controller
             return $lock;
         }
 
+        $data = Kelompok::where('id_periode', $periode_id)
+            ->where('id_kelompok', $id)
+            ->firstOrFail();
+
         $validated = $request->validate([
-            'nomor_kelompok' => 'required|integer|min:1',
+            'nomor_kelompok' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('kelompok')
+                    ->where(fn($q) => $q->where('id_periode', $periode_id))
+                    ->ignore($data->id_kelompok, 'id_kelompok')
+            ],
             'desa' => 'required|string|max:255',
             'dusun' => 'required|string|max:255',
             'nama_dukuh' => 'required|string|max:255',
-            'id_tuan_rumah' => 'required|string|max:255',
+            'tuan_rumah' => 'required|string|max:255',
             'nomor_telepon' => 'required|digits_between:10,15',
             'alamat' => 'required|string|max:255',
             'faskes' => 'required|in:0,1',
@@ -340,13 +440,14 @@ class KelompokController extends Controller
             'nik' => 'required',
             'nim' => 'required',
 
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ], [
             // NOMOR KELOMPOK
             'nomor_kelompok.required' => 'Nomor Kelompok wajib diisi',
             'nomor_kelompok.integer' => 'Nomor Kelompok harus angka',
             'nomor_kelompok.min' => 'Nomor Kelompok minimal 1',
+            'nomor_kelompok.unique' => 'Nomor kelompok sudah digunakan pada periode ini',
 
             // KECAMATAN
             'nama_kecamatan.required' => 'Nama Kecamatan wajib diisi',
@@ -383,12 +484,10 @@ class KelompokController extends Controller
             'kapasitas.min' => 'Kapasitas minimal 1',
 
             // LATITUDE
-            'latitude.required' => 'Latitude wajib diisi',
             'latitude.numeric' => 'Latitude harus angka',
             'latitude.between' => 'Latitude harus antara -90 sampai 90',
 
             // LONGITUDE
-            'longitude.required' => 'Longitude wajib diisi',
             'longitude.numeric' => 'Longitude harus angka',
             'longitude.between' => 'Longitude harus antara -180 sampai 180',
 
@@ -399,54 +498,102 @@ class KelompokController extends Controller
             'nim.required' => 'APL wajib dipilih',
         ]);
 
-        $data = Kelompok::where('id_periode', $periode_id)
-            ->where('id_kelompok', $id)
-            ->firstOrFail();
-
-        $data = Kelompok::where('id_periode', $periode_id)
-            ->where('id_kelompok', $id)
-            ->firstOrFail();
-
         // ==========================
         // HANDLE TUAN RUMAH ANTI DUPLIKAT
         // ==========================
 
-        $nama_tuan_rumah = trim($request->id_tuan_rumah);
-
-        // cek apakah nama sudah ada
-        $tuanRumahExist = DB::table('tuan_rumah')
-            ->whereRaw(
-                'LOWER(nama_tuan_rumah) = ?',
-                [strtolower($nama_tuan_rumah)]
-            )
+        // 🔥 cek apakah input adalah ID dari datalist
+        $tuanById = DB::table('tuan_rumah')
+            ->where('id_tuan_rumah', $request->id_tuan_rumah)
             ->first();
 
-        if ($tuanRumahExist) {
+        if ($tuanById) {
 
-            // pakai ID yang sudah ada
-            $id_tuan_rumah = $tuanRumahExist->id_tuan_rumah;
+            // =====================================
+            // PILIH DARI DATALIST
+            // =====================================
 
-        } else {
+            $id_tuan_rumah = $tuanById->id_tuan_rumah;
 
-            // pakai ID lama
-            $id_tuan_rumah = $data->id_tuan_rumah;
-
-            // update data lama
+            // update data terbaru
             DB::table('tuan_rumah')
                 ->where('id_tuan_rumah', $id_tuan_rumah)
                 ->update([
 
-                    'nama_tuan_rumah' => $nama_tuan_rumah,
-
+                    // DATA LOKASI
                     'dusun' => $request->dusun,
                     'desa' => $request->desa,
+                    'nama_kecamatan' => $request->nama_kecamatan,
+
+                    // DATA TUAN RUMAH
                     'nomor_telepon' => $request->nomor_telepon,
                     'alamat' => $request->alamat,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
-                    'nama_kecamatan' => $request->nama_kecamatan,
-                    'faskes' => $request->faskes
+
+                    // DATA KELOMPOK
+                    'kapasitas' => $request->kapasitas,
+                    'semester' => $request->semester,
+                    'tahun_kkn' => $request->tahun_kkn,
+                    'faskes' => $request->faskes,
+
+                    'updated_at' => now()
+
                 ]);
+
+        } else {
+
+            // =====================================
+            // INPUT NAMA BARU MANUAL
+            // =====================================
+
+            $nama_tuan_rumah = trim($request->tuan_rumah);
+
+            // cek apakah nama sudah ada
+            $tuanRumahExist = DB::table('tuan_rumah')
+                ->whereRaw(
+                    'LOWER(nama_tuan_rumah) = ?',
+                    [strtolower($nama_tuan_rumah)]
+                )
+                ->first();
+
+            if ($tuanRumahExist) {
+
+                // pakai ID lama yang sudah ada
+                $id_tuan_rumah = $tuanRumahExist->id_tuan_rumah;
+
+            } else {
+
+                // =====================================
+                // BUAT DATA TUAN RUMAH BARU
+                // =====================================
+
+                $id_tuan_rumah = DB::table('tuan_rumah')
+                    ->insertGetId([
+
+                        'nama_tuan_rumah' => $nama_tuan_rumah,
+
+                        // LOKASI
+                        'dusun' => $request->dusun,
+                        'desa' => $request->desa,
+                        'nama_kecamatan' => $request->nama_kecamatan,
+
+                        // TUAN RUMAH
+                        'nomor_telepon' => $request->nomor_telepon,
+                        'alamat' => $request->alamat,
+                        'latitude' => $request->latitude,
+                        'longitude' => $request->longitude,
+
+                        // DATA KELOMPOK
+                        'kapasitas' => $request->kapasitas,
+                        'semester' => $request->semester,
+                        'tahun_kkn' => $request->tahun_kkn,
+                        'faskes' => $request->faskes,
+
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+            }
         }
 
         try {
@@ -519,8 +666,8 @@ class KelompokController extends Controller
 
         foreach ($data as $peserta) {
             // =========================
-// NORMALISASI GENDER
-// =========================
+            // NORMALISASI GENDER
+            // =========================
 
             $gender = strtolower(trim(
                 $peserta['gender']
@@ -662,6 +809,7 @@ class KelompokController extends Controller
                 $result[] = [
                     'nim' => $peserta['nim'],
                     'nama' => $peserta['nama'],
+                    'no_telp' => $peserta['no_telp'] ?? null,
                     'prodi' => $peserta['prodi'],
                     'gender' => $peserta['gender'],
                     'bahasa_jawa' => $peserta['bahasa_jawa'],
@@ -688,6 +836,7 @@ class KelompokController extends Controller
             $result[] = [
                 'nim' => $peserta['nim'],
                 'nama' => $peserta['nama'],
+                'no_telp' => $peserta['no_telp'] ?? null,
                 'prodi' => $peserta['prodi'],
                 'gender' => $peserta['gender'],
                 'bahasa_jawa' => $peserta['bahasa_jawa'],
@@ -775,6 +924,7 @@ class KelompokController extends Controller
 
                 [
                     'nama' => $row['nama'],
+                    'no_telp' => $row['no_telp'] ?? null,
                     'prodi' => $row['prodi'],
                     'gender' => $row['gender'],
                     'bahasa_jawa' => $row['bahasa_jawa'],
@@ -1009,6 +1159,61 @@ class KelompokController extends Controller
             );
         }
     }
+
+    public function unpublish(Request $request)
+    {
+        $this->logAktivitas('Unpublish', 'Hasil pembagian diunpublish');
+
+        DB::beginTransaction();
+
+        try {
+
+            $periode_id = $request->periode_id;
+
+            // =========================
+            // CEK STATUS PUBLISH
+            // =========================
+
+            $status = Periode::where('id_periode', $periode_id)
+                ->value('status_publish');
+
+            if ($status == 0) {
+
+                DB::rollback();
+
+                return back()->with(
+                    'error',
+                    'Data belum dipublish!'
+                );
+            }
+
+            // =========================
+            // UPDATE STATUS PUBLISH
+            // =========================
+
+            Periode::where('id_periode', $periode_id)
+                ->update([
+                    'status_publish' => 0
+                ]);
+
+            DB::commit();
+
+            return back()->with(
+                'success',
+                'Hasil pembagian berhasil diunpublish! Data dapat diubah kembali.'
+            );
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            return back()->with(
+                'error',
+                'Terjadi kesalahan saat unpublish: ' . $e->getMessage()
+            );
+        }
+    }
+
     public function delete($id)
     {
         $periode_id = $this->getPeriodeId();

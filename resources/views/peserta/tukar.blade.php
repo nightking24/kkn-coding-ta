@@ -24,7 +24,7 @@
             {{-- ================= KELOMPOK 1 ================= --}}
             <div class="mb-3">
                 <label>Kelompok 1</label>
-                <select id="kelompok1" class="form-control">
+                <select id="kelompok1" class="form-control select2">
                     <option value="">-- Pilih Kelompok --</option>
                     @foreach($kelompok as $k)
                         <option value="{{ $k->id_kelompok }}">
@@ -36,7 +36,7 @@
 
             <div class="mb-3">
                 <label>Peserta 1</label>
-                <select name="nim1" id="peserta1" class="form-control" required>
+                <select name="nim1" id="peserta1" class="form-control select2" required>
                     <option value="">-- Pilih Peserta --</option>
                 </select>
             </div>
@@ -44,7 +44,7 @@
             {{-- ================= KELOMPOK 2 ================= --}}
             <div class="mb-3">
                 <label>Kelompok 2</label>
-                <select id="kelompok2" class="form-control">
+                <select id="kelompok2" class="form-control select2">
                     <option value="">-- Pilih Kelompok --</option>
                     @foreach($kelompok as $k)
                         <option value="{{ $k->id_kelompok }}">
@@ -56,7 +56,7 @@
 
             <div class="mb-3">
                 <label>Peserta 2</label>
-                <select name="nim2" id="peserta2" class="form-control" required>
+                <select name="nim2" id="peserta2" class="form-control select2" required>
                     <option value="">-- Pilih Peserta --</option>
                 </select>
             </div>
@@ -75,26 +75,37 @@
         let peserta = @json($peserta);
 
         function filterPeserta(kelompokId, targetSelect) {
+
             let select = document.getElementById(targetSelect);
 
             // reset isi dropdown
             select.innerHTML = '<option value="">-- Pilih Peserta --</option>';
 
             peserta.forEach(p => {
-                if (p.id_kelompok == kelompokId) {
-                    let option = `<option value="${p.nim}">
-                        ${p.nim} - ${p.nama} (K${p.kelompok ? p.kelompok.nomor_kelompok : '-'})
-                    </option>`;
-                    select.innerHTML += option;
+
+                if (String(p.id_kelompok) === String(kelompokId)) {
+
+                    let option = document.createElement('option');
+
+                    option.value = p.nim;
+
+                    option.text =
+                        p.nama + ' - ' +
+                        p.nim + ' - K' +
+                        (p.kelompok ? p.kelompok.nomor_kelompok : '-');
+
+                    select.appendChild(option);
                 }
             });
+
+            // refresh select2
+            $('#' + targetSelect).trigger('change');
         }
 
         // 🔥 KELOMPOK 1
-        document.getElementById('kelompok1').addEventListener('change', function () {
-
+        $('#kelompok1').on('change', function () {
             // reset peserta 1
-            document.getElementById('peserta1').innerHTML = '<option value="">-- Pilih Peserta --</option>';
+            $('#peserta1').empty().append('<option value="">-- Pilih Peserta --</option>').trigger('change');
 
             if (this.value === document.getElementById('kelompok2').value) {
                 alert('Pilih kelompok yang berbeda!');
@@ -106,7 +117,7 @@
         });
 
         // 🔥 KELOMPOK 2
-        document.getElementById('kelompok2').addEventListener('change', function () {
+        $('#kelompok2').on('change', function () {
 
             // reset peserta 2
             document.getElementById('peserta2').innerHTML = '<option value="">-- Pilih Peserta --</option>';
@@ -140,6 +151,18 @@
             }
 
             this.querySelector('button[type="submit"]').disabled = true;
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('.select2').select2({
+                width: '100%',
+                placeholder: '-- Pilih Data --',
+                allowClear: true
+            });
+
         });
     </script>
 

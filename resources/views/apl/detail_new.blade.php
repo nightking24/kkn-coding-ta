@@ -12,7 +12,11 @@
         <div
             style="background: linear-gradient(135deg, #1e7e34 0%, #0f5f37 100%); color: white; padding: 25px; border-radius: 10px; margin-bottom: 30px;">
             <h2 style="margin: 0 0 15px 0; font-size: 28px;">Kelompok {{ $kelompok->nomor_kelompok }}</h2>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9;">Lokasi: {{ optional($kelompok->periode)->lokasi }}</p>
+            <p style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Periode:
+                {{ optional($kelompok->periode)->tahun_kkn ?? '-' }}</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">
+                Lokasi: {{ optional($kelompok->periode)->lokasi }}
+            </p>
         </div>
 
         <!-- INFO KELOMPOK -->
@@ -20,16 +24,20 @@
             <!-- Lokasi Section -->
             <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
                 <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">📍 Detail Lokasi</h5>
-                <p style="margin: 8px 0;"><b>Kecamatan:</b> <span style="color: #666;">{{ $kelompok->nama_kecamatan }}</span></p>
+                <p style="margin: 8px 0;"><b>Kecamatan:</b> <span
+                        style="color: #666;">{{ $kelompok->nama_kecamatan }}</span></p>
                 <p style="margin: 8px 0;"><b>Desa:</b> <span style="color: #666;">{{ $kelompok->desa }}</span></p>
                 <p style="margin: 8px 0;"><b>Dusun:</b> <span style="color: #666;">{{ $kelompok->dusun }}</span></p>
             </div>
 
             <!-- Dosen Section -->
             <div style="border-left: 4px solid #1e7e34; padding-left: 20px;">
-                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">👨‍🏫 Dosen Pembimbing Lapangan (DPL)</h5>
-                <p style="margin: 8px 0;"><b>DPL:</b> <span style="color: #666;">{{ optional($kelompok->dpl)->nama }}</span></p>
-                <p style="margin: 8px 0;"><b>No HP:</b> <span style="color: #666;">{{ optional($kelompok->dpl)->no_telp }}</span></p>
+                <h5 style="color: #1e7e34; margin-bottom: 15px; font-weight: 600;">👨‍🏫 Dosen Pembimbing Lapangan (DPL)
+                </h5>
+                <p style="margin: 8px 0;"><b>DPL:</b> <span style="color: #666;">{{ optional($kelompok->dpl)->nama }}</span>
+                </p>
+                <p style="margin: 8px 0;"><b>No HP:</b> <span
+                        style="color: #666;">{{ optional($kelompok->dpl)->no_telp }}</span></p>
             </div>
         </div>
     </div>
@@ -46,9 +54,10 @@
                         <tr>
                             <th style="text-align: center; padding: 12px;">No</th>
                             <th style="text-align: center; padding: 12px;">NIM</th>
-                            <th style="padding: 12px;">Nama</th>
-                            <th style="padding: 12px;">Prodi</th>
+                            <th style="text-align: center; padding: 12px;">Nama</th>
+                            <th style="text-align: center; padding: 12px;">Prodi</th>
                             <th style="text-align: center; padding: 12px;">Gender</th>
+                            <th style="text-align: center; padding: 12px;">No. Telp</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,10 +65,13 @@
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
                                 <td style="text-align: center; padding: 12px; font-weight: 500;">{{ $p->nim }}</td>
-                                <td style="padding: 12px;">{{ $p->nama }}</td>
-                                <td style="padding: 12px;">{{ $p->prodi }}</td>
+                                <td style="text-align: left; padding: 12px;">{{ $p->nama }}</td>
+                                <td style="text-align: center; padding: 12px;">{{ $p->prodi }}</td>
                                 <td style="text-align: center; padding: 12px;">
                                     {{ $p->gender == 'L' ? 'Laki-Laki' : 'Perempuan' }}
+                                </td>
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ $p->no_telp ?? '-' }}
                                 </td>
                             </tr>
                         @endforeach

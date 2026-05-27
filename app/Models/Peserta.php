@@ -19,6 +19,7 @@ class Peserta extends Model
         'email',
         'prodi',
         'gender',
+        'no_telp',
         'bahasa_jawa',
         'riwayat_penyakit',
         'berkebutuhan_khusus',

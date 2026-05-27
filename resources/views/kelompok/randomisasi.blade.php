@@ -8,7 +8,7 @@
             <div class="card-body">
 
                 <h4 class="mb-3">Hasil Randomisasi Kelompok</h4>
-                
+
                 @php
                     $berhasil = collect($data)->where('status', 'ok');
                     $gagal = collect($data)->where('status', 'melanggar_rule');
@@ -24,44 +24,46 @@
 
                 <div class="table-responsive">
                     <table id="table-berhasil" class="table table-bordered table-striped">
-                        <thead class="table-dark">
+                        <thead class="table-dark" style="background: #343a40; color: white;">
                             <tr>
-                                <th>No</th>
-                                <th>Kelompok</th>
-                                <th>NIM</th>
-                                <th>Nama</th>
-                                <th>Prodi</th>
-                                <th>Gender</th>
-                                <th>Bahasa Jawa</th>
-                                <th>Riwayat Penyakit</th>
-                                <th>Kebutuhan Khusus</th>
-                                <th>Status</th>
+                                <th style="text-align: center; padding: 12px;">No</th>
+                                <th style="text-align: center; padding: 12px;">Kelompok</th>
+                                <th style="text-align: center; padding: 12px;">NIM</th>
+                                <th style="text-align: center; padding: 12px;">Nama</th>
+                                <th style="text-align: center; padding: 12px;">Prodi</th>
+                                <th style="text-align: center; padding: 12px;">No Telp</th>
+                                <th style="text-align: center; padding: 12px;">Gender</th>
+                                <th style="text-align: center; padding: 12px;">Bahasa Jawa</th>
+                                <th style="text-align: center; padding: 12px;">Riwayat Penyakit</th>
+                                <th style="text-align: center; padding: 12px;">Kebutuhan Khusus</th>
+                                <th style="text-align: center; padding: 12px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($berhasil as $i => $d)
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>K{{ $d['nomor_kelompok'] }}</td>
-                                    <td>{{ $d['nim'] }}</td>
-                                    <td>{{ $d['nama'] }}</td>
-                                    <td>{{ $d['prodi'] }}</td>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
+                                    <td style="text-align: center; padding: 12px;">K{{ $d['nomor_kelompok'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
+                                    <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['no_telp'] ?? '-' }}</td>
 
-                                    <td>{{ $d['gender'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         <span class="badge bg-success">OK</span>
                                     </td>
                                 </tr>
@@ -74,42 +76,45 @@
 
                 <div class="table-responsive">
                     <table id="table-gagal" class="table table-bordered table-striped">
-                        <thead class="table-danger">
+                        <thead class="table-danger" style="background: #f8d7da; color: #721c24;">
                             <tr>
-                                <th>No</th>
-                                <th>NIM</th>
-                                <th>Nama</th>
-                                <th>Prodi</th>
-                                <th>Gender</th>
-                                <th>Bahasa Jawa</th>
-                                <th>Riwayat Penyakit</th>
-                                <th>Kebutuhan Khusus</th>
-                                <th>Status</th>
+                                <th style="text-align: center; padding: 12px;">No</th>
+                                <th style="text-align: center; padding: 12px;">NIM</th>
+                                <th style="text-align: center; padding: 12px;">Nama</th>
+                                <th style="text-align: center; padding: 12px;">Prodi</th>
+                                <th style="text-align: center; padding: 12px;">No Telp</th>
+                                <th style="text-align: center; padding: 12px;">Gender</th>
+                                <th style="text-align: center; padding: 12px;">Bahasa Jawa</th>
+                                <th style="text-align: center; padding: 12px;">Riwayat Penyakit</th>
+                                <th style="text-align: center; padding: 12px;">Kebutuhan Khusus</th>
+                                <th style="text-align: center; padding: 12px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($gagal as $i => $d)
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $d['nim'] }}</td>
-                                    <td>{{ $d['nama'] }}</td>
-                                    <td>{{ $d['prodi'] }}</td>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
+                                    <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">
+                                        {{ $d['no_telp'] ?? '-' }}
+                                    </td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
 
-                                    <td>{{ $d['gender'] }}</td>
-
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         {{ $d['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}
                                     </td>
 
-                                    <td>
+                                    <td style="text-align: center; padding: 12px;">
                                         <span class="badge bg-danger">
                                             Belum dapat kelompok
                                         </span>

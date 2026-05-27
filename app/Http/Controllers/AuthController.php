@@ -19,26 +19,30 @@ class AuthController extends Controller
             ->where('username', $request->username)
             ->first();
 
-        // ✅ validasi dulu
-        if ($user && Hash::check($request->password, $user->password)) {
-
-            // ✅ set session SETELAH valid
-            session(['user' => $user]);
-
-            $role = trim(strtolower($user->role ?? ''));
-
-            if ($role == 'admin') {
-                return redirect('/dashboard');
-            } elseif ($role == 'peserta') {
-                return redirect('/hasil-peserta');
-            } elseif ($role == 'dpl') {
-                return redirect('/dpl-view');
-            } elseif ($role == 'apl') {
-                return redirect('/hasil-apl-new');
-            }
+        // Check if user exists
+        if (!$user) {
+            return back()->with('error', 'Username salah');
         }
 
-        return back()->with('error', 'Login gagal');
+        // Check if password is correct
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->with('error', 'Password salah');
+        }
+
+        // ✅ set session SETELAH valid
+        session(['user' => $user]);
+
+        $role = trim(strtolower($user->role ?? ''));
+
+        if ($role == 'admin') {
+            return redirect('/dashboard');
+        } elseif ($role == 'peserta') {
+            return redirect('/hasil-peserta');
+        } elseif ($role == 'dpl') {
+            return redirect('/dpl-view');
+        } elseif ($role == 'apl') {
+            return redirect('/hasil-apl-new');
+        }
     }
 
     public function logout()

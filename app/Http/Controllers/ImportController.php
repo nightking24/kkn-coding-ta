@@ -74,6 +74,13 @@ class ImportController extends Controller
             'nama' => 'nama',
             'nim' => 'nim',
             'email' => 'email',
+            'no hp' => 'no_telp',
+            'no_hp' => 'no_telp',
+            'no telp' => 'no_telp',
+            'no_telp' => 'no_telp',
+            'nomor telepon' => 'no_telp',
+            'telepon' => 'no_telp',
+            'hp' => 'no_telp',
             'program studi' => 'prodi',
             'prodi' => 'prodi',
             'jenis kelamin' => 'gender',
@@ -87,11 +94,18 @@ class ImportController extends Controller
         ];
 
         $header = array_map(function ($h) use ($mapping) {
-            $h = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h);
-            $h = strtolower(trim($h));
-            return $mapping[$h] ?? $h;
-        }, $data[0]);
 
+            // hapus BOM UTF8
+            $h = preg_replace('/^\xEF\xBB\xBF/', '', $h);
+
+            // bersihkan karakter aneh
+            $h = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h);
+
+            $h = strtolower(trim($h));
+
+            return $mapping[$h] ?? $h;
+
+        }, $data[0]);
         $required = ['nama', 'nim'];
 
         foreach ($required as $col) {
@@ -145,6 +159,7 @@ class ImportController extends Controller
                 'nama' => $nama,
                 'nim' => $nim,
                 'email' => $rowData['email'] ?? '',
+                'no_telp' => $rowData['no_telp'] ?? '',
                 'prodi' => $rowData['prodi'] ?? '',
                 'gender' => $this->convertGender($rowData['gender'] ?? ''),
                 'bahasa_jawa' => $this->convertBahasaJawa($rowData['bahasa_jawa'] ?? ''),
@@ -300,6 +315,7 @@ class ImportController extends Controller
                     'nama' => trim($row['nama']),
                     'nim' => trim($row['nim']),
                     'email' => isset($row['email']) ? trim($row['email']) : null,
+                    'no_telp' => isset($row['no_telp']) ? trim($row['no_telp']) : null,
                     'prodi' => isset($row['prodi']) ? trim($row['prodi']) : null,
                     'gender' => $row['gender'] ?? null,
                     'bahasa_jawa' => $row['bahasa_jawa'] ?? 0,

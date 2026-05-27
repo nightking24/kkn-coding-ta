@@ -6,6 +6,19 @@
 
         <div class="card-header">
             <h2>Data Kelompok</h2>
+            @if(session('error'))
+                <div style="
+                    background:#f8d7da;
+                    color:#721c24;
+                    padding:12px;
+                    border-radius:8px;
+                    margin-bottom:15px;
+                    border-left:5px solid #dc3545;
+                ">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if(session('success'))
                 <div style="
                                                             background:#d4edda;
@@ -54,50 +67,36 @@
                 </select>
             </form>
             <table id="kelompokTable">
-                <thead>
+                <thead style="background: #343a40; color: white;">
                     <tr>
-                        <th>No</th>
-                        <th>Kelompok</th>
-                        <th>Desa</th>
-                        <th>Dusun</th>
-                        <th class="col-wrap">Nama Dukuh</th>
-                        <th class="col-wrap">Tuan Rumah</th>
-                        <th>Kontak</th>
-                        <th class="col-wrap">Alamat</th>
-                        <th>Faskes</th>
-                        <th>Kapasitas</th>
-                        <th>Semester</th>
-                        <th>Tahun</th>
-                        <th>Latitude</th>
-                        <th>Longitude</th>
-                        <th>DPL</th>
-                        <th>APL</th>
-                        <th>Aksi</th>
+                        <th style="text-align: center; padding: 12px;">No</th>
+                        <th style="text-align: center; padding: 12px;">Kelompok</th>
+                        <th style="text-align: center; padding: 12px;">Kecamatan</th>
+                        <th style="text-align: center; padding: 12px;">Desa</th>
+                        <th style="text-align: center; padding: 12px;">Dusun</th>
+                        <th style="text-align: center; padding: 12px;" class="col-wrap">Nama Dukuh</th>
+                        <th style="text-align: center; padding: 12px;">Kontak</th>
+                        <th style="text-align: center; padding: 12px;">Tahun KKN</th>
+                        <th style="text-align: center; padding: 12px;">DPL</th>
+                        <th style="text-align: center; padding: 12px;">APL</th>
+                        <th style="text-align: center; padding: 12px;">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @foreach($kelompok as $d)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $d->nomor_kelompok }}</td>
-                            <td>{{ $d->desa }}</td>
-                            <td>{{ $d->dusun }}</td>
-                            <td class="col-wrap">{{ $d->nama_dukuh }}</td>
-                            <td class="col-wrap">{{ optional($d->tuanRumah)->nama_tuan_rumah ?? '-' }}</td>
-                            <td>{{ $d->nomor_telepon }}</td>
-                            <td class="col-wrap" title="{{ $d->alamat }}">
-                                {{ $d->alamat }}
-                            </td>
-                            <td>{{ $d->faskes ? 'Ya' : 'Tidak' }}</td>
-                            <td>{{ $d->kapasitas }}</td>
-                            <td>{{ $d->semester }}</td>
-                            <td>{{ $d->tahun_kkn }}</td>
-                            <td>{{ $d->latitude }}</td>
-                            <td>{{ $d->longitude }}</td>
-                            <td>{{ optional($d->dpl)->nama ?? '-' }}</td>
-                            <td>{{ optional($d->apl)->nama ?? '-' }}</td>
-                            <td>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="text-align: center; padding: 12px;">{{ $loop->iteration }}</td>
+                            <td style="text-align: center; padding: 12px;">K{{ $d->nomor_kelompok }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $d->nama_kecamatan }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $d->desa }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $d->dusun }}</td>
+                            <td style="text-align: left; padding: 12px;" class="col-wrap">{{ $d->nama_dukuh }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $d->nomor_telepon }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $d->tahun_kkn }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ optional($d->dpl)->nama ?? '-' }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ optional($d->apl)->nama ?? '-' }}</td>
+                            <td style="text-align: center; padding: 12px;">
                                 <a href="/kelompok/edit/{{ $d->id_kelompok }}" class="btn btn-blue">Edit</a>
                                 <a href="/kelompok/delete/{{ $d->id_kelompok }}" class="btn btn-red">Hapus</a>
                             </td>
@@ -118,9 +117,7 @@
             autoWidth: false,
 
             columnDefs: [
-                { width: "250px", targets: 7 }, // alamat
-                { width: "150px", targets: 4 }, // nama dukuh
-                { width: "150px", targets: 5 }  // tuan rumah
+                { width: "150px", targets: 5 }  // nama dukuh
             ]
         });
     </script>

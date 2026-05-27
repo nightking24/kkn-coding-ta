@@ -16,6 +16,8 @@ class Dpl extends Model
         'nama',
         'email',
         'no_telp',
+        'prodi',
+        'fakultas',
         'id_periode'
     ];
 

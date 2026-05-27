@@ -30,7 +30,7 @@ class HasilPembagianExport implements WithEvents
                 // JUDUL
                 // ======================================
     
-                $sheet->mergeCells('A1:L1');
+                $sheet->mergeCells('A1:M1');
 
                 $sheet->setCellValue(
                     'A1',
@@ -83,8 +83,9 @@ class HasilPembagianExport implements WithEvents
                         'H' => 'Kontak DPL',
                         'I' => 'APL',
                         'J' => 'Kontak APL',
-                        'K' => 'Desa',
-                        'L' => 'Dusun',
+                        'K' => 'Kecamatan',
+                        'L' => 'Desa',
+                        'M' => 'Dusun',
                     ];
 
                     foreach ($headers as $col => $text) {
@@ -127,7 +128,7 @@ class HasilPembagianExport implements WithEvents
                     // MERGE
                     // ======================================
     
-                    $mergeCols = ['A', 'G', 'H', 'I', 'J', 'K', 'L'];
+                    $mergeCols = ['A', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
 
                     foreach ($mergeCols as $col) {
                         $sheet->mergeCells($col . $row . ':' . $col . $endRow);
@@ -159,9 +160,11 @@ class HasilPembagianExport implements WithEvents
                         optional($k->apl)->no_telp
                     );
 
-                    $sheet->setCellValue("K{$row}", $k->desa);
+                    $sheet->setCellValue("K{$row}", $k->nama_kecamatan);
 
-                    $sheet->setCellValue("L{$row}", $k->dusun);
+                    $sheet->setCellValue("L{$row}", $k->desa);
+
+                    $sheet->setCellValue("M{$rMw}", $k->dusun);
 
                     $sheet->getStyle("A{$row}:L{$endRow}")
                         ->applyFromArray([
@@ -225,7 +228,7 @@ class HasilPembagianExport implements WithEvents
                         $sheet->getRowDimension($r)->setRowHeight(30);
                     }
 
-                    $sheet->getStyle("A{$startRow}:L{$endRow}")
+                    $sheet->getStyle("A{$startRow}:M{$endRow}")
                         ->applyFromArray([
                             'borders' => [
                                 'outline' => [
@@ -237,7 +240,7 @@ class HasilPembagianExport implements WithEvents
                     $row = $endRow + 2;
                 }
 
-                foreach (range('A', 'L') as $col) {
+                foreach (range('A', 'M') as $col) {
                     $sheet->getColumnDimension($col)
                         ->setAutoSize(true);
                 }

@@ -80,12 +80,16 @@
                 <div class="form-group">
                     <label>Tuan Rumah</label>
 
-                    <input list="list_tuan" id="tuan_rumah" name="id_tuan_rumah" class="form-control"
+                    {{-- INPUT HIDDEN UNTUK ID --}}
+                    <input type="hidden" name="id_tuan_rumah" id="id_tuan_rumah">
+
+                    {{-- INPUT NAMA --}}
+                    <input list="list_tuan" id="tuan_rumah" name="tuan_rumah" class="form-control"
                         placeholder="Ketik nama tuan rumah...">
 
                     <datalist id="list_tuan">
                         @foreach($tuan_rumah as $t)
-                            <option value="{{ $t->nama_tuan_rumah }}">
+                            <option value="{{ $t->nama_tuan_rumah }}" data-id="{{ $t->id_tuan_rumah }}">
                         @endforeach
                     </datalist>
 
@@ -96,7 +100,7 @@
 
                 {{-- Nomor Telepon --}}
                 <div class="form-group">
-                    <label for="nomor_telepon">Nomor Telepon</label>
+                    <label for="nomor_telepon">Nomor Telepon (Dukuh/Tuan Rumah)</label>
                     <input type="text" id="nomor_telepon" name="nomor_telepon" class="form-control"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric"
                         maxlength="15">
@@ -126,7 +130,7 @@
 
                 {{-- Kapasitas --}}
                 <div class="form-group">
-                    <label for="kapasitas">Kapasitas</label>
+                    <label for="kapasitas">Kapasitas (Maksimal)</label>
                     <input type="number" id="kapasitas" name="kapasitas" class="form-control"
                         value="{{ old('kapasitas', session('retain_kelompok.kapasitas')) }}">
                 </div>
@@ -212,6 +216,30 @@
         $(document).ready(function () {
 
             // =========================
+            // HANDLE DATALIST TUAN RUMAH
+            // =========================
+            $('#tuan_rumah').on('input', function () {
+
+                let input = $(this).val().trim();
+
+                // reset hidden id
+                $('#id_tuan_rumah').val('');
+
+                $('#list_tuan option').each(function () {
+
+                    if ($(this).val() === input) {
+
+                        $('#id_tuan_rumah').val(
+                            $(this).data('id')
+                        );
+
+                    }
+
+                });
+
+            });
+
+            // =========================
             // AUTO FILL TUAN RUMAH
             // =========================
             $('#tuan_rumah').on('blur', function () {
@@ -225,14 +253,65 @@
                     // kalau data tidak ditemukan
                     if (!data) return;
 
-                    // isi field TANPA menghapus manual input
-                    $('input[name="nomor_telepon"]').val(data.nomor_telepon ?? $('input[name="nomor_telepon"]').val());
+                    // =========================
+                    // DATA TUAN RUMAH
+                    // =========================
+                    $('input[name="nomor_telepon"]').val(
+                        data.nomor_telepon ?? $('input[name="nomor_telepon"]').val()
+                    );
 
-                    $('input[name="alamat"]').val(data.alamat ?? $('input[name="alamat"]').val());
+                    $('input[name="alamat"]').val(
+                        data.alamat ?? $('input[name="alamat"]').val()
+                    );
 
-                    $('input[name="latitude"]').val(data.latitude ?? $('input[name="latitude"]').val());
+                    $('input[name="latitude"]').val(
+                        data.latitude ?? $('input[name="latitude"]').val()
+                    );
 
-                    $('input[name="longitude"]').val(data.longitude ?? $('input[name="longitude"]').val());
+                    $('input[name="longitude"]').val(
+                        data.longitude ?? $('input[name="longitude"]').val()
+                    );
+
+                    // =========================
+                    // DATA LOKASI
+                    // =========================
+                    $('#desa').val(
+                        data.desa ?? $('#desa').val()
+                    );
+
+                    $('#nama_kecamatan').val(
+                        data.nama_kecamatan ?? $('#nama_kecamatan').val()
+                    );
+
+                    $('#dusun').val(
+                        data.dusun ?? $('#dusun').val()
+                    );
+
+                    // =========================
+                    // DATA KELOMPOK
+                    // =========================
+                    $('input[name="kapasitas"]').val(
+                        data.kapasitas ?? $('input[name="kapasitas"]').val()
+                    );
+
+                    $('#semester').val(
+                        data.semester ?? $('#semester').val()
+                    );
+
+                    $('input[name="tahun_kkn"]').val(
+                        data.tahun_kkn ?? $('input[name="tahun_kkn"]').val()
+                    );
+
+                    $('#faskes').val(
+                        data.faskes == 1 ? "1" : "0"
+                    );
+
+                    // =========================
+                    // AUTO LOAD DPL APL
+                    // =========================
+                    if (data.desa) {
+                        loadDplApl(data.desa);
+                    }
 
                 });
 
@@ -287,6 +366,7 @@
                 });
 
             });
+
             // =========================
             // DESA MANUAL
             // =========================
@@ -317,9 +397,6 @@
                 });
             }
 
-            // =========================
-            // VALIDASI FORM
-            // =========================
             // =========================
             // VALIDASI FORM
             // =========================

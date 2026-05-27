@@ -62,7 +62,10 @@ class DplController extends Controller
     public function create()
     {
         $this->setPeriodeSession();
-        return view('dpl.create');
+
+        $dplList = Dpl::select('nama')->distinct()->get();
+
+        return view('dpl.create', compact('dplList'));
     }
 
     public function store(Request $request)
@@ -76,7 +79,7 @@ class DplController extends Controller
 
         $request->merge([
             'nik' => preg_replace('/[^0-9]/', '', $request->nik),
-            'nidn' => preg_replace('/[^0-9]/', '', $request->nidn),
+            'nidn' => preg_replace('/[^0-9]/', '', $request->nidn) ?: null,
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
             'id_periode' => $periode_id
         ]);
@@ -87,7 +90,6 @@ class DplController extends Controller
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
-            'nidn' => 'required|digits:10',
             'nama' => 'required',
             'email' => [
                 'required',
@@ -96,14 +98,21 @@ class DplController extends Controller
                     ->where(fn($q) => $q->where('id_periode', $periode_id)),
             ],
             'no_telp' => 'required|digits_between:10,15',
+            'prodi' => 'required|string|min:2|max:100',
+            'fakultas' => 'required|string|min:2|max:100',
         ], [
             'nik.required' => 'NIK wajib diisi',
             'nik.unique' => 'NIK sudah digunakan pada periode ini',
 
-            'nidn.required' => 'NIDN wajib diisi',
-            'nidn.digits' => 'NIDN harus 10 digit',
-
             'nama.required' => 'Nama wajib diisi',
+
+            'prodi.required' => 'Program studi wajib diisi',
+            'prodi.min' => 'Program studi minimal 2 karakter',
+            'prodi.max' => 'Program studi maksimal 100 karakter',
+
+            'fakultas.required' => 'Fakultas wajib diisi',
+            'fakultas.min' => 'Fakultas minimal 2 karakter',
+            'fakultas.max' => 'Fakultas maksimal 100 karakter',
 
             'email.required' => 'Email wajib diisi',
             'email.email' => 'Format email harus mengandung @',
@@ -128,14 +137,21 @@ class DplController extends Controller
     {
         $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
+
+        if ($lock = $this->checkPublishLock($periode_id)) {
+            return $lock;
+        }
+
         $data = Dpl::where('nik', $nik)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
 
-        return view('dpl.edit', compact('data'));
+        $dplList = Dpl::select('nama')->distinct()->get();
+
+        return view('dpl.edit', compact('data', 'dplList'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $nik)
     {
         $this->setPeriodeSession();
         $periode_id = $this->getPeriodeId();
@@ -145,12 +161,11 @@ class DplController extends Controller
         }
 
         $request->merge([
-            'nik' => preg_replace('/[^0-9]/', '', $request->nik),
-            'nidn' => preg_replace('/[^0-9]/', '', $request->nidn),
+            'nidn' => preg_replace('/[^0-9]/', '', $request->nidn) ?: null,
             'no_telp' => preg_replace('/[^0-9]/', '', $request->no_telp),
         ]);
 
-        $data = Dpl::where('id_dpl', $id)
+        $data = Dpl::where('nik', $nik)
             ->where('id_periode', $periode_id)
             ->firstOrFail();
 
@@ -159,26 +174,32 @@ class DplController extends Controller
                 'required',
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id_dpl, 'id_dpl')
+                    ->ignore($data->nik, 'nik')
             ],
-            'nidn' => 'required|digits:10',
             'nama' => 'required',
             'email' => [
                 'required',
                 'email',
                 Rule::unique('dpl')
                     ->where(fn($q) => $q->where('id_periode', $periode_id))
-                    ->ignore($data->id_dpl, 'id_dpl')
+                    ->ignore($data->nik, 'nik')
             ],
             'no_telp' => 'required|digits_between:10,15',
+            'prodi' => 'required|string|min:2|max:100',
+            'fakultas' => 'required|string|min:2|max:100',
         ], [
             'nik.required' => 'NIK wajib diisi',
             'nik.unique' => 'NIK sudah digunakan pada periode ini',
 
-            'nidn.required' => 'NIDN wajib diisi',
-            'nidn.digits' => 'NIDN harus 10 digit',
-
             'nama.required' => 'Nama wajib diisi',
+
+            'prodi.required' => 'Program studi wajib diisi',
+            'prodi.min' => 'Program studi minimal 2 karakter',
+            'prodi.max' => 'Program studi maksimal 100 karakter',
+
+            'fakultas.required' => 'Fakultas wajib diisi',
+            'fakultas.min' => 'Fakultas minimal 2 karakter',
+            'fakultas.max' => 'Fakultas maksimal 100 karakter',
 
             'email.required' => 'Email wajib diisi',
             'email.email' => 'Format email harus mengandung @',
@@ -195,6 +216,8 @@ class DplController extends Controller
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'no_telp' => $request->no_telp,
+                'prodi' => $request->prodi,
+                'fakultas' => $request->fakultas,
             ]);
 
             // 🔥 LOG ACTIVITY
@@ -256,14 +279,58 @@ class DplController extends Controller
 
         }
 
-        $nik = trim((string) $user->username);
+        // ======================================
+        // AMBIL USERNAME LOGIN
+        // ======================================
 
-        $kelompok = \App\Models\Kelompok::with('dpl')
+        $username = trim((string) $user->username);
+
+        // ======================================
+        // CEK APAKAH LOGIN PAKAI EMAIL ATAU NIK
+        // ======================================
+
+        $dpl = \App\Models\Dpl::where(function ($query) use ($username) {
+            $query->where('nik', $username)
+                ->orWhere('email', $username);
+        })
+            ->where('id_periode', $periode_id)
+            ->first();
+
+        // ======================================
+        // JIKA DATA DPL TIDAK DITEMUKAN
+        // ======================================
+
+        if (!$dpl) {
+
+            return view('dpl.hasil_dpl_view', [
+                'kelompok' => collect(),
+                'dpl_nama' => 'DPL'
+            ]);
+        }
+
+        // ======================================
+        // AMBIL NIK DPL
+        // ======================================
+
+        $nik = trim((string) $dpl->nik);
+
+        // ======================================
+        // AMBIL DATA KELOMPOK
+        // ======================================
+
+        $kelompok = \App\Models\Kelompok::with(['dpl', 'apl', 'peserta'])
             ->where('nik', $nik)
             ->where('id_periode', $periode_id)
             ->get();
 
-        return view('dpl.hasil_dpl_view', compact('kelompok'));
+        // ======================================
+        // KIRIM KE VIEW
+        // ======================================
+
+        return view('dpl.hasil_dpl_view', [
+            'kelompok' => $kelompok,
+            'dpl_nama' => $dpl->nama
+        ]);
     }
 
     public function detailView($id)

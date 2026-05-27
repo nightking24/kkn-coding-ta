@@ -20,21 +20,21 @@
         </div>
 
         <table id="logTable" class="display">
-            <thead>
+            <thead style="background: #343a40; color: white;">
                 <tr>
-                    <th>No</th>
-                    <th>Waktu</th>
-                    <th>User</th>
-                    <th>Aktivitas</th>
+                    <th style="text-align: center; padding: 12px;">No</th>
+                    <th style="text-align: center; padding: 12px;">Waktu</th>
+                    <th style="text-align: center; padding: 12px;">User</th>
+                    <th style="padding: 12px;">Aktivitas</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($logs as $i => $log)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $log->created_at }}</td>
-                        <td>{{ $log->username }}</td>
-                        <td>{{ $log->aktivitas }}</td>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px;">{{ $i + 1 }}</td>
+                        <td style="padding: 12px;">{{ $log->created_at }}</td>
+                        <td style="padding: 12px;">{{ $log->username }}</td>
+                        <td style="text-align: left; padding: 12px;">{{ $log->aktivitas }}</td>
                     </tr>
                 @endforeach
             </tbody>

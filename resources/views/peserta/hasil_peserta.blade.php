@@ -4,11 +4,11 @@
 
 <div class="card">
 
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 15px;">
         <h3 style="margin-bottom: 10px; color: #000;">
             Selamat datang,
             <b style="color: #1e7e34;">
-                {{ session('user')->username }}
+                {{ $peserta->nama }}
             </b>
         </h3>
 
@@ -17,7 +17,7 @@
         </p>
     </div>
 
-    <hr style="margin: 25px 0; border: none; border-top: 2px solid #eee;">
+    <hr style="margin: 12px 0; border: none; border-top: 2px solid #eee;">
 
     {{-- ========================= --}}
     {{-- CEK PESERTA & KELOMPOK --}}
@@ -37,6 +37,11 @@
             <h2 style="margin: 0 0 15px 0; font-size: 28px;">
                 Kelompok {{ $peserta->kelompok->nomor_kelompok }}
             </h2>
+
+            <p style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">
+                Periode:
+                {{ optional($peserta->kelompok->periode)->tahun_kkn ?? '-' }}
+            </p>
 
             <p style="margin: 0; font-size: 14px; opacity: 0.9;">
                 Lokasi:
@@ -207,6 +212,7 @@
                         <th>Nama</th>
                         <th>Prodi</th>
                         <th style="text-align:center;">Gender</th>
+                        <th style="text-align:center;">No. Telp</th>
                     </tr>
 
                 </thead>
@@ -249,6 +255,10 @@
 
                                 @endif
 
+                            </td>
+
+                            <td style="text-align:center;">
+                                {{ $p->no_telp ?? '-' }}
                             </td>
 
                         </tr>

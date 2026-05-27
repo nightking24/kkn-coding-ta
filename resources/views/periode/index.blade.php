@@ -42,32 +42,32 @@
 
         <div class="table-wrapper">
             <table id="periodeTable">
-                <thead>
+                <thead style="background: #343a40; color: white;">
                     <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Tahun</th>
-                        <th>Lokasi</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th style="text-align: center; padding: 12px;">No</th>
+                        <th style="text-align: center; padding: 12px;">Nama</th>
+                        <th style="text-align: center; padding: 12px;">Tahun</th>
+                        <th style="text-align: center; padding: 12px;">Lokasi</th>
+                        <th style="text-align: center; padding: 12px;">Status</th>
+                        <th style="text-align: center; padding: 12px;">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @foreach($periode as $p)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $p->nama_kkn }}</td>
-                            <td>{{ $p->tahun_kkn }}</td>
-                            <td>{{ $p->lokasi }}</td>
-                            <td>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="text-align: center; padding: 12px;">{{ $loop->iteration }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $p->nama_kkn }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $p->tahun_kkn }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $p->lokasi }}</td>
+                            <td style="text-align: center; padding: 12px;">
                                 @if($p->status == 1)
                                     <span style="color:green; font-weight:bold;">Aktif</span>
                                 @else
                                     <span style="color:red; font-weight:bold;">Tidak Aktif</span>
                                 @endif
                             </td>
-                            <td>
+                            <td style="text-align: center; padding: 12px;">
                                 <div style="display:flex; gap:8px; justify-content:center;">
                                     <a href="/periode/edit/{{ $p->id_periode }}" class="btn btn-blue">Edit</a>
                                     <a href="/periode/delete/{{ $p->id_periode }}" class="btn btn-red">Hapus</a>

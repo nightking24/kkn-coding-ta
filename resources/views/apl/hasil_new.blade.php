@@ -5,7 +5,7 @@
     <div class="card">
         <div style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 10px; color: #000;">Selamat datang, <b
-                    style="color: #1e7e34;">{{ session('user')->username }}</b></h3>
+                    style="color: #1e7e34;">{{ $apl_nama }}</b></h3>
             <p style="color: #666; font-size: 14px; margin: 0;">Portal Pembagian Kelompok KKN Reguler</p>
         </div>
 
@@ -18,21 +18,25 @@
                 <thead style="background: #343a40; color: white;">
                     <tr>
                         <th style="text-align: center; padding: 12px;">No</th>
-                        <th style="padding: 12px;">Kelompok</th>
-                        <th style="padding: 12px;">Kecamatan</th>
-                        <th style="padding: 12px;">Desa</th>
-                        <th style="padding: 12px;">Dusun</th>
-                        <th style="text-align: center; padding: 12px;">Aksi</th>
+                        <th style="text-align: center; padding: 12px;">Kelompok</th>
+                        <th style="text-align: center; padding: 12px;">Kecamatan</th>
+                        <th style="text-align: center; padding: 12px;">Desa</th>
+                        <th style="text-align: center; padding: 12px;">Dusun</th>
+                        <th style="text-align: center; padding: 12px;">DPL</th>
+                        <th style="text-align: center; padding: 12px;">Total Peserta</th>
+                        <th style="text-align: center; padding: 12px;"></th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($kelompok as $i => $k)
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
-                            <td style="padding: 12px; font-weight: 500;">Kelompok {{ $k->nomor_kelompok }}</td>
-                            <td style="padding: 12px;">{{ $k->nama_kecamatan }}</td>
-                            <td style="padding: 12px;">{{ $k->desa }}</td>
-                            <td style="padding: 12px;">{{ $k->dusun }}</td>
+                            <td style="text-align: center; padding: 12px; font-weight: 500;">Kelompok {{ $k->nomor_kelompok }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->nama_kecamatan }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->desa }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->dusun }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ optional($k->dpl)->nama }}</td>
+                            <td style="text-align: center; padding: 12px;">{{ $k->peserta->count() }}</td>
                             <td style="text-align: center; padding: 12px;">
                                 <a href="{{ url('/hasil-apl-new/detail/' . $k->id_kelompok) }}" class="btn btn-sm" style="background: #1e7e34; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none;">
                                     Detail

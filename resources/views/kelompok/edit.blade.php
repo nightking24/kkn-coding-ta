@@ -58,12 +58,17 @@
                 <div class="form-group">
                     <label>Tuan Rumah</label>
 
-                    <input list="list_tuan" id="tuan_rumah" name="id_tuan_rumah" class="form-control"
+                    {{-- HIDDEN ID --}}
+                    <input type="hidden" name="id_tuan_rumah" id="id_tuan_rumah" value="{{ $data->id_tuan_rumah }}">
+
+                    {{-- INPUT NAMA --}}
+                    <input list="list_tuan" id="tuan_rumah" name="tuan_rumah" class="form-control"
                         value="{{ optional($data->tuanRumah)->nama_tuan_rumah }}" required>
 
+                    {{-- DATALIST --}}
                     <datalist id="list_tuan">
                         @foreach($tuan_rumah as $t)
-                            <option value="{{ $t->nama_tuan_rumah }}">
+                            <option value="{{ $t->nama_tuan_rumah }}" data-id="{{ $t->id_tuan_rumah }}">
                         @endforeach
                     </datalist>
 
@@ -73,7 +78,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nomor Telepon</label>
+                    <label>Nomor Telepon (Dukuh/Tuan Rumah)</label>
                     <input type="text" name="nomor_telepon" class="form-control" value="{{ $data->nomor_telepon }}"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
                 </div>
@@ -91,7 +96,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Kapasitas</label>
+                    <label>Kapasitas (Maksimal)</label>
                     <input type="number" name="kapasitas" class="form-control" value="{{ $data->kapasitas }}">
                 </div>
 
@@ -168,6 +173,30 @@
         $(document).ready(function () {
 
             // =========================
+            // HANDLE DATALIST TUAN RUMAH
+            // =========================
+            $('#tuan_rumah').on('input', function () {
+
+                let input = $(this).val().trim();
+
+                // reset hidden id
+                $('#id_tuan_rumah').val('');
+
+                $('#list_tuan option').each(function () {
+
+                    if ($(this).val() === input) {
+
+                        $('#id_tuan_rumah').val(
+                            $(this).data('id')
+                        );
+
+                    }
+
+                });
+
+            });
+
+            // =========================
             // AUTO FILL TUAN RUMAH
             // =========================
             $('#tuan_rumah').on('blur', function () {
@@ -180,6 +209,9 @@
 
                     if (!data) return;
 
+                    // =========================
+                    // DATA TUAN RUMAH
+                    // =========================
                     $('input[name="nomor_telepon"]').val(
                         data.nomor_telepon ?? $('input[name="nomor_telepon"]').val()
                     );
@@ -195,6 +227,47 @@
                     $('input[name="longitude"]').val(
                         data.longitude ?? $('input[name="longitude"]').val()
                     );
+
+                    // =========================
+                    // DATA LOKASI
+                    // =========================
+                    $('#desa').val(
+                        data.desa ?? $('#desa').val()
+                    );
+
+                    $('#nama_kecamatan').val(
+                        data.nama_kecamatan ?? $('#nama_kecamatan').val()
+                    );
+
+                    $('#dusun').val(
+                        data.dusun ?? $('#dusun').val()
+                    );
+
+                    // =========================
+                    // DATA KELOMPOK
+                    // =========================
+                    $('input[name="kapasitas"]').val(
+                        data.kapasitas ?? $('input[name="kapasitas"]').val()
+                    );
+
+                    $('#semester').val(
+                        data.semester ?? $('#semester').val()
+                    );
+
+                    $('input[name="tahun_kkn"]').val(
+                        data.tahun_kkn ?? $('input[name="tahun_kkn"]').val()
+                    );
+
+                    $('#faskes').val(
+                        data.faskes == 1 ? "1" : "0"
+                    );
+
+                    // =========================
+                    // AUTO LOAD DPL APL
+                    // =========================
+                    if (data.desa) {
+                        loadDplApl(data.desa);
+                    }
 
                 });
 

@@ -22,19 +22,24 @@
 
             <div class="mb-3">
                 <label>Pilih Peserta</label>
-                <select name="nim" class="form-control" required>
+                <select name="nim" class="form-control select2">
+
                     <option value="">-- Pilih Peserta --</option>
+
                     @foreach($peserta as $p)
+
                         <option value="{{ $p->nim }}">
-                            {{ $p->nim }} - {{ $p->nama }} (K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }})
+                            {{ $p->nama }} - {{ $p->nim }} - K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}
                         </option>
+
                     @endforeach
+
                 </select>
             </div>
 
             <div class="mb-3">
                 <label>Pindah ke Kelompok</label>
-                <select name="id_kelompok" class="form-control" required>
+                <select name="id_kelompok" class="form-control select2">
                     <option value="">-- Pilih Kelompok --</option>
                     @foreach($kelompok as $k)
                         <option value="{{ $k->id_kelompok }}">
@@ -50,5 +55,14 @@
             </a>
         </form>
     </div>
+
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: '-- Pilih --',
+                allowClear: true
+            });
+        });
+    </script>
 
 @endsection

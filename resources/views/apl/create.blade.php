@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>No Telepon</label>
+                    <label>Nomor Telepon</label>
                     <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp') }}" pattern="[0-9]*"
                         inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="15">
                 </div>
