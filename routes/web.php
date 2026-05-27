@@ -50,6 +50,7 @@ Route::middleware(['ceklogin', 'role:admin'])->group(function () {
     Route::get('/apl/delete/{nim}', [AplController::class, 'delete']);
 
     Route::get('/import', [ImportController::class, 'index']);
+    Route::get('/download-template', [ImportController::class, 'downloadTemplate']);
     Route::post('/import/preview', [ImportController::class, 'preview']);
     Route::post('/import', [ImportController::class, 'store']);
 

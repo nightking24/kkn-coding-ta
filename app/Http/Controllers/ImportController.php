@@ -16,7 +16,7 @@ class ImportController extends Controller
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? Periode::where('status', 'aktif')
+            ?? Periode::where('status', 'berjalan')
                 ->value('id_periode');
     }
 
@@ -137,7 +137,7 @@ class ImportController extends Controller
             }
 
             $nama = trim($rowData['nama'] ?? '');
-            $nim = trim($rowData['nim'] ?? '');
+            $nim = str_replace("'", '', trim($rowData['nim'] ?? ''));
 
             $rowError = [];
 
@@ -313,15 +313,15 @@ class ImportController extends Controller
                 // 💾 SIMPAN DATA
                 \App\Models\Peserta::create([
                     'nama' => trim($row['nama']),
-                    'nim' => trim($row['nim']),
+                    'nim' => str_replace("'", '', trim($row['nim'])),
                     'email' => isset($row['email']) ? trim($row['email']) : null,
                     'no_telp' => isset($row['no_telp']) ? trim($row['no_telp']) : null,
                     'prodi' => isset($row['prodi']) ? trim($row['prodi']) : null,
                     'gender' => $row['gender'] ?? null,
                     'bahasa_jawa' => $row['bahasa_jawa'] ?? 0,
-                    'riwayat_penyakit' => $row['riwayat_penyakit'],
+                    'riwayat_penyakit' => $row['riwayat_penyakit'] ?? 0,
                     'detail_penyakit' => $row['detail_penyakit'] ?? null,
-                    'berkebutuhan_khusus' => $row['berkebutuhan_khusus'],
+                    'berkebutuhan_khusus' => $row['berkebutuhan_khusus'] ?? 0,
                     'detail_khusus' => $row['detail_khusus'] ?? null,
                     'id_periode' => $periode_id
                 ]);
@@ -347,5 +347,78 @@ class ImportController extends Controller
                 'error' => 'Gagal import data, silakan cek file CSV'
             ])->withInput();
         }
+    }
+
+    public function downloadTemplate()
+    {
+        $filename = 'template_import_peserta.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () {
+
+            $file = fopen('php://output', 'w');
+
+            // BOM UTF-8 AGAR EXCEL TIDAK RUSAK
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // HEADER SESUAI FORMAT SISTEM
+            fputcsv($file, [
+                'nim',
+                'nama',
+                'email',
+                'prodi',
+                'no telp',
+                'jenis kelamin',
+                'bahasa jawa',
+                'riwayat penyakit',
+                'kebutuhan khusus'
+            ], ';');
+
+            // CONTOH DATA BARIS 1
+            fputcsv($file, [
+                '11190401',
+                'Bima Wijaya',
+                'bimawijaya@gmail.com',
+                'Manajemen',
+                '081234567883',
+                'Pria',
+                'Bisa',
+                '-',
+                '-'
+            ], ';');
+
+            // CONTOH DATA BARIS 2
+            fputcsv($file, [
+                '11190402',
+                'Pandu Kusuma',
+                'pandukusuma@gmail.com',
+                'Manajemen',
+                '081234567873',
+                'Pria',
+                'Tidak',
+                'Asma',
+                '-'
+            ], ';');
+
+            // CONTOH DATA BARIS 3
+            fputcsv($file, [
+                '61190403',
+                'Mikaela Cyntia',
+                'mikaela@gmail.com',
+                'Arsitektur',
+                '081234567842',
+                'Wanita',
+                'Bisa',
+                '-',
+                'Disabilitas Ringan'
+            ], ';');
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

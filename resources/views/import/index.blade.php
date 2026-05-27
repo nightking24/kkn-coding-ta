@@ -5,14 +5,14 @@
     <div style="display:flex; justify-content:center; margin-top:50px;">
 
         <div style="
-                        width:100%;
-                        max-width:500px;
-                        background:white;
-                        padding:30px;
-                        border-radius:12px;
-                        box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                        text-align:center;
-                    ">
+                            width:100%;
+                            max-width:500px;
+                            background:white;
+                            padding:30px;
+                            border-radius:12px;
+                            box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                            text-align:center;
+                        ">
 
             <h2 style="margin-bottom:20px;">Import Data Peserta</h2>
 
@@ -29,12 +29,12 @@
 
             @if(session('error'))
                 <div style="
-                            background:#f8d7da;
-                            color:#721c24;
-                            padding:10px;
-                            border-radius:6px;
-                            margin-bottom:15px;
-                        ">
+                                    background:#f8d7da;
+                                    color:#721c24;
+                                    padding:10px;
+                                    border-radius:6px;
+                                    margin-bottom:15px;
+                                ">
                     {{ session('error') }}
                 </div>
             @endif
@@ -62,14 +62,31 @@
                         style="padding:8px; border:1px solid #ccc; border-radius:6px; width:100%;">
                 </div>
 
+                <div style="margin-bottom:15px;">
+
+                    <a href="{{ url('/download-template') }}" style="
+                display:inline-block;
+                background:#28a745;
+                color:white;
+                padding:10px 20px;
+                border-radius:6px;
+                text-decoration:none;
+            ">
+
+                        Download Template CSV
+
+                    </a>
+
+                </div>
+
                 <button type="submit" style="
-                                background:#007bff;
-                                color:white;
-                                border:none;
-                                padding:10px 20px;
-                                border-radius:6px;
-                                cursor:pointer;
-                            ">
+                                    background:#007bff;
+                                    color:white;
+                                    border:none;
+                                    padding:10px 20px;
+                                    border-radius:6px;
+                                    cursor:pointer;
+                                ">
                     Preview
                 </button>
 
