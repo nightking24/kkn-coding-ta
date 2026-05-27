@@ -41,8 +41,7 @@
                 <div class="form-group">
                     <label for="nomor_kelompok">Nomor Kelompok</label>
                     <input type="text" id="nomor_kelompok" name="nomor_kelompok" class="form-control"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric"
-                        maxlength="3">
+                        value="{{ $nextKelompok }}" readonly style="background:#e9ecef; cursor:not-allowed;">
                 </div>
 
                 {{-- Kecamatan --}}

@@ -164,7 +164,7 @@ class HasilPembagianExport implements WithEvents
 
                     $sheet->setCellValue("L{$row}", $k->desa);
 
-                    $sheet->setCellValue("M{$rMw}", $k->dusun);
+                    $sheet->setCellValue("M{$row}", $k->dusun);
 
                     $sheet->getStyle("A{$row}:L{$endRow}")
                         ->applyFromArray([

@@ -97,7 +97,20 @@ class KelompokController extends Controller
 
         $tuan_rumah = DB::table('tuan_rumah')->get();
 
-        return view('kelompok.create', compact('dpl', 'apl', 'tuan_rumah'));
+        // =========================
+        // AUTO NOMOR KELOMPOK
+        // =========================
+        $lastKelompok = Kelompok::where('id_periode', $periode_id)
+            ->max('nomor_kelompok');
+
+        $nextKelompok = ($lastKelompok ?? 0) + 1;
+
+        return view('kelompok.create', compact(
+            'dpl',
+            'apl',
+            'tuan_rumah',
+            'nextKelompok'
+        ));
     }
 
     public function getDusun($dusun)
