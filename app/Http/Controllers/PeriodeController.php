@@ -90,6 +90,15 @@ class PeriodeController extends Controller
                 'status' => $request->status
             ]);
 
+            // JIKA PERIODE INI BERJALAN
+            // MAKA SET JADI SESSION AKTIF
+            if ($request->status == 'berjalan') {
+
+                session([
+                    'periode_id' => $data->id_periode
+                ]);
+            }
+
             // 🔥 LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',

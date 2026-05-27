@@ -8,26 +8,26 @@
             <h2>Data Kelompok</h2>
             @if(session('error'))
                 <div style="
-                    background:#f8d7da;
-                    color:#721c24;
-                    padding:12px;
-                    border-radius:8px;
-                    margin-bottom:15px;
-                    border-left:5px solid #dc3545;
-                ">
+                            background:#f8d7da;
+                            color:#721c24;
+                            padding:12px;
+                            border-radius:8px;
+                            margin-bottom:15px;
+                            border-left:5px solid #dc3545;
+                        ">
                     {{ session('error') }}
                 </div>
             @endif
 
             @if(session('success'))
                 <div style="
-                                                            background:#d4edda;
-                                                            color:#155724;
-                                                            padding:12px;
-                                                            border-radius:8px;
-                                                            margin-bottom:15px;
-                                                            border-left:5px solid #28a745;
-                                                        ">
+                                                                    background:#d4edda;
+                                                                    color:#155724;
+                                                                    padding:12px;
+                                                                    border-radius:8px;
+                                                                    margin-bottom:15px;
+                                                                    border-left:5px solid #28a745;
+                                                                ">
                     {{ session('success') }}
                 </div>
             @endif
@@ -38,13 +38,13 @@
 
             @if ($errors->any())
                 <div style="
-                                                    background:#f8d7da;
-                                                    color:#721c24;
-                                                    padding:12px;
-                                                    border-radius:8px;
-                                                    margin-bottom:15px;
-                                                    border-left:5px solid #dc3545;
-                                                ">
+                                                            background:#f8d7da;
+                                                            color:#721c24;
+                                                            padding:12px;
+                                                            border-radius:8px;
+                                                            margin-bottom:15px;
+                                                            border-left:5px solid #dc3545;
+                                                        ">
                     <b>Terjadi kesalahan:</b>
                     <ul style="margin:5px 0 0 15px;">
                         @foreach ($errors->all() as $e)
@@ -56,16 +56,26 @@
         </div>
 
         <div class="table-wrapper">
-            <form method="GET" style="margin-bottom: 15px;">
-                <label>Pilih Periode:</label>
-                <select name="periode_id" onchange="this.form.submit()" class="form-control" style="width: 200px;">
+            <form method="GET" style="margin-bottom:15px;">
+
+                <label>Pilih Nomor KKN:</label>
+
+                <select name="periode_id" onchange="this.form.submit()" class="form-control" style="width:250px;">
+
                     @foreach($periodes as $p)
+
                         <option value="{{ $p->id_periode }}" {{ $periode_id == $p->id_periode ? 'selected' : '' }}>
-                            {{ $p->tahun_kkn }}
+
+                            {{ $p->nama_kkn }}
+
                         </option>
+
                     @endforeach
+
                 </select>
+
             </form>
+            
             <table id="kelompokTable">
                 <thead style="background: #343a40; color: white;">
                     <tr>

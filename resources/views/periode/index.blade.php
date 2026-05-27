@@ -8,33 +8,33 @@
             <h2>Data Periode KKN</h2>
             @if(session('success'))
                 <div style="
-                            background:#d4edda;
-                            color:#155724;
-                            padding:12px;
-                            border-radius:8px;
-                            margin-bottom:15px;
-                            border-left:5px solid #28a745;
-                        ">
+                                    background:#d4edda;
+                                    color:#155724;
+                                    padding:12px;
+                                    border-radius:8px;
+                                    margin-bottom:15px;
+                                    border-left:5px solid #28a745;
+                                ">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                    <div style="
-                    background:#f8d7da;
-                    color:#721c24;
-                    padding:12px;
-                    border-radius:8px;
-                    margin-bottom:15px;
-                    border-left:5px solid #dc3545;
-                ">
-                        <b>Terjadi kesalahan:</b>
-                        <ul style="margin:5px 0 0 15px;">
-                            @foreach ($errors->all() as $e)
-                                <li>{{ $e }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div style="
+                            background:#f8d7da;
+                            color:#721c24;
+                            padding:12px;
+                            border-radius:8px;
+                            margin-bottom:15px;
+                            border-left:5px solid #dc3545;
+                        ">
+                    <b>Terjadi kesalahan:</b>
+                    <ul style="margin:5px 0 0 15px;">
+                        @foreach ($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
             <a href="/periode/create" class="btn btn-green">+ Tambah Periode</a>
@@ -61,10 +61,14 @@
                             <td style="text-align: center; padding: 12px;">{{ $p->tahun_kkn }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $p->lokasi }}</td>
                             <td style="text-align: center; padding: 12px;">
-                                @if($p->status == 1)
-                                    <span style="color:green; font-weight:bold;">Aktif</span>
+                                @if($p->status == 'berjalan')
+                                    <span style="color:green; font-weight:bold;">
+                                        Berjalan
+                                    </span>
                                 @else
-                                    <span style="color:red; font-weight:bold;">Tidak Aktif</span>
+                                    <span style="color:red; font-weight:bold;">
+                                        Selesai
+                                    </span>
                                 @endif
                             </td>
                             <td style="text-align: center; padding: 12px;">

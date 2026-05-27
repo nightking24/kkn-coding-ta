@@ -6,6 +6,26 @@
 
         <h2 style="margin-bottom:20px;">Hasil Pembagian Kelompok</h2>
 
+        <form method="GET" style="margin-bottom:15px;">
+
+            <label>Pilih Nomor KKN:</label>
+
+            <select name="periode_id" onchange="this.form.submit()" class="form-control" style="width:250px;">
+
+                @foreach($periodes as $periode)
+
+                    <option value="{{ $periode->id_periode }}" {{ $periode_id == $periode->id_periode ? 'selected' : '' }}>
+
+                        {{ $periode->nama_kkn }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </form>
+
         @if(session('error'))
             <div class="alert alert-danger">
                 {{ session('error') }}
@@ -48,23 +68,67 @@
                     @php $no = 1; @endphp
 
                     @foreach($kelompok as $id => $items)
+
                         @foreach($items as $p)
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="text-align: center; padding: 12px;">{{ $no++ }}</td>
-                                    <td style="text-align: center; padding: 12px;">K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $p->nim }}</td>
-                                    <td style="text-align: left; padding: 12px;">{{ $p->nama }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $p->prodi }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}</td>
-                                    <td style="text-align: left; padding: 12px;">{{ optional($p->kelompok?->dpl)->nama ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}</td>
-                                    <td style="text-align: left; padding: 12px;">{{ optional($p->kelompok?->apl)->nama ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ optional($p->kelompok?->apl)->no_telp ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ optional($p->kelompok)->nama_kecamatan ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ optional($p->kelompok)->desa ?? '-' }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ optional($p->kelompok)->dusun ?? '-' }}</td>
-                                </tr>
+
+                            <tr style="border-bottom: 1px solid #eee;">
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ $no++ }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ $p->nim }}
+                                </td>
+
+                                <td style="text-align: left; padding: 12px;">
+                                    {{ $p->nama }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ $p->prodi }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
+                                </td>
+
+                                <td style="text-align: left; padding: 12px;">
+                                    {{ optional($p->kelompok?->dpl)->nama ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
+                                </td>
+
+                                <td style="text-align: left; padding: 12px;">
+                                    {{ optional($p->kelompok?->apl)->nama ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ optional($p->kelompok)->nama_kecamatan ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ optional($p->kelompok)->desa ?? '-' }}
+                                </td>
+
+                                <td style="text-align: center; padding: 12px;">
+                                    {{ optional($p->kelompok)->dusun ?? '-' }}
+                                </td>
+
+                            </tr>
+
                         @endforeach
+
                     @endforeach
 
                 </tbody>
@@ -112,10 +176,9 @@
                                         <select name="id_kelompok" required class="form-control kelompok-select">
                                             <option value="">Pilih Kelompok</option>
                                             @foreach($kelompokList as $k)
-                                                <option value="{{ $k->id_kelompok }}" data-kapasitas="{{ $k->kapasitas }}"
-                                                    data-isi="{{ \App\Models\Peserta::where('id_kelompok', $k->id_kelompok)->count() }}">
-                                                    K{{ $k->nomor_kelompok }}
-                                                </option>
+                                                        <option value="{{ $k->id_kelompok }}" data-kapasitas="{{ $k->kapasitas }}" data-isi="{{ \App\Models\Peserta::where('id_kelompok', $k->id_kelompok)
+                                                ->where('id_periode', $periode_id)
+                                                ->count() }}" K{{ $k->nomor_kelompok }} </option>
                                             @endforeach
                                         </select>
 

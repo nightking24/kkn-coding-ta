@@ -29,7 +29,7 @@ class KelompokController extends Controller
     {
         return session('periode_id')
             ?? request('periode_id')
-            ?? Periode::where('status', 'aktif')
+            ?? Periode::where('status', 'berjalan')
                 ->value('id_periode');
     }
 
@@ -51,17 +51,35 @@ class KelompokController extends Controller
             session(['periode_id' => $request->periode_id]);
         }
 
-        $periodes = Periode::all();
+        // HANYA PERIODE BERJALAN
+        $periodes = Periode::where('status', 'berjalan')
+            ->latest()
+            ->get();
 
-        $periode_id = $this->getPeriodeId();
+        // AMBIL PERIODE TERPILIH
+        $periode_id = session('periode_id');
 
         if (!$periode_id) {
-            $periode_id = Periode::where('status_publish', 1)
+
+            $periode_id = Periode::where('status', 'berjalan')
                 ->value('id_periode');
+
+            session(['periode_id' => $periode_id]);
+        }
+
+        // JIKA BELUM ADA -> AMBIL YANG TERAKHIR BERJALAN
+        if (!$periode_id) {
+
+            $periode_id = Periode::where('status', 'berjalan')
+                ->latest()
+                ->value('id_periode');
+
+            session(['periode_id' => $periode_id]);
         }
 
         $kelompok = Kelompok::with(['tuanRumah', 'dpl', 'apl'])
-            ->where('id_periode', $periode_id)->get();
+            ->where('id_periode', $periode_id)
+            ->get();
 
         return view('kelompok.index', compact(
             'kelompok',
@@ -85,7 +103,9 @@ class KelompokController extends Controller
     public function getDusun($dusun)
     {
         // ambil data kelompok berdasarkan dusun
-        $data = Kelompok::where('dusun', $dusun)->first();
+        $data = Kelompok::where('dusun', $dusun)
+            ->where('id_periode', $this->getPeriodeId())
+            ->first();
 
         if (!$data) {
             return response()->json(null);
@@ -121,6 +141,7 @@ class KelompokController extends Controller
         // ambil kelompok terakhir berdasarkan dusun/desa
         $kelompok = Kelompok::where('dusun', $tuan->dusun)
             ->where('desa', $tuan->desa)
+            ->where('id_periode', $this->getPeriodeId())
             ->latest('id_kelompok')
             ->first();
 
@@ -336,7 +357,7 @@ class KelompokController extends Controller
 
             if (!$id_periode) {
 
-                $id_periode = Periode::where('status_publish', 0)
+                $id_periode = Periode::where('status', 'berjalan')
                     ->value('id_periode');
             }
 
@@ -407,7 +428,7 @@ class KelompokController extends Controller
 
         $periode_id = request('periode_id')
             ?? session('periode_id')
-            ?? Periode::where('status_publish', 0)->value('id_periode');
+            ?? Periode::where('status', 'berjalan')->value('id_periode');
 
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
@@ -653,7 +674,7 @@ class KelompokController extends Controller
 
         $periode_id = session('periode_id')
             ?? request('periode_id')
-            ?? Periode::where('status_publish', 1)->value('id_periode');
+            ?? Periode::where('status', 'berjalan')->value('id_periode');
 
         $periode_id = $this->getPeriodeId();
 
@@ -942,16 +963,39 @@ class KelompokController extends Controller
 
     public function hasilPembagian(Request $request)
     {
-        $periode_id = $request->periode_id
-            ?? session('periode_id')
-            ?? Periode::latest()->value('id_periode');
+        if ($request->periode_id) {
+            session(['periode_id' => $request->periode_id]);
+        }
+
+        // HANYA PERIODE BERJALAN
+        $periodes = Periode::where('status', 'berjalan')
+            ->latest()
+            ->get();
+
+        $periode_id = session('periode_id');
+
+        if (!$periode_id) {
+
+            $periode_id = Periode::where('status', 'berjalan')
+                ->value('id_periode');
+
+            session(['periode_id' => $periode_id]);
+        }
+
+        // DEFAULT KE YANG TERAKHIR BERJALAN
+        if (!$periode_id) {
+
+            $periode_id = Periode::where('status', 'berjalan')
+                ->latest()
+                ->value('id_periode');
+
+            session(['periode_id' => $periode_id]);
+        }
 
         if (!$periode_id) {
             return redirect('/dashboard')
                 ->with('error', 'Belum ada data periode!');
         }
-
-        session(['periode_id' => $periode_id]);
 
         $peserta = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
             ->where('id_periode', $periode_id)
@@ -962,9 +1006,11 @@ class KelompokController extends Controller
             ->sortBy(function ($group) {
                 return optional($group->first()->kelompok)->nomor_kelompok ?? 0;
             });
+
         $belum = $peserta->whereNull('id_kelompok');
 
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
+
         $dplList = Dpl::where('id_periode', $periode_id)
             ->select('nik', 'nama', 'no_telp')
             ->distinct()
@@ -984,7 +1030,9 @@ class KelompokController extends Controller
             'kelompokList',
             'dplList',
             'aplList',
-            'status'
+            'status',
+            'periodes',
+            'periode_id'
         ));
     }
 

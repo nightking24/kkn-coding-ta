@@ -9,13 +9,13 @@
         {{-- ERROR --}}
         @if ($errors->any())
             <div style="
-                                            background:#f8d7da;
-                                            color:#721c24;
-                                            padding:12px;
-                                            border-radius:8px;
-                                            margin-bottom:15px;
-                                            border-left:5px solid #dc3545;
-                                        ">
+                                                    background:#f8d7da;
+                                                    color:#721c24;
+                                                    padding:12px;
+                                                    border-radius:8px;
+                                                    margin-bottom:15px;
+                                                    border-left:5px solid #dc3545;
+                                                ">
                 <b>Terjadi kesalahan:</b>
                 <ul style="margin:5px 0 0 15px;">
                     @foreach ($errors->all() as $e)
@@ -28,13 +28,13 @@
         {{-- SUCCESS --}}
         @if(session('success'))
             <div style="
-                                            background:#d4edda;
-                                            color:#155724;
-                                            padding:12px;
-                                            border-radius:8px;
-                                            margin-bottom:15px;
-                                            border-left:5px solid #28a745;
-                                        ">
+                                                    background:#d4edda;
+                                                    color:#155724;
+                                                    padding:12px;
+                                                    border-radius:8px;
+                                                    margin-bottom:15px;
+                                                    border-left:5px solid #28a745;
+                                                ">
                 {{ session('success') }}
             </div>
         @endif
@@ -77,14 +77,14 @@
                 <label>Status</label>
                 <select name="status" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
 
-                    <option value="0" {{ $periode->status == 0 ? 'selected' : '' }}>
-                        Tidak Aktif
+                    <option value="selesai" {{ $periode->status == 'selesai' ? 'selected' : '' }}>
+                        Selesai
                     </option>
 
-                    <option value="1" {{ $periode->status == 1 ? 'selected' : '' }}>
-                        Aktif
+                    <option value="berjalan" {{ $periode->status == 'berjalan' ? 'selected' : '' }}>
+                        Berjalan
                     </option>
-
+                    
                 </select>
             </div>
 
