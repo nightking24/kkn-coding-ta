@@ -35,7 +35,7 @@
                             <td style="text-align: center; padding: 12px;">{{ $k->nama_kecamatan }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $k->desa }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $k->dusun }}</td>
-                            <td style="text-align: center; padding: 12px;">{{ optional($k->apl)->nama }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ optional($k->apl)->nama }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $k->peserta->count() }}</td>
                             <td style="text-align: center; padding: 12px;">
                                 <a href="{{ url('/dpl-view/detail/' . $k->id_kelompok) }}" class="btn btn-sm" style="background: #1e7e34; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none;">

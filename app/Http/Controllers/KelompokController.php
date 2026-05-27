@@ -1025,12 +1025,12 @@ class KelompokController extends Controller
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
 
         $dplList = Dpl::where('id_periode', $periode_id)
-            ->select('nik', 'nama', 'no_telp')
+            ->select('id_dpl', 'nama', 'no_telp')
             ->distinct()
             ->get();
 
         $aplList = Apl::where('id_periode', $periode_id)
-            ->select('nim', 'nama', 'no_telp')
+            ->select('id_apl', 'nama', 'no_telp')
             ->distinct()
             ->get();
 
@@ -1079,6 +1079,24 @@ class KelompokController extends Controller
         $periode_id = request('periode_id')
             ?? session('periode_id');
 
+        // =========================
+        // FILTER DPL & APL
+        // =========================
+        $dpl_id = request('dpl_id');
+        $apl_id = request('apl_id');
+
+        // konversi ID -> NIK
+        $dpl_nik = null;
+        if ($dpl_id) {
+            $dpl_nik = Dpl::where('id_dpl', $dpl_id)->value('nik');
+        }
+
+        // konversi ID -> NIM
+        $apl_nim = null;
+        if ($apl_id) {
+            $apl_nim = Apl::where('id_apl', $apl_id)->value('nim');
+        }
+
         $periode = Periode::find($periode_id);
 
         $namaFile =
@@ -1087,7 +1105,11 @@ class KelompokController extends Controller
             '.xlsx';
 
         return Excel::download(
-            new HasilPembagianExport($periode_id),
+            new HasilPembagianExport(
+                $periode_id,
+                $dpl_nik,
+                $apl_nim
+            ),
             $namaFile
         );
     }
@@ -1099,18 +1121,54 @@ class KelompokController extends Controller
         $periode_id = request('periode_id')
             ?? session('periode_id');
 
-        $data = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
-            ->whereHas('kelompok', function ($q) use ($periode_id) {
+        // =========================
+        // FILTER DPL & APL
+        // =========================
+        $dpl_id = request('dpl_id');
+        $apl_id = request('apl_id');
+
+        // konversi ID -> NIK
+        $dpl_nik = null;
+        if ($dpl_id) {
+            $dpl_nik = Dpl::where('id_dpl', $dpl_id)->value('nik');
+        }
+
+        // konversi ID -> NIM
+        $apl_nim = null;
+        if ($apl_id) {
+            $apl_nim = Apl::where('id_apl', $apl_id)->value('nim');
+        }
+
+        $data = Peserta::with([
+            'kelompok.dpl',
+            'kelompok.apl'
+        ])
+
+            ->whereHas('kelompok', function ($q) use ($periode_id, $dpl_nik, $apl_nim) {
+
                 $q->where('id_periode', $periode_id);
+
+                // FILTER DPL
+                if ($dpl_nik) {
+                    $q->where('nik', $dpl_nik);
+                }
+
+                //FILTER APL
+                if ($apl_nim) {
+                    $q->where('nim', $apl_nim);
+                }
             })
+
             ->get();
 
         $grouped = $data->groupBy(function ($p) {
             return $p->kelompok->nomor_kelompok ?? 'Tanpa Kelompok';
         });
 
-        $pdf = Pdf::loadView('kelompok.export_pdf', compact('grouped'))
-            ->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView(
+            'kelompok.export_pdf',
+            compact('grouped')
+        )->setPaper('a4', 'landscape');
 
         $periode = Periode::find($periode_id);
 

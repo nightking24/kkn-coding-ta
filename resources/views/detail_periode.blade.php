@@ -20,14 +20,14 @@
         </div>
 
         <div style="display:flex; gap:10px;">
-            <a href="{{ url('/periode/' . $periode->id_periode . '/export-pdf?periode_id=' . session('periode_id')) }}"
-                class="btn btn-red">
-                Export PDF
-            </a>
-
             <a href="{{ url('/periode/' . $periode->id_periode . '/export-excel?periode_id=' . session('periode_id')) }}"
                 class="btn btn-green">
                 Export Excel
+            </a>
+
+            <a href="{{ url('/periode/' . $periode->id_periode . '/export-pdf?periode_id=' . session('periode_id')) }}"
+                class="btn btn-red">
+                Export PDF
             </a>
         </div>
 

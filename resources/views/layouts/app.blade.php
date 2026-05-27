@@ -88,8 +88,8 @@
         }
 
         .container {
-            width: 100%;
-            max-width: 1200px;
+            width: 98%;
+            max-width: 1800px;
         }
 
         .card {
@@ -280,7 +280,7 @@
                 @endif
 
             @endif
-            
+
         </div>
 
         <div class="content">

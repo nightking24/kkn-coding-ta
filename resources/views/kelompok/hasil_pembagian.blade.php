@@ -2,9 +2,105 @@
 
 @section('content')
 
-    <div class="card">
+    <style>
+        .hasil-card {
+            max-width: 1400px;
+            margin: auto;
+        }
 
-        <h2 style="margin-bottom:20px;">Hasil Pembagian Kelompok</h2>
+        .hasil-wrapper {
+            overflow-x: auto;
+        }
+
+        #table-main {
+            width: 100% !important;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+    </style>
+
+    <div class="card hasil-card">
+
+        {{-- HEADER WITH TITLE AND FILTERS/EXPORTS --}}
+        <div style="display:flex; gap:20px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:20px;">
+
+            {{-- LEFT: Title --}}
+            <h2 style="margin:0;">Hasil Pembagian Kelompok</h2>
+
+            {{-- RIGHT: Filters + Exports --}}
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                
+                {{-- Filter Section --}}
+                <form method="GET" action="" style="display:flex; gap:10px; align-items:center;">
+
+                    <input type="hidden" name="periode_id" value="{{ $periode_id }}">
+
+                    {{-- FILTER DPL --}}
+                    <select name="dpl_id" class="form-control" style="width:150px;">
+                        <option value="">Semua DPL</option>
+
+                        @foreach($dplList as $dpl)
+                            <option value="{{ $dpl->id_dpl }}" {{ request('dpl_id') == $dpl->id_dpl ? 'selected' : '' }}>
+                                {{ $dpl->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- FILTER APL --}}
+                    <select name="apl_id" class="form-control" style="width:150px;">
+                        <option value="">Semua APL</option>
+
+                        @foreach($aplList as $apl)
+                            <option value="{{ $apl->id_apl }}" {{ request('apl_id') == $apl->id_apl ? 'selected' : '' }}>
+                                {{ $apl->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        Filter
+                    </button>
+
+                </form>
+
+                {{-- Export Section --}}
+                @php
+                    $periode_id = request('periode_id') ?? session('periode_id');
+                @endphp
+
+                @if($periode_id)
+                    <a href="{{ route('export.excel', [
+                        'periode_id' => $periode_id,
+                        'dpl_id' => request('dpl_id'),
+                        'apl_id' => request('apl_id')
+                    ]) }}" class="btn btn-success">
+                        Export Excel
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Export Excel
+                    </button>
+                @endif
+
+                @if($periode_id)
+                    <a href="{{ route('export.pdf', [
+                        'periode_id' => $periode_id,
+                        'dpl_id' => request('dpl_id'),
+                        'apl_id' => request('apl_id')
+                    ]) }}" class="btn btn-danger">
+                        Export PDF
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Export PDF
+                    </button>
+                @endif
+
+            </div>
+
+        </div>
 
         <form method="GET" style="margin-bottom:15px;">
 
@@ -45,93 +141,95 @@
         @endif
 
         <div style="overflow-x:auto;">
-            <table id="table-main" class="display">
-                <thead style="background: #343a40; color: white;">
-                    <tr>
-                        <th style="text-align: center; padding: 12px;">No</th>
-                        <th style="text-align: center; padding: 12px;">Kelompok</th>
-                        <th style="text-align: center; padding: 12px;">NIM</th>
-                        <th style="text-align: center; padding: 12px;">Nama</th>
-                        <th style="text-align: center; padding: 12px;">Prodi</th>
-                        <th style="text-align: center; padding: 12px;">Gender</th>
-                        <th style="text-align: center; padding: 12px;">DPL</th>
-                        <th style="text-align: center; padding: 12px;">Kontak DPL</th>
-                        <th style="text-align: center; padding: 12px;">APL</th>
-                        <th style="text-align: center; padding: 12px;">Kontak APL</th>
-                        <th style="text-align: center; padding: 12px;">Kecamatan</th>
-                        <th style="text-align: center; padding: 12px;">Desa</th>
-                        <th style="text-align: center; padding: 12px;">Dusun</th>
-                    </tr>
-                </thead>
+            <div class="hasil-wrapper">
+                <table id="table-main" class="display">
+            </div>
+            <thead style="background: #343a40; color: white;">
+                <tr>
+                    <th style="text-align: center; padding: 12px;">No</th>
+                    <th style="text-align: center; padding: 12px;">Kelompok</th>
+                    <th style="text-align: center; padding: 12px;">NIM</th>
+                    <th style="text-align: center; padding: 12px;">Nama</th>
+                    <th style="text-align: center; padding: 12px;">Prodi</th>
+                    <th style="text-align: center; padding: 12px;">Gender</th>
+                    <th style="text-align: center; padding: 12px;">DPL</th>
+                    <th style="text-align: center; padding: 12px;">Kontak DPL</th>
+                    <th style="text-align: center; padding: 12px;">APL</th>
+                    <th style="text-align: center; padding: 12px;">Kontak APL</th>
+                    <th style="text-align: center; padding: 12px;">Kecamatan</th>
+                    <th style="text-align: center; padding: 12px;">Desa</th>
+                    <th style="text-align: center; padding: 12px;">Dusun</th>
+                </tr>
+            </thead>
 
-                <tbody>
-                    @php $no = 1; @endphp
+            <tbody>
+                @php $no = 1; @endphp
 
-                    @foreach($kelompok as $id => $items)
+                @foreach($kelompok as $id => $items)
 
-                        @foreach($items as $p)
+                    @foreach($items as $p)
 
-                            <tr style="border-bottom: 1px solid #eee;">
+                        <tr style="border-bottom: 1px solid #eee;">
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ $no++ }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ $no++ }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ $p->nim }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ $p->nim }}
+                            </td>
 
-                                <td style="text-align: left; padding: 12px;">
-                                    {{ $p->nama }}
-                                </td>
+                            <td style="text-align: left; padding: 12px;">
+                                {{ $p->nama }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ $p->prodi }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ $p->prodi }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
+                            </td>
 
-                                <td style="text-align: left; padding: 12px;">
-                                    {{ optional($p->kelompok?->dpl)->nama ?? '-' }}
-                                </td>
+                            <td style="text-align: left; padding: 12px;">
+                                {{ optional($p->kelompok?->dpl)->nama ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
+                            </td>
 
-                                <td style="text-align: left; padding: 12px;">
-                                    {{ optional($p->kelompok?->apl)->nama ?? '-' }}
-                                </td>
+                            <td style="text-align: left; padding: 12px;">
+                                {{ optional($p->kelompok?->apl)->nama ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ optional($p->kelompok)->nama_kecamatan ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ optional($p->kelompok)->nama_kecamatan ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ optional($p->kelompok)->desa ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ optional($p->kelompok)->desa ?? '-' }}
+                            </td>
 
-                                <td style="text-align: center; padding: 12px;">
-                                    {{ optional($p->kelompok)->dusun ?? '-' }}
-                                </td>
+                            <td style="text-align: center; padding: 12px;">
+                                {{ optional($p->kelompok)->dusun ?? '-' }}
+                            </td>
 
-                            </tr>
-
-                        @endforeach
+                        </tr>
 
                     @endforeach
 
-                </tbody>
+                @endforeach
+
+            </tbody>
             </table>
         </div>
 
@@ -178,7 +276,9 @@
                                             @foreach($kelompokList as $k)
                                                         <option value="{{ $k->id_kelompok }}" data-kapasitas="{{ $k->kapasitas }}" data-isi="{{ \App\Models\Peserta::where('id_kelompok', $k->id_kelompok)
                                                 ->where('id_periode', $periode_id)
-                                                ->count() }}" K{{ $k->nomor_kelompok }} </option>
+                                                ->count() }}">
+                                                            K{{ $k->nomor_kelompok }}
+                                                        </option>
                                             @endforeach
                                         </select>
 
@@ -204,7 +304,8 @@
 
         <br>
 
-        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        {{-- ROW 2: Action Buttons & Status --}}
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
 
             @if($status == 0)
                 <form action="{{ route('reset.pembagian') }}" method="POST">
@@ -216,10 +317,8 @@
                 </form>
             @endif
 
-            <div style="display:flex; gap:10px;">
-                @php
-                    $periode_id = request('periode_id') ?? session('periode_id');
-                @endphp
+            {{-- Right Section: Pindah/Tukar + Publish + Status --}}
+            <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
 
                 @if($status == 0)
                     @if($periode_id)
@@ -245,28 +344,8 @@
                     @endif
                 @endif
 
-                @if($periode_id)
-                    <a href="{{ route('export.excel', ['periode_id' => $periode_id]) }}" class="btn btn-success">
-                        Export Excel
-                    </a>
-                @else
-                    <button class="btn btn-secondary" disabled>
-                        Export Excel
-                    </button>
-                @endif
-
-                @if($periode_id)
-                    <a href="{{ route('export.pdf', ['periode_id' => $periode_id]) }}" class="btn btn-danger">
-                        Export PDF
-                    </a>
-                @else
-                    <button class="btn btn-secondary" disabled>
-                        Export PDF
-                    </button>
-                @endif
-
                 @if($status == 0)
-                    <form action="{{ route('kelompok.publish') }}" method="POST">
+                    <form action="{{ route('kelompok.publish') }}" method="POST" style="margin:0;">
                         @csrf
                         <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
 
@@ -276,7 +355,7 @@
                         </button>
                     </form>
                 @elseif($status == 1)
-                    <form action="{{ route('kelompok.unpublish') }}" method="POST">
+                    <form action="{{ route('kelompok.unpublish') }}" method="POST" style="margin:0;">
                         @csrf
                         <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
 
@@ -286,47 +365,49 @@
                         </button>
                     </form>
                 @endif
-            </div>
-            <div style="margin-top:10px;">
-                <strong>Status:</strong>
 
-                @if($status == 1)
-                    <span style="color:green; font-weight:bold;">✔ Sudah Publish</span>
-                @else
-                    <span style="color:orange; font-weight:bold;">⏳ Belum Publish</span>
-                @endif
+                {{-- STATUS DISPLAY --}}
+                <div style="white-space:nowrap;">
+                    <strong>Status:</strong>
+
+                    @if($status == 1)
+                        <span style="color:green; font-weight:bold;">✔ Sudah Publish</span>
+                    @else
+                        <span style="color:orange; font-weight:bold;">⏳ Belum Publish</span>
+                    @endif
+                </div>
+
             </div>
+
         </div>
 
-    </div>
+        <script>
+            $(document).ready(function () {
+                $('#table-main').DataTable({
+                    scrollX: true
+                });
 
-    <script>
-        $(document).ready(function () {
-            $('#table-main').DataTable({
-                scrollX: true
+                $('#table-belum').DataTable();
             });
+        </script>
 
-            $('#table-belum').DataTable();
-        });
-    </script>
+        <script>
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 3000);
+        </script>
 
-    <script>
-        setTimeout(function () {
-            $('.alert').fadeOut('slow');
-        }, 3000);
-    </script>
+        <script>
+            document.querySelectorAll('.kelompok-select').forEach(select => {
+                select.addEventListener('change', function () {
+                    let kapasitas = this.options[this.selectedIndex].getAttribute('data-kapasitas');
+                    let isi = this.options[this.selectedIndex].getAttribute('data-isi');
 
-    <script>
-        document.querySelectorAll('.kelompok-select').forEach(select => {
-            select.addEventListener('change', function () {
-                let kapasitas = this.options[this.selectedIndex].getAttribute('data-kapasitas');
-                let isi = this.options[this.selectedIndex].getAttribute('data-isi');
-
-                if (kapasitas && isi && parseInt(isi) >= parseInt(kapasitas)) {
-                    alert('⚠️ Kelompok sudah penuh!');
-                }
+                    if (kapasitas && isi && parseInt(isi) >= parseInt(kapasitas)) {
+                        alert('⚠️ Kelompok sudah penuh!');
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 
 @endsection

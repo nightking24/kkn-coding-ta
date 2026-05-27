@@ -212,6 +212,15 @@ class PesertaExport implements WithEvents
 
                     $sheet->setCellValue("L{$row}", $k->dusun);
 
+                    // Format nomor telepon agar tidak scientific notation
+                    $sheet->getStyle("H{$row}:H{$endRow}")
+                        ->getNumberFormat()
+                        ->setFormatCode('0');
+
+                    $sheet->getStyle("J{$row}:J{$endRow}")
+                        ->getNumberFormat()
+                        ->setFormatCode('0');
+
                     // ======================================
                     // STYLE INFO TENGAH
                     // ======================================
@@ -255,7 +264,10 @@ class PesertaExport implements WithEvents
                             ? 'Laki-Laki'
                             : 'Perempuan'
                         );
-                        
+                                                // Format NIM agar tidak scientific notation
+                        $sheet->getStyle("C{$currentRow}")
+                            ->getNumberFormat()
+                            ->setFormatCode('0');
                         $sheet->getStyle("B{$currentRow}:F{$currentRow}")
                             ->applyFromArray([
                                 'alignment' => [
@@ -297,6 +309,11 @@ class PesertaExport implements WithEvents
 
                     $row = $endRow + 2;
                 }
+
+                // Format kolom untuk mencegah scientific notation
+                $sheet->getStyle('C:C')->getNumberFormat()->setFormatCode('0');
+                $sheet->getStyle('H:H')->getNumberFormat()->setFormatCode('0');
+                $sheet->getStyle('J:J')->getNumberFormat()->setFormatCode('0');
 
                 // ======================================
                 // AUTO SIZE

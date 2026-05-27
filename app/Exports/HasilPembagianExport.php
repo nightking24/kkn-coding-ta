@@ -12,10 +12,14 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 class HasilPembagianExport implements WithEvents
 {
     protected $periode_id;
+    protected $dpl_id;
+    protected $apl_id;
 
-    public function __construct($periode_id)
+    public function __construct($periode_id, $dpl_id = null, $apl_id = null)
     {
         $this->periode_id = $periode_id;
+        $this->dpl_id = $dpl_id;
+        $this->apl_id = $apl_id;
     }
 
     public function registerEvents(): array
@@ -61,6 +65,15 @@ class HasilPembagianExport implements WithEvents
                     'tuanRumah'
                 ])
                     ->where('id_periode', $this->periode_id)
+
+                    ->when($this->dpl_id, function ($q) {
+                        $q->where('nik', $this->dpl_id);
+                    })
+
+                    ->when($this->apl_id, function ($q) {
+                        $q->where('nim', $this->apl_id);
+                    })
+
                     ->orderBy('nomor_kelompok')
                     ->get();
 
@@ -166,7 +179,16 @@ class HasilPembagianExport implements WithEvents
 
                     $sheet->setCellValue("M{$row}", $k->dusun);
 
-                    $sheet->getStyle("A{$row}:L{$endRow}")
+                    // Format nomor telepon agar tidak scientific notation
+                    $sheet->getStyle("H{$row}:H{$endRow}")
+                        ->getNumberFormat()
+                        ->setFormatCode('0');
+
+                    $sheet->getStyle("J{$row}:J{$endRow}")
+                        ->getNumberFormat()
+                        ->setFormatCode('0');
+
+                    $sheet->getStyle("A{$row}:M{$endRow}")
                         ->applyFromArray([
                             'alignment' => [
                                 'horizontal' => Alignment::HORIZONTAL_CENTER,
@@ -206,6 +228,11 @@ class HasilPembagianExport implements WithEvents
                             : 'Perempuan'
                         );
 
+                        // Format NIM agar tidak scientific notation
+                        $sheet->getStyle("C{$currentRow}")
+                            ->getNumberFormat()
+                            ->setFormatCode('0');
+
                         $sheet->getStyle("B{$currentRow}:F{$currentRow}")
                             ->applyFromArray([
                                 'alignment' => [
@@ -239,6 +266,11 @@ class HasilPembagianExport implements WithEvents
 
                     $row = $endRow + 2;
                 }
+
+                // Format kolom untuk mencegah scientific notation
+                $sheet->getStyle('C:C')->getNumberFormat()->setFormatCode('0');
+                $sheet->getStyle('H:H')->getNumberFormat()->setFormatCode('0');
+                $sheet->getStyle('J:J')->getNumberFormat()->setFormatCode('0');
 
                 foreach (range('A', 'M') as $col) {
                     $sheet->getColumnDimension($col)

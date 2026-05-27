@@ -2,32 +2,57 @@
 
 @section('content')
 
+    <style>
+        .card {
+            width: 100% !important;
+            margin: 20px auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding: 5px 20px 20px 20px;
+            min-height: 500px;
+        }
+
+        #kelompokTable {
+            width: 100%;
+            min-width: 1400px;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+
     <div class="card">
 
         <div class="card-header">
             <h2>Data Kelompok</h2>
             @if(session('error'))
                 <div style="
-                            background:#f8d7da;
-                            color:#721c24;
-                            padding:12px;
-                            border-radius:8px;
-                            margin-bottom:15px;
-                            border-left:5px solid #dc3545;
-                        ">
+                                            background:#f8d7da;
+                                            color:#721c24;
+                                            padding:12px;
+                                            border-radius:8px;
+                                            margin-bottom:15px;
+                                            border-left:5px solid #dc3545;
+                                        ">
                     {{ session('error') }}
                 </div>
             @endif
 
             @if(session('success'))
                 <div style="
-                                                                    background:#d4edda;
-                                                                    color:#155724;
-                                                                    padding:12px;
-                                                                    border-radius:8px;
-                                                                    margin-bottom:15px;
-                                                                    border-left:5px solid #28a745;
-                                                                ">
+                                                                                    background:#d4edda;
+                                                                                    color:#155724;
+                                                                                    padding:12px;
+                                                                                    border-radius:8px;
+                                                                                    margin-bottom:15px;
+                                                                                    border-left:5px solid #28a745;
+                                                                                ">
                     {{ session('success') }}
                 </div>
             @endif
@@ -38,13 +63,13 @@
 
             @if ($errors->any())
                 <div style="
-                                                            background:#f8d7da;
-                                                            color:#721c24;
-                                                            padding:12px;
-                                                            border-radius:8px;
-                                                            margin-bottom:15px;
-                                                            border-left:5px solid #dc3545;
-                                                        ">
+                                                                            background:#f8d7da;
+                                                                            color:#721c24;
+                                                                            padding:12px;
+                                                                            border-radius:8px;
+                                                                            margin-bottom:15px;
+                                                                            border-left:5px solid #dc3545;
+                                                                        ">
                     <b>Terjadi kesalahan:</b>
                     <ul style="margin:5px 0 0 15px;">
                         @foreach ($errors->all() as $e)
@@ -75,7 +100,7 @@
                 </select>
 
             </form>
-            
+
             <table id="kelompokTable">
                 <thead style="background: #343a40; color: white;">
                     <tr>
@@ -124,7 +149,8 @@
     <script>
         $('#kelompokTable').DataTable({
             scrollX: true,
-            autoWidth: false,
+            autoWidth: true,
+            responsive: false,
 
             columnDefs: [
                 { width: "150px", targets: 5 }  // nama dukuh
