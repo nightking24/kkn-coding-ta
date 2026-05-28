@@ -31,8 +31,8 @@
                                 <th style="text-align: center; padding: 12px;">NIM</th>
                                 <th style="text-align: center; padding: 12px;">Nama</th>
                                 <th style="text-align: center; padding: 12px;">Prodi</th>
-                                <th style="text-align: center; padding: 12px;">No Telp</th>
                                 <th style="text-align: center; padding: 12px;">Gender</th>
+                                <th style="text-align: center; padding: 12px;">No Telp</th>
                                 <th style="text-align: center; padding: 12px;">Bahasa Jawa</th>
                                 <th style="text-align: center; padding: 12px;">Riwayat Penyakit</th>
                                 <th style="text-align: center; padding: 12px;">Kebutuhan Khusus</th>
@@ -47,9 +47,9 @@
                                     <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
                                     <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
                                     <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['no_telp'] ?? '-' }}</td>
-
                                     <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
+
+                                    <td style="text-align: center; padding: 12px;">{{ $d['no_telp'] ?? '-' }}</td>
 
                                     <td style="text-align: center; padding: 12px;">
                                         {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}
@@ -82,8 +82,8 @@
                                 <th style="text-align: center; padding: 12px;">NIM</th>
                                 <th style="text-align: center; padding: 12px;">Nama</th>
                                 <th style="text-align: center; padding: 12px;">Prodi</th>
-                                <th style="text-align: center; padding: 12px;">No Telp</th>
                                 <th style="text-align: center; padding: 12px;">Gender</th>
+                                <th style="text-align: center; padding: 12px;">No Telp</th>
                                 <th style="text-align: center; padding: 12px;">Bahasa Jawa</th>
                                 <th style="text-align: center; padding: 12px;">Riwayat Penyakit</th>
                                 <th style="text-align: center; padding: 12px;">Kebutuhan Khusus</th>
@@ -97,10 +97,10 @@
                                     <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
                                     <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
                                     <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
+                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
                                     <td style="text-align: center; padding: 12px;">
                                         {{ $d['no_telp'] ?? '-' }}
                                     </td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
 
                                     <td style="text-align: center; padding: 12px;">
                                         {{ $d['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}

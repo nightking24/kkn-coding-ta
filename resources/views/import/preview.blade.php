@@ -43,9 +43,9 @@
                         <tr>
                             <th style="text-align: center; padding: 12px;">Nama</th>
                             <th style="text-align: center; padding: 12px;">NIM</th>
-                            <th style="text-align: center; padding: 12px;">No Telp</th>
                             <th style="text-align: center; padding: 12px;">Prodi</th>
                             <th style="text-align: center; padding: 12px;">Gender</th>
+                            <th style="text-align: center; padding: 12px;">No Telp</th>
                             <th style="text-align: center; padding: 12px;">Bahasa Jawa</th>
                             <th style="text-align: center; padding: 12px;">Riwayat</th>
                             <th style="text-align: center; padding: 12px;">Khusus</th>
@@ -59,9 +59,9 @@
                             <tr style="border-bottom:1px solid #ddd;">
                                 <td style="text-align: left; padding: 12px;">{{ $p['nama'] }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['nim'] }}</td>
-                                <td style="text-align: center; padding: 12px;">{{ $p['no_telp'] }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['prodi'] }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['gender'] }}</td>
+                                <td style="text-align: center; padding: 12px;">{{ $p['no_telp'] }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['bahasa_jawa'] == 1 ? 'Bisa' : 'Tidak' }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['riwayat_penyakit'] == 1 ? 'Ya' : 'Tidak' }}</td>
                                 <td style="text-align: center; padding: 12px;">{{ $p['berkebutuhan_khusus'] == 1 ? 'Ya' : 'Tidak' }}</td>
