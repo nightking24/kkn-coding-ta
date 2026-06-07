@@ -6,36 +6,95 @@
     <title>Hasil Pembagian Kelompok KKN</title>
 
     <style>
+        @page {
+            size: A4 landscape;
+            margin: 5mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 8px;
+            padding: 5px;
+            line-height: 1.2;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            margin-top: 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
-            table-layout: fixed;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+            font-size: 7px;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            height: auto;
+            min-height: 18px;
         }
 
         th,
         td {
-            border: 1px solid black;
-            padding: 5px;
+            border: 0.5px solid #333;
+            padding: 2px 1px;
             text-align: center;
             vertical-align: middle;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            font-size: 7px;
+            max-width: 80px;
+            white-space: normal;
+            line-height: 1.1;
+        }
+
+        td {
+            height: auto;
+        }
+
+        /* Styling untuk kolom dengan rowspan */
+        td[rowspan] {
+            vertical-align: middle;
+            padding: 3px 1px;
+            font-weight: 500;
+        }
+
+        thead tr {
+            background-color: #b7dee8;
         }
 
         thead th {
             background-color: #b7dee8;
             font-weight: bold;
+            font-size: 6.5px;
+            padding: 2px 1px;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 5px;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+            tr {
+                page-break-inside: avoid;
+                min-height: 18px;
+            }
+            td[rowspan] {
+                vertical-align: middle;
+            }
         }
     </style>
 </head>
