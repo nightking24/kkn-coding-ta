@@ -24,7 +24,7 @@
                         <th style="text-align: center; padding: 12px;">Dusun</th>
                         <th style="text-align: center; padding: 12px;">DPL</th>
                         <th style="text-align: center; padding: 12px;">Total Peserta</th>
-                        <th style="text-align: center; padding: 12px;"></th>Aksi</th>
+                        <th style="text-align: center; padding: 12px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
