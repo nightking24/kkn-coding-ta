@@ -224,8 +224,8 @@ class HasilPembagianExport implements WithEvents
                         $sheet->setCellValue(
                             "F{$currentRow}",
                             in_array($p->gender, ['L', 'Pria'])
-                            ? 'Laki-Laki'
-                            : 'Perempuan'
+                            ? 'Pria'
+                            : 'Wanita'
                         );
 
                         // Format NIM agar tidak scientific notation
@@ -237,7 +237,7 @@ class HasilPembagianExport implements WithEvents
                             ->applyFromArray([
                                 'alignment' => [
                                     'vertical' => Alignment::VERTICAL_CENTER,
-                                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                                    'horizontal' => Alignment::HORIZONTAL_LEFT,
                                     'wrapText' => true,
                                 ],
                                 'font' => [
@@ -247,6 +247,22 @@ class HasilPembagianExport implements WithEvents
                                     'allBorders' => [
                                         'borderStyle' => Border::BORDER_THIN,
                                     ]
+                                ]
+                            ]);
+
+                        // Align No column to center
+                        $sheet->getStyle("B{$currentRow}")
+                            ->applyFromArray([
+                                'alignment' => [
+                                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                                ]
+                            ]);
+
+                        // Align NIM column to center
+                        $sheet->getStyle("C{$currentRow}")
+                            ->applyFromArray([
+                                'alignment' => [
+                                    'horizontal' => Alignment::HORIZONTAL_CENTER,
                                 ]
                             ]);
                     }
@@ -264,7 +280,7 @@ class HasilPembagianExport implements WithEvents
                             ]
                         ]);
 
-                    $row = $endRow + 2;
+                    $row = $endRow + 4;
                 }
 
                 // Format kolom untuk mencegah scientific notation

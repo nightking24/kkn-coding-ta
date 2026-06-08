@@ -36,6 +36,7 @@
             margin-bottom: 15px;
             page-break-inside: avoid;
             font-size: 7px;
+            table-layout: fixed;
         }
 
         tr {
@@ -53,13 +54,114 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             font-size: 7px;
-            max-width: 80px;
             white-space: normal;
             line-height: 1.1;
         }
 
-        td {
-            height: auto;
+        /* Kolom Kelompok */
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 4.5%;
+        }
+
+        /* Kolom No */
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 3.5%;
+        }
+
+        /* Kolom NIM */
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 8%;
+        }
+
+        /* Kolom Nama Lengkap */
+        th:nth-child(4) {
+            width: 17%;
+            word-break: break-word;
+            text-align: center;
+        }
+
+        td:nth-child(4) {
+            width: 17%;
+            word-break: break-word;
+            text-align: left !important;
+        }
+
+        /* Class untuk Nama Lengkap */
+        td.nama-lengkap {
+            text-align: left !important;
+        }
+
+        tbody tr td.nama-lengkap {
+            text-align: left !important;
+        }
+
+        /* Kolom Prodi */
+        tbody tr td.prodi-col {
+            text-align: left !important;
+        }
+
+        /* Kolom Gender */
+        tbody tr td.gender-col {
+            text-align: left !important;
+        }
+
+        /* Kolom Prodi */
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 9%;
+        }
+
+        /* Kolom Gender */
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 5%;
+        }
+
+        /* Kolom DPL */
+        th:nth-child(7),
+        td:nth-child(7) {
+            width: 10%;
+            word-break: break-word;
+        }
+
+        /* Kolom Kontak DPL */
+        th:nth-child(8),
+        td:nth-child(8) {
+            width: 9%;
+        }
+
+        /* Kolom APL */
+        th:nth-child(9),
+        td:nth-child(9) {
+            width: 10%;
+            word-break: break-word;
+        }
+
+        /* Kolom Kontak APL */
+        th:nth-child(10),
+        td:nth-child(10) {
+            width: 9%;
+        }
+
+        /* Kolom Kecamatan */
+        th:nth-child(11),
+        td:nth-child(11) {
+            width: 7%;
+        }
+
+        /* Kolom Desa */
+        th:nth-child(12),
+        td:nth-child(12) {
+            width: 7%;
+        }
+
+        /* Kolom Dusun */
+        th:nth-child(13),
+        td:nth-child(13) {
+            width: 7%;
         }
 
         /* Styling untuk kolom dengan rowspan */
@@ -78,6 +180,7 @@
             font-weight: bold;
             font-size: 6.5px;
             padding: 2px 1px;
+            word-break: break-word;
         }
 
         @media print {
@@ -87,6 +190,7 @@
             }
             table {
                 page-break-inside: avoid;
+                table-layout: fixed;
             }
             tr {
                 page-break-inside: avoid;
@@ -94,6 +198,71 @@
             }
             td[rowspan] {
                 vertical-align: middle;
+            }
+            td.nama-lengkap {
+                text-align: left !important;
+            }
+            td.prodi-col {
+                text-align: left !important;
+            }
+            td.gender-col {
+                text-align: left !important;
+            }
+            th:nth-child(1),
+            td:nth-child(1) {
+                width: 4.5%;
+            }
+            th:nth-child(2),
+            td:nth-child(2) {
+                width: 3.5%;
+            }
+            th:nth-child(3),
+            td:nth-child(3) {
+                width: 8%;
+            }
+            th:nth-child(4) {
+                width: 17%;
+                text-align: center;
+            }
+            td:nth-child(4) {
+                width: 17%;
+                text-align: left !important;
+            }
+            th:nth-child(5),
+            td:nth-child(5) {
+                width: 9%;
+            }
+            th:nth-child(6),
+            td:nth-child(6) {
+                width: 5%;
+            }
+            th:nth-child(7),
+            td:nth-child(7) {
+                width: 10%;
+            }
+            th:nth-child(8),
+            td:nth-child(8) {
+                width: 9%;
+            }
+            th:nth-child(9),
+            td:nth-child(9) {
+                width: 10%;
+            }
+            th:nth-child(10),
+            td:nth-child(10) {
+                width: 9%;
+            }
+            th:nth-child(11),
+            td:nth-child(11) {
+                width: 7%;
+            }
+            th:nth-child(12),
+            td:nth-child(12) {
+                width: 7%;
+            }
+            th:nth-child(13),
+            td:nth-child(13) {
+                width: 7%;
             }
         }
     </style>
@@ -148,18 +317,18 @@
                         </td>
 
                         {{-- NAMA --}}
-                        <td>
+                        <td class="nama-lengkap" style="text-align: left;">
                             {{ $p->nama }}
                         </td>
 
                         {{-- PRODI --}}
-                        <td>
+                        <td class="prodi-col" style="text-align: left;">
                             {{ $p->prodi }}
                         </td>
 
                         {{-- GENDER --}}
-                        <td>
-                            {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
+                        <td class="gender-col" style="text-align: left;">
+                            {{ in_array($p->gender, ['L', 'Pria']) ? 'Pria' : 'Wanita' }}
                         </td>
 
                         {{-- DPL --}}
