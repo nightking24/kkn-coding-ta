@@ -199,7 +199,7 @@
 
 <div class="sidebar-header">
     <h3>⚙️ Pembagian Kelompok KKN Reguler</h3>
-    <p>Administrator</p>
+    <p>Admin LPPM</p>
 </div>
 
 <ul class="menu">
