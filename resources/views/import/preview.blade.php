@@ -6,23 +6,23 @@
 
         @if(session('error'))
             <div style="
-                                                        background:#f8d7da;
-                                                        color:#721c24;
-                                                        padding:12px;
-                                                        border-radius:8px;
-                                                        margin-bottom:15px;
-                                                        border-left:5px solid #dc3545;
-                                                    ">
+            background:#f8d7da;
+            color:#721c24;
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:15px;
+            border-left:5px solid #dc3545;
+            ">
                 {{ session('error') }}
             </div>
         @endif
 
         <div style="
-                                                        background:white;
-                                                        padding:25px;
-                                                        border-radius:12px;
-                                                        box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                                                    ">
+            background:white;
+            padding:25px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.1);
+            ">
 
             <h2 style="margin-bottom:20px;">Preview Data Peserta</h2>
 

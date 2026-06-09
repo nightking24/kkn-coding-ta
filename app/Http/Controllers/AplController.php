@@ -11,6 +11,7 @@ use App\Models\LogActivity;
 
 class AplController extends Controller
 {
+    // Menyimpan periode yang dipilih ke dalam session
     private function setPeriodeSession()
     {
         if (request('periode_id')) {
@@ -18,6 +19,7 @@ class AplController extends Controller
         }
     }
 
+    // Mengambil ID periode aktif dari session, request, atau database
     private function getPeriodeId()
     {
         return session('periode_id')
@@ -26,6 +28,7 @@ class AplController extends Controller
                 ->value('id_periode');
     }
 
+    // Memeriksa apakah hasil pembagian kelompok sudah dipublish sehingga data tidak dapat diubah
     private function checkPublishLock($periode_id)
     {
         $status = \App\Models\Periode::where('id_periode', $periode_id)
@@ -38,6 +41,7 @@ class AplController extends Controller
         return null;
     }
 
+    // Memastikan hanya terdapat satu periode yang aktif atau dipublish
     private function validateSingleActivePeriode()
     {
         $count = \App\Models\Periode::where('status_publish', 1)->count();
@@ -49,6 +53,7 @@ class AplController extends Controller
         return null;
     }
 
+    // Menampilkan daftar data Asisten Pendamping Lapangan (APL)
     public function index()
     {
         $this->setPeriodeSession();
@@ -59,12 +64,14 @@ class AplController extends Controller
         return view('apl.index', compact('data'));
     }
 
+    // Menampilkan halaman tambah data Asisten Pendamping Lapangan (APL)
     public function create()
     {
         $this->setPeriodeSession();
         return view('apl.create');
     }
 
+    // Menyimpan data Asisten Pendamping Lapangan (APL) baru ke database
     public function store(Request $request)
     {
         $this->setPeriodeSession();
@@ -116,7 +123,7 @@ class AplController extends Controller
         ]);
         $apl = Apl::create($request->all());
 
-        // 🔥 LOG ACTIVITY
+        // LOG ACTIVITY
         LogActivity::create([
             'username' => session('user')->username ?? 'Admin',
             'aktivitas' => 'Tambah APL - ' . $apl->nama
@@ -125,6 +132,7 @@ class AplController extends Controller
         return redirect('/apl')->with('success', 'Data APL berhasil ditambahkan');
     }
 
+    // Menampilkan halaman edit data Asisten Pendamping Lapangan (APL)
     public function edit($nim)
     {
         $this->setPeriodeSession();
@@ -140,6 +148,7 @@ class AplController extends Controller
         return view('apl.edit', compact('data'));
     }
 
+    // Memperbarui data Asisten Pendamping Lapangan (APL) yang sudah ada
     public function update(Request $request, $nim)
     {
         $this->setPeriodeSession();
@@ -197,7 +206,7 @@ class AplController extends Controller
         try {
             $data->update($request->all());
 
-            // 🔥 LOG ACTIVITY
+            // LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',
                 'aktivitas' => 'Edit APL - ' . $request->nama
@@ -209,6 +218,8 @@ class AplController extends Controller
             return back()->withErrors(['error' => 'Gagal update data'])->withInput();
         }
     }
+
+    // Menghapus data Asisten Pendamping Lapangan (APL)
     public function delete($nim)
     {
         $periode_id = $this->getPeriodeId();
@@ -233,6 +244,7 @@ class AplController extends Controller
         return redirect('/apl')->with('success', 'Data APL berhasil dihapus');
     }
 
+    // Menampilkan kelompok KKN yang didampingi oleh APL yang sedang login
     public function hasilNew()
     {
         $this->setPeriodeSession();
@@ -270,6 +282,7 @@ class AplController extends Controller
         return view('apl.hasil_new', compact('kelompok', 'apl_nama'));
     }
 
+    // Menampilkan detail kelompok KKN yang dipilih oleh APL
     public function detailNew($id)
     {
         $this->setPeriodeSession();

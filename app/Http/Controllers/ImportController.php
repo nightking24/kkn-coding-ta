@@ -12,63 +12,90 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ImportController extends Controller
 {
+    // Mengambil ID periode aktif dari session, request, atau periode yang berstatus berjalan
     private function getPeriodeId()
     {
-        return session('periode_id')
+        return
+            // Prioritas 1: periode yang tersimpan di session
+            session('periode_id')
+
+            // Prioritas 2: periode yang dikirim dari request
             ?? request('periode_id')
+
+            // Prioritas 3: periode yang berstatus berjalan di database
             ?? Periode::where('status', 'berjalan')
                 ->value('id_periode');
     }
 
+    // Memeriksa apakah periode sudah dipublish sehingga data peserta tidak dapat diubah
     private function checkPublishLock($periode_id)
     {
+        // Mengambil status publish dari periode yang dipilih
         $status = \App\Models\Periode::where('id_periode', $periode_id)
             ->value('status_publish');
 
+        // Jika periode sudah dipublish
         if ($status == 1) {
+            // Batalkan proses perubahan data
             return back()->with('error', 'Periode sudah dipublish, data tidak bisa diubah!');
         }
 
+        // Jika belum publish lanjutkan proses
         return null;
     }
 
+    // Menampilkan halaman import data peserta
     public function index()
     {
         return view('import.index');
     }
 
+    // Menampilkan preview data CSV sebelum disimpan ke database
     public function preview(Request $request)
     {
+        // Mengambil ID periode aktif
         $periode_id = request('periode_id') ?? session('periode_id');
 
+        // Mengambil data periode
         $periode = \App\Models\Periode::find($periode_id);
 
+        // Mencegah import jika periode sudah dipublish
         if ($periode && $periode->status_publish == 1) {
             return redirect('/import?periode_id=' . $periode_id)
                 ->with('error', 'Periode sudah dipublish, tidak bisa import data!');
         }
 
+        // Memastikan file sudah dipilih
         if (!$request->hasFile('file')) {
             return back()->withErrors(['error' => 'File harus diupload']);
         }
 
+        // Mengambil file yang diupload
         $file = $request->file('file');
 
+        // Memastikan file berformat CSV atau TXT
         if (!in_array($file->getClientOriginalExtension(), ['csv', 'txt'])) {
             return back()->withErrors(['error' => 'File harus berupa CSV']);
         }
 
+        // Membaca seluruh isi file
         $content = file_get_contents($file);
 
+        // Menentukan delimiter otomatis (; atau ,)
         $delimiter = strpos($content, ';') !== false ? ';' : ',';
 
+        // Membaca setiap baris CSV dan mengubahnya menjadi array
         $data = array_map(function ($line) use ($delimiter) {
             return str_getcsv($line, $delimiter);
         }, file($file));
 
+        // Menyimpan data preview yang akan ditampilkan ke user
         $preview = [];
+
+        // Menyimpan daftar error yang ditemukan saat validasi CSV
         $errors = [];
 
+        // Mapping berbagai variasi nama header CSV ke nama field sistem
         $mapping = [
             'nama lengkap' => 'nama',
             'nama' => 'nama',
@@ -93,22 +120,28 @@ class ImportController extends Controller
             'kebutuhan khusus' => 'berkebutuhan_khusus'
         ];
 
+        // Membersihkan dan menyesuaikan nama header CSV
         $header = array_map(function ($h) use ($mapping) {
 
-            // hapus BOM UTF8
+            // Menghapus karakter BOM UTF-8 yang sering muncul dari Excel
             $h = preg_replace('/^\xEF\xBB\xBF/', '', $h);
 
-            // bersihkan karakter aneh
+            // Menghapus karakter aneh yang tidak diperlukan
             $h = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h);
 
+            // Mengubah menjadi huruf kecil dan menghapus spasi depan/belakang
             $h = strtolower(trim($h));
 
+            // Mengubah nama header sesuai mapping sistem
             return $mapping[$h] ?? $h;
 
         }, $data[0]);
+
+        // Menentukan kolom yang wajib ada dalam file CSV
         $required = ['nama', 'nim'];
 
         foreach ($required as $col) {
+            // Jika kolom wajib tidak ditemukan
             if (!in_array($col, $header)) {
                 return back()->withErrors([
                     'error' => "Kolom '$col' tidak ditemukan di file CSV"
@@ -116,51 +149,67 @@ class ImportController extends Controller
             }
         }
 
+        // Memproses seluruh baris CSV
         foreach ($data as $i => $row) {
 
+            // Lewati baris pertama karena merupakan header
             if ($i == 0)
                 continue;
 
+            // Lewati baris kosong
             if (empty(array_filter($row)))
                 continue;
 
+            // Memastikan jumlah kolom sesuai dengan header
             if (count($header) != count($row)) {
                 $errors[] = "Baris " . ($i + 1) . ": jumlah kolom tidak sesuai";
                 continue;
             }
 
+            // Menggabungkan header dengan isi data
             $rowData = @array_combine($header, $row);
 
+            // Jika format data gagal dibaca
             if (!$rowData) {
                 $errors[] = "Baris " . ($i + 1) . ": format tidak valid";
                 continue;
             }
 
+            // Mengambil nama peserta
             $nama = trim($rowData['nama'] ?? '');
+
+            // Membersihkan NIM dari karakter petik
             $nim = str_replace("'", '', trim($rowData['nim'] ?? ''));
 
+            // Menampung error pada baris ini
             $rowError = [];
 
+            // Validasi nama
             if (!$nama) {
                 $rowError[] = 'Nama kosong';
             }
 
+            // Validasi NIM
             if (!$nim) {
                 $rowError[] = 'NIM kosong';
             } elseif (!is_numeric($nim)) {
                 $rowError[] = 'NIM harus angka';
             }
 
+            // Menyimpan error jika ditemukan
             if (!empty($rowError)) {
                 $errors[] = "Baris " . ($i + 1) . ": " . implode(', ', $rowError);
             }
 
+            // Menyimpan data untuk ditampilkan pada halaman preview
             $preview[] = [
                 'nama' => $nama,
                 'nim' => $nim,
                 'email' => $rowData['email'] ?? '',
                 'no_telp' => $rowData['no_telp'] ?? '',
                 'prodi' => $rowData['prodi'] ?? '',
+
+                // Konversi data agar sesuai format sistem
                 'gender' => $this->convertGender($rowData['gender'] ?? ''),
                 'bahasa_jawa' => $this->convertBahasaJawa($rowData['bahasa_jawa'] ?? ''),
                 'riwayat_penyakit' => $this->convertPenyakit($rowData['riwayat_penyakit'] ?? ''),
@@ -170,9 +219,11 @@ class ImportController extends Controller
             ];
         }
 
+        // Menampilkan halaman preview sebelum data disimpan
         return view('import.preview', compact('preview', 'errors'));
     }
 
+    // Mengubah berbagai format jenis kelamin menjadi Pria atau Wanita
     private function convertGender($value)
     {
         $value = strtolower(trim($value));
@@ -211,6 +262,7 @@ class ImportController extends Controller
         return null;
     }
 
+    // Mengubah data kemampuan bahasa Jawa menjadi nilai 1 atau 0
     private function convertBahasaJawa($value)
     {
         $value = strtolower(trim($value));
@@ -231,6 +283,7 @@ class ImportController extends Controller
         return 0;
     }
 
+    // Mengubah data kebutuhan khusus menjadi nilai 1 atau 0
     private function convertKhusus($value)
     {
         $value = strtolower(trim($value));
@@ -252,6 +305,7 @@ class ImportController extends Controller
         return 1;
     }
 
+    // Mengubah data riwayat penyakit menjadi nilai 1 atau 0
     private function convertPenyakit($value)
     {
         $value = strtolower(trim($value));
@@ -273,16 +327,21 @@ class ImportController extends Controller
         return 1;
     }
 
-
+    // Menyimpan data hasil preview ke database peserta
     public function store(Request $request)
     {
+        // Mengambil periode aktif
         $periode_id = $this->getPeriodeId();
+
+        // Mencegah perubahan jika periode sudah dipublish
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
 
+        // Mengubah data JSON dari preview menjadi array PHP
         $data = json_decode($request->data, true);
 
+        // Memastikan data valid
         if (!$data || !is_array($data)) {
             return back()->withErrors([
                 'error' => 'Data tidak valid atau kosong'
@@ -290,27 +349,32 @@ class ImportController extends Controller
         }
 
         try {
+            // Menghitung jumlah data peserta yang berhasil disimpan
             $jumlah = 0;
+
+            // Menyimpan daftar pesan error selama proses import
             $errors = [];
 
+            // Memproses setiap data peserta hasil preview
             foreach ($data as $i => $row) {
 
-                // ❌ skip jika kosong
+                // Lewati data jika nama atau NIM kosong
                 if (empty($row['nama']) || empty($row['nim'])) {
                     continue;
                 }
 
-                // 🚫 VALIDASI DUPLIKAT PER PERIODE
+                // Memastikan NIM belum pernah diimport pada periode yang sama
                 if (
                     \App\Models\Peserta::where('nim', trim($row['nim']))
                         ->where('id_periode', $periode_id)
                         ->exists()
                 ) {
+                    // Menyimpan pesan error jika ditemukan NIM duplikat
                     $errors[] = "Baris " . ($i + 1) . ": NIM {$row['nim']} sudah ada di periode ini";
                     continue;
                 }
 
-                // 💾 SIMPAN DATA
+                // Menyimpan data peserta ke database
                 \App\Models\Peserta::create([
                     'nama' => trim($row['nama']),
                     'nim' => str_replace("'", '', trim($row['nim'])),
@@ -326,46 +390,64 @@ class ImportController extends Controller
                     'id_periode' => $periode_id
                 ]);
 
+                // Menambah jumlah data yang berhasil diimport
                 $jumlah++;
             }
 
-            // 🔥 LOG ACTIVITY - HANYA JIKA ADA DATA YANG BERHASIL DISIMPAN
+            // Mencatat log aktivitas jika ada data yang berhasil disimpan
             if ($jumlah > 0) {
                 LogActivity::create([
+                    // Menyimpan username pengguna yang melakukan import
                     'username' => session('user')->username ?? 'Admin',
+
+                    // Menyimpan aktivitas import ke log sistem
                     'aktivitas' => "Import Peserta - $jumlah peserta berhasil diimport"
                 ]);
             }
 
+            // Kembali ke halaman import dengan pesan sukses
             return redirect('/import')
+
+                // Menampilkan jumlah data yang berhasil disimpan
                 ->with('success', "Data berhasil disimpan ($jumlah data)")
+
+                // Menampilkan daftar data yang gagal diimport
                 ->with('warning', $errors);
 
         } catch (\Exception $e) {
 
+            // Menampilkan pesan error jika proses import gagal
             return back()->withErrors([
                 'error' => 'Gagal import data, silakan cek file CSV'
             ])->withInput();
         }
     }
 
+    // Mengunduh template CSV yang dapat digunakan untuk import peserta
     public function downloadTemplate()
     {
+        // Menentukan nama file template CSV
         $filename = 'template_import_peserta.csv';
 
+        // Menentukan header HTTP agar browser mengunduh file CSV
         $headers = [
+            // Menentukan tipe file CSV
             'Content-Type' => 'text/csv; charset=UTF-8',
+
+            // Menentukan nama file yang akan diunduh
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ];
 
+        // Membuat callback untuk menghasilkan isi file CSV
         $callback = function () {
 
+            // Membuka output stream untuk file CSV
             $file = fopen('php://output', 'w');
 
-            // BOM UTF-8 AGAR EXCEL TIDAK RUSAK
+            // Menambahkan BOM UTF-8 agar karakter terbaca dengan benar di Excel
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            // HEADER SESUAI FORMAT SISTEM
+            // Menulis header kolom sesuai format sistem
             fputcsv($file, [
                 'nim',
                 'nama',
@@ -416,9 +498,11 @@ class ImportController extends Controller
                 '-',
                 'Disabilitas Ringan'
             ], ';');
+            // Menutup file setelah selesai ditulis
             fclose($file);
         };
 
+        // Mengirim file CSV ke browser untuk diunduh
         return response()->stream($callback, 200, $headers);
     }
 }

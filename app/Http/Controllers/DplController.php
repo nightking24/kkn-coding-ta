@@ -11,6 +11,7 @@ use App\Models\LogActivity;
 
 class DplController extends Controller
 {
+    // Menyimpan periode yang dipilih ke dalam session
     private function setPeriodeSession()
     {
         if (request('periode_id')) {
@@ -18,6 +19,7 @@ class DplController extends Controller
         }
     }
 
+    // Mengambil ID periode aktif dari session, request, atau database
     private function getPeriodeId()
     {
         return session('periode_id')
@@ -26,6 +28,7 @@ class DplController extends Controller
                 ->value('id_periode');
     }
 
+    // Memeriksa apakah hasil pembagian kelompok sudah dipublish sehingga data tidak dapat diubah
     private function checkPublishLock($periode_id)
     {
         $status = \App\Models\Periode::where('id_periode', $periode_id)
@@ -38,6 +41,7 @@ class DplController extends Controller
         return null;
     }
 
+    // Memastikan hanya terdapat satu periode yang aktif atau dipublish
     private function validateSingleActivePeriode()
     {
         $count = \App\Models\Periode::where('status_publish', 1)->count();
@@ -49,6 +53,7 @@ class DplController extends Controller
         return null;
     }
 
+    // Menampilkan daftar data Dosen Pembimbing Lapangan (DPL)
     public function index()
     {
         $this->setPeriodeSession();
@@ -59,6 +64,7 @@ class DplController extends Controller
         return view('dpl.index', compact('data'));
     }
 
+    // Menampilkan halaman tambah data Dosen Pembimbing Lapangan (DPL)
     public function create()
     {
         $this->setPeriodeSession();
@@ -68,6 +74,7 @@ class DplController extends Controller
         return view('dpl.create', compact('dplList'));
     }
 
+    // Menyimpan data Dosen Pembimbing Lapangan (DPL) baru ke database
     public function store(Request $request)
     {
         $this->setPeriodeSession();
@@ -124,7 +131,7 @@ class DplController extends Controller
 
         $dpl = Dpl::create($request->all());
 
-        // 🔥 LOG ACTIVITY
+        // LOG ACTIVITY
         LogActivity::create([
             'username' => session('user')->username ?? 'Admin',
             'aktivitas' => 'Tambah DPL - ' . $dpl->nama
@@ -133,6 +140,7 @@ class DplController extends Controller
         return redirect('/dpl')->with('success', 'Data DPL berhasil ditambahkan');
     }
 
+    // Menampilkan halaman edit data Dosen Pembimbing Lapangan (DPL)
     public function edit($nik)
     {
         $this->setPeriodeSession();
@@ -151,6 +159,7 @@ class DplController extends Controller
         return view('dpl.edit', compact('data', 'dplList'));
     }
 
+    // Memperbarui data Dosen Pembimbing Lapangan (DPL) yang sudah ada
     public function update(Request $request, $nik)
     {
         $this->setPeriodeSession();
@@ -220,7 +229,7 @@ class DplController extends Controller
                 'fakultas' => $request->fakultas,
             ]);
 
-            // 🔥 LOG ACTIVITY
+            // LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',
                 'aktivitas' => 'Edit DPL - ' . $request->nama
@@ -233,6 +242,7 @@ class DplController extends Controller
         }
     }
 
+    // Menghapus data Dosen Pembimbing Lapangan (DPL)
     public function delete($nik)
     {
         $this->setPeriodeSession();
@@ -249,7 +259,7 @@ class DplController extends Controller
         $nama_dpl = $dpl->nama;
         $dpl->delete();
 
-        // 🔥 LOG ACTIVITY
+        // LOG ACTIVITY
         LogActivity::create([
             'username' => session('user')->username ?? 'Admin',
             'aktivitas' => 'Hapus DPL - ' . $nama_dpl
@@ -258,6 +268,7 @@ class DplController extends Controller
         return redirect('/dpl')->with('success', 'Data DPL berhasil dihapus');
     }
 
+    // Menampilkan kelompok KKN yang dibimbing oleh DPL yang sedang login
     public function hasilView()
     {
         $this->setPeriodeSession();
@@ -333,6 +344,7 @@ class DplController extends Controller
         ]);
     }
 
+    // Menampilkan detail kelompok KKN yang dipilih oleh DPL
     public function detailView($id)
     {
         $this->setPeriodeSession();

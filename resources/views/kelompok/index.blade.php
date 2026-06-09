@@ -46,13 +46,13 @@
 
             @if(session('success'))
                 <div style="
-                                                                                    background:#d4edda;
-                                                                                    color:#155724;
-                                                                                    padding:12px;
-                                                                                    border-radius:8px;
-                                                                                    margin-bottom:15px;
-                                                                                    border-left:5px solid #28a745;
-                                                                                ">
+                background:#d4edda;
+                color:#155724;
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:15px;
+                border-left:5px solid #28a745;
+                ">
                     {{ session('success') }}
                 </div>
             @endif
@@ -63,13 +63,13 @@
 
             @if ($errors->any())
                 <div style="
-                                                                            background:#f8d7da;
-                                                                            color:#721c24;
-                                                                            padding:12px;
-                                                                            border-radius:8px;
-                                                                            margin-bottom:15px;
-                                                                            border-left:5px solid #dc3545;
-                                                                        ">
+                background:#f8d7da;
+                color:#721c24;
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:15px;
+                border-left:5px solid #dc3545;
+                ">
                     <b>Terjadi kesalahan:</b>
                     <ul style="margin:5px 0 0 15px;">
                         @foreach ($errors->all() as $e)
@@ -153,7 +153,7 @@
             responsive: false,
 
             columnDefs: [
-                { width: "150px", targets: 5 }  // nama dukuh
+                { width: "150px", targets: 5 }
             ]
         });
     </script>

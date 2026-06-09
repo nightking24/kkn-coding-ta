@@ -15,10 +15,14 @@ class CekLogin
      */
     public function handle($request, Closure $next)
     {
+        // Jika sudah login, lanjutkan ke halaman yang dituju
         if (!session('user')) {
+
+            // Jika belum login, arahkan ke halaman login
             return redirect('/');
         }
 
+        // Jika sudah login, lanjutkan ke halaman yang dituju
         return $next($request);
     }
 }

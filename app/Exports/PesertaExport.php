@@ -14,23 +14,29 @@ class PesertaExport implements WithEvents
 {
     protected $periode_id;
 
+    // Constructor untuk menerima ID periode yang akan diexport
     public function __construct($periode_id)
     {
+        // Menyimpan ID periode ke property class
         $this->periode_id = $periode_id;
     }
 
+    // Mendaftarkan event yang dijalankan setelah sheet Excel selesai dibuat
     public function registerEvents(): array
     {
         return [
 
+                // Event AfterSheet dijalankan setelah worksheet berhasil dibuat
             AfterSheet::class => function (AfterSheet $event) {
 
+                // Mengambil worksheet aktif yang akan dimodifikasi
                 $sheet = $event->sheet->getDelegate();
 
                 // ======================================
                 // DATA PERIODE
                 // ======================================
     
+                // Mengambil data periode berdasarkan ID periode yang dipilih
                 $periode = Periode::find($this->periode_id);
 
                 // ======================================
@@ -45,10 +51,13 @@ class PesertaExport implements WithEvents
                 );
 
                 $sheet->getStyle('A1')->applyFromArray([
+                    // Mengatur font judul
                     'font' => [
                         'bold' => true,
                         'size' => 16,
                     ],
+
+                    // Mengatur posisi judul di tengah
                     'alignment' => [
                         'horizontal' => Alignment::HORIZONTAL_CENTER,
                         'vertical' => Alignment::VERTICAL_CENTER,
@@ -59,6 +68,7 @@ class PesertaExport implements WithEvents
                 // INFORMASI KKN
                 // ======================================
     
+                // Menggabungkan baris informasi KKN
                 $sheet->mergeCells('A2:L2');
                 $sheet->mergeCells('A3:L3');
                 $sheet->mergeCells('A4:L4');
@@ -78,6 +88,7 @@ class PesertaExport implements WithEvents
                     'Lokasi : ' . ($periode->lokasi ?? '-')
                 );
 
+                // Mengatur style informasi KKN
                 $sheet->getStyle('A2:A4')->applyFromArray([
                     'font' => [
                         'bold' => true,
@@ -95,18 +106,26 @@ class PesertaExport implements WithEvents
                 // DATA KELOMPOK
                 // ======================================
     
+                // Mengambil seluruh kelompok beserta relasinya
                 $kelompok = Kelompok::with([
                     'peserta',
                     'dpl',
                     'apl',
                     'tuanRumah'
                 ])
+                    // Mengambil seluruh kelompok beserta relasinya
                     ->where('id_periode', $this->periode_id)
+
+                    // Mengurutkan berdasarkan nomor kelompok
                     ->orderBy('nomor_kelompok')
+
+                    // Mengambil seluruh hasil query
                     ->get();
 
+                // Memproses setiap kelompok
                 foreach ($kelompok as $k) {
 
+                    // Menyimpan posisi awal kelompok
                     $startRow = $row;
 
                     // ======================================
@@ -128,26 +147,35 @@ class PesertaExport implements WithEvents
                         'L' => 'Dusun',
                     ];
 
+                    // Menampilkan seluruh header ke worksheet
                     foreach ($headers as $col => $text) {
 
+                        // Menuliskan teks header pada kolom tertentu
                         $sheet->setCellValue($col . $row, $text);
 
+                        // Mengatur tampilan header tabel
                         $sheet->getStyle($col . $row)->applyFromArray([
                             'font' => [
                                 'bold' => true,
                                 'size' => 10,
                             ],
+
+                            // Posisi teks di tengah
                             'alignment' => [
                                 'horizontal' => Alignment::HORIZONTAL_CENTER,
                                 'vertical' => Alignment::VERTICAL_CENTER,
                                 'wrapText' => true,
                             ],
+
+                            // Memberi warna latar belakang biru muda
                             'fill' => [
                                 'fillType' => Fill::FILL_SOLID,
                                 'startColor' => [
                                     'rgb' => 'B7DEE8'
                                 ]
                             ],
+
+                            // Memberi garis border
                             'borders' => [
                                 'allBorders' => [
                                     'borderStyle' => Border::BORDER_THIN,
@@ -162,18 +190,23 @@ class PesertaExport implements WithEvents
                     // DATA PESERTA
                     // ======================================
     
+                    // Mengambil seluruh peserta pada kelompok
                     $peserta = $k->peserta;
 
+                    // Menentukan jumlah peserta minimum 1
                     $jumlahPeserta = max($peserta->count(), 1);
 
+                    // Menentukan posisi akhir kelompok
                     $endRow = $row + $jumlahPeserta - 1;
 
                     // ======================================
                     // MERGE CELL
                     // ======================================
     
+                    // Kolom yang akan digabungkan untuk informasi kelompok
                     $mergeCols = ['A', 'G', 'H', 'I', 'J', 'K', 'L'];
 
+                    // Menggabungkan sel sesuai jumlah peserta
                     foreach ($mergeCols as $col) {
                         $sheet->mergeCells($col . $row . ':' . $col . $endRow);
                     }
@@ -212,11 +245,12 @@ class PesertaExport implements WithEvents
 
                     $sheet->setCellValue("L{$row}", $k->dusun);
 
-                    // Format nomor telepon agar tidak scientific notation
+                    // Mencegah nomor telepon APL berubah menjadi scientific notation
                     $sheet->getStyle("H{$row}:H{$endRow}")
                         ->getNumberFormat()
                         ->setFormatCode('0');
 
+                    // Mencegah nomor telepon APL berubah menjadi scientific notation
                     $sheet->getStyle("J{$row}:J{$endRow}")
                         ->getNumberFormat()
                         ->setFormatCode('0');
@@ -246,10 +280,13 @@ class PesertaExport implements WithEvents
                     // ISI PESERTA
                     // ======================================
     
+                    // Mencegah nomor telepon APL berubah menjadi scientific notation
                     foreach ($peserta as $index => $p) {
 
+                        // Menentukan posisi baris peserta saat ini
                         $currentRow = $row + $index;
 
+                        // Menampilkan nomor urut peserta
                         $sheet->setCellValue("B{$currentRow}", $index + 1);
 
                         $sheet->setCellValue("C{$currentRow}", $p->nim);
@@ -264,7 +301,8 @@ class PesertaExport implements WithEvents
                             ? 'Pria'
                             : 'Wanita'
                         );
-                                                // Format NIM agar tidak scientific notation
+
+                        // Mencegah NIM berubah menjadi scientific notation
                         $sheet->getStyle("C{$currentRow}")
                             ->getNumberFormat()
                             ->setFormatCode('0');
@@ -306,6 +344,7 @@ class PesertaExport implements WithEvents
                     // TINGGI ROW
                     // ======================================
     
+                    // Mengatur tinggi setiap baris kelompok
                     for ($r = $startRow; $r <= $endRow; $r++) {
                         $sheet->getRowDimension($r)->setRowHeight(30);
                     }
@@ -314,6 +353,7 @@ class PesertaExport implements WithEvents
                     // BORDER LUAR
                     // ======================================
     
+                    // Memberikan border tebal di luar area kelompok
                     $sheet->getStyle("A{$startRow}:L{$endRow}")
                         ->applyFromArray([
                             'borders' => [
@@ -323,10 +363,11 @@ class PesertaExport implements WithEvents
                             ]
                         ]);
 
+                    // Memberikan jarak 4 baris sebelum kelompok berikutnya
                     $row = $endRow + 4;
                 }
 
-                // Format kolom untuk mencegah scientific notation
+                // Mencegah seluruh kolom NIM menjadi scientific notation
                 $sheet->getStyle('C:C')->getNumberFormat()->setFormatCode('0');
                 $sheet->getStyle('H:H')->getNumberFormat()->setFormatCode('0');
                 $sheet->getStyle('J:J')->getNumberFormat()->setFormatCode('0');
@@ -340,10 +381,10 @@ class PesertaExport implements WithEvents
                         ->setAutoSize(true);
                 }
 
-                // khusus nama
+                // Mengatur lebar kolom nama secara khusus
                 $sheet->getColumnDimension('C')->setWidth(35);
 
-                // zoom
+                // Mengatur tampilan zoom Excel menjadi 85%
                 $sheet->getSheetView()->setZoomScale(85);
             }
         ];

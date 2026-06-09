@@ -18,6 +18,7 @@ use App\Models\LogActivity;
 
 class KelompokController extends Controller
 {
+    // Menyimpan periode yang dipilih ke dalam session
     private function setPeriodeSession()
     {
         if (request('periode_id')) {
@@ -25,6 +26,7 @@ class KelompokController extends Controller
         }
     }
 
+    // Mengambil ID periode aktif dari session atau periode yang sedang berjalan
     private function getPeriodeId()
     {
         return session('periode_id')
@@ -33,6 +35,7 @@ class KelompokController extends Controller
                 ->value('id_periode');
     }
 
+    // Memeriksa apakah periode sudah dipublish sehingga data tidak dapat diubah
     private function checkPublishLock($periode_id)
     {
         $status = \App\Models\Periode::where('id_periode', $periode_id)
@@ -45,6 +48,7 @@ class KelompokController extends Controller
         return null;
     }
 
+    // Menampilkan halaman daftar kelompok berdasarkan periode yang dipilih
     public function index(Request $request)
     {
         if ($request->periode_id) {
@@ -88,6 +92,7 @@ class KelompokController extends Controller
         ));
     }
 
+    // Menampilkan halaman tambah kelompok dan menyiapkan data pendukung
     public function create()
     {
         $periode_id = $this->getPeriodeId();
@@ -113,6 +118,7 @@ class KelompokController extends Controller
         ));
     }
 
+    // Mengambil data kelompok berdasarkan dusun untuk kebutuhan autofill form
     public function getDusun($dusun)
     {
         // ambil data kelompok berdasarkan dusun
@@ -141,6 +147,7 @@ class KelompokController extends Controller
         ]);
     }
 
+    // Mengambil data tuan rumah berdasarkan nama yang dipilih untuk autofill form
     public function getTuanRumah($nama)
     {
         $tuan = DB::table('tuan_rumah')
@@ -185,6 +192,7 @@ class KelompokController extends Controller
         ]);
     }
 
+    // Menyimpan data kelompok baru ke database
     public function store(Request $request)
     {
         $this->logAktivitas(
@@ -198,7 +206,7 @@ class KelompokController extends Controller
             return $lock;
         }
 
-        // ✅ VALIDASI
+        // VALIDASI
         $validated = $request->validate([
             'nomor_kelompok' => [
                 'required',
@@ -280,29 +288,29 @@ class KelompokController extends Controller
 
         // HANDLE TUAN RUMAH (FIX AMAN)
 
-        // 🔥 Coba cek apakah input adalah ID yang valid
+        // Coba cek apakah input adalah ID yang valid
         $tuanById = DB::table('tuan_rumah')
             ->where('id_tuan_rumah', $request->id_tuan_rumah)
             ->first();
 
         if ($tuanById) {
 
-            // ✅ ARTINYA PILIH DARI DROPDOWN (ID VALID)
+            //  ARTINYA PILIH DARI DROPDOWN (ID VALID)
             $id_tuan_rumah = $tuanById->id_tuan_rumah;
 
         } else {
 
-            // ✅ ARTINYA INPUT MANUAL (NAMA)
+            // ARTINYA INPUT MANUAL (NAMA)
             $nama = trim($request->tuan_rumah);
 
-            // 🔥 CEK DUPLIKAT (CASE INSENSITIVE)
+            // CEK DUPLIKAT (CASE INSENSITIVE)
             $tuan = DB::table('tuan_rumah')
                 ->whereRaw('LOWER(nama_tuan_rumah) = ?', [strtolower($nama)])
                 ->first();
 
             if (!$tuan) {
 
-                // 🔥 INSERT BARU
+                // INSERT BARU
                 $id_tuan_rumah = DB::table('tuan_rumah')->insertGetId([
 
                     'nama_tuan_rumah' => $nama,
@@ -330,7 +338,7 @@ class KelompokController extends Controller
 
             } else {
 
-                // 🔥 SUDAH ADA → PAKAI YANG LAMA
+                // SUDAH ADA → PAKAI YANG LAMA
                 $id_tuan_rumah = $tuan->id_tuan_rumah;
             }
         }
@@ -411,6 +419,7 @@ class KelompokController extends Controller
         }
     }
 
+    // Menampilkan halaman edit data kelompok
     public function edit($id)
     {
         $this->setPeriodeSession();
@@ -432,6 +441,7 @@ class KelompokController extends Controller
         return view('kelompok.edit', compact('data', 'dpl', 'apl', 'tuan_rumah'));
     }
 
+    // Memperbarui data kelompok yang sudah ada
     public function update(Request $request, $id)
     {
         $this->logAktivitas(
@@ -536,7 +546,7 @@ class KelompokController extends Controller
         // HANDLE TUAN RUMAH ANTI DUPLIKAT
         // ==========================
 
-        // 🔥 cek apakah input adalah ID dari datalist
+        // cek apakah input adalah ID dari datalist
         $tuanById = DB::table('tuan_rumah')
             ->where('id_tuan_rumah', $request->id_tuan_rumah)
             ->first();
@@ -675,6 +685,7 @@ class KelompokController extends Controller
         }
     }
 
+    // Melakukan proses randomisasi peserta ke dalam kelompok berdasarkan aturan sistem
     public function generate(Request $request)
     {
         $data = json_decode($request->data, true);
@@ -896,6 +907,7 @@ class KelompokController extends Controller
         return redirect('/randomisasi');
     }
 
+    // Menampilkan hasil randomisasi peserta sebelum disimpan
     public function randomisasi()
     {
         $this->setPeriodeSession();
@@ -912,6 +924,7 @@ class KelompokController extends Controller
         return view('kelompok.randomisasi', compact('data'));
     }
 
+    // Menyimpan hasil randomisasi ke tabel peserta
     public function simpanHasil()
     {
         $this->setPeriodeSession();
@@ -973,7 +986,7 @@ class KelompokController extends Controller
         return redirect()->route('hasil.pembagian');
     }
 
-
+    // Menampilkan hasil pembagian kelompok yang telah disimpan
     public function hasilPembagian(Request $request)
     {
         if ($request->periode_id) {
@@ -1049,6 +1062,7 @@ class KelompokController extends Controller
         ));
     }
 
+    // Menghapus seluruh hasil pembagian kelompok pada periode yang dipilih
     public function resetPembagian()
     {
         $this->logAktivitas('Reset Pembagian', 'Semua peserta dihapus dari kelompok');
@@ -1072,6 +1086,7 @@ class KelompokController extends Controller
             ->with('success', 'Pembagian berhasil direset');
     }
 
+    // Mengekspor hasil pembagian kelompok ke file Excel
     public function exportExcel($periode_id)
     {
         $this->logAktivitas('Export Excel dari Halaman Hasil Pembagian');
@@ -1114,6 +1129,7 @@ class KelompokController extends Controller
         );
     }
 
+    // Mengekspor hasil pembagian kelompok ke file PDF
     public function exportPDF($periode_id)
     {
         $this->logAktivitas('Export PDF dari Halaman Hasil Pembagian');
@@ -1180,6 +1196,7 @@ class KelompokController extends Controller
         return $pdf->download($namaFile);
     }
 
+    // Mempublikasikan hasil pembagian kelompok agar dapat diakses peserta
     public function publish(Request $request)
     {
         $this->logAktivitas('Publish', 'Hasil pembagian dipublish');
@@ -1279,6 +1296,7 @@ class KelompokController extends Controller
         }
     }
 
+    // Membatalkan publikasi hasil pembagian kelompok
     public function unpublish(Request $request)
     {
         $this->logAktivitas('Unpublish', 'Hasil pembagian diunpublish');
@@ -1333,6 +1351,7 @@ class KelompokController extends Controller
         }
     }
 
+    // Menghapus data kelompok berdasarkan ID kelompok
     public function delete($id)
     {
         $periode_id = $this->getPeriodeId();
@@ -1348,7 +1367,7 @@ class KelompokController extends Controller
         $nomor_kelompok = $kelompok->nomor_kelompok;
         $kelompok->delete();
 
-        // 🔥 LOG ACTIVITY
+        // LOG ACTIVITY
         $this->logAktivitas(
             'Hapus Kelompok',
             "Menghapus kelompok K{$nomor_kelompok}"
@@ -1357,6 +1376,7 @@ class KelompokController extends Controller
         return redirect('/kelompok')->with('success', 'Data kelompok berhasil dihapus');
     }
 
+    // Menyimpan aktivitas pengguna ke dalam log sistem
     private function logAktivitas($aksi, $deskripsi = null)
     {
         LogActivity::create([

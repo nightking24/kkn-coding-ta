@@ -15,19 +15,28 @@ class HasilPembagianExport implements WithEvents
     protected $dpl_id;
     protected $apl_id;
 
+    // Constructor untuk menerima parameter periode, DPL, dan APL
     public function __construct($periode_id, $dpl_id = null, $apl_id = null)
     {
+        // Menyimpan ID periode yang akan diexport
         $this->periode_id = $periode_id;
+
+        // Menyimpan ID DPL jika export difilter berdasarkan DPL
         $this->dpl_id = $dpl_id;
+
+        // Menyimpan ID APL jika export difilter berdasarkan APL
         $this->apl_id = $apl_id;
     }
 
+    // Mendaftarkan event yang dijalankan setelah sheet Excel dibuat
     public function registerEvents(): array
     {
         return [
 
+                // Event yang dijalankan setelah sheet selesai dibuat
             AfterSheet::class => function (AfterSheet $event) {
 
+                // Mengambil object worksheet aktif
                 $sheet = $event->sheet->getDelegate();
 
                 // ======================================
@@ -58,22 +67,27 @@ class HasilPembagianExport implements WithEvents
                 // DATA KELOMPOK
                 // ======================================
     
+                // Mengambil data kelompok beserta relasi yang dibutuhkan
                 $kelompok = Kelompok::with([
                     'peserta',
                     'dpl',
                     'apl',
                     'tuanRumah'
                 ])
+                    // Menampilkan kelompok berdasarkan periode yang dipilih
                     ->where('id_periode', $this->periode_id)
 
+                    // Jika terdapat filter DPL maka tampilkan kelompok DPL tersebut saja
                     ->when($this->dpl_id, function ($q) {
-                        $q->where('nik', $this->dpl_id);
-                    })
+                    $q->where('nik', $this->dpl_id);
+                })
 
+                    // Jika terdapat filter APL maka tampilkan kelompok APL tersebut saja
                     ->when($this->apl_id, function ($q) {
-                        $q->where('nim', $this->apl_id);
-                    })
+                    $q->where('nim', $this->apl_id);
+                })
 
+                    // Mengurutkan kelompok berdasarkan nomor kelompok
                     ->orderBy('nomor_kelompok')
                     ->get();
 
@@ -267,10 +281,12 @@ class HasilPembagianExport implements WithEvents
                             ]);
                     }
 
+                    // Mengatur tinggi setiap baris kelompok
                     for ($r = $startRow; $r <= $endRow; $r++) {
                         $sheet->getRowDimension($r)->setRowHeight(30);
                     }
 
+                    // Memberikan border tebal di luar area kelompok
                     $sheet->getStyle("A{$startRow}:M{$endRow}")
                         ->applyFromArray([
                             'borders' => [
@@ -280,21 +296,25 @@ class HasilPembagianExport implements WithEvents
                             ]
                         ]);
 
+                    // Memberi jarak 4 baris sebelum kelompok berikutnya
                     $row = $endRow + 4;
                 }
 
-                // Format kolom untuk mencegah scientific notation
+                // Mencegah seluruh kolom NIM menjadi scientific notation
                 $sheet->getStyle('C:C')->getNumberFormat()->setFormatCode('0');
                 $sheet->getStyle('H:H')->getNumberFormat()->setFormatCode('0');
                 $sheet->getStyle('J:J')->getNumberFormat()->setFormatCode('0');
 
+                // Mengatur seluruh kolom A sampai M menyesuaikan isi data
                 foreach (range('A', 'M') as $col) {
                     $sheet->getColumnDimension($col)
                         ->setAutoSize(true);
                 }
 
+                // Mengatur lebar kolom nama peserta secara khusus
                 $sheet->getColumnDimension('D')->setWidth(35);
 
+                // Mengatur tingkat zoom Excel menjadi 85%
                 $sheet->getSheetView()->setZoomScale(85);
             }
         ];

@@ -8,20 +8,25 @@ use Illuminate\Http\Request;
 
 class PeriodeController extends Controller
 {
+    // Menampilkan daftar seluruh periode KKN yang tersimpan di sistem
     public function index()
     {
+        // Mengambil seluruh data periode dan mengurutkan dari yang terbaru
         $periode = Periode::latest()->get();
+        // Mengirim data periode ke halaman index
         return view('periode.index', compact('periode'));
     }
 
+    // Menampilkan halaman form tambah periode KKN
     public function create()
     {
         return view('periode.create');
     }
 
+    // Menyimpan data periode KKN baru ke database
     public function store(Request $request)
     {
-        // 🔥 VALIDASI
+        // Memastikan semua input wajib diisi sesuai aturan (validasi)
         $request->validate([
             'nama_kkn' => 'required',
             'tahun_kkn' => 'required|numeric',
@@ -32,7 +37,7 @@ class PeriodeController extends Controller
         ]);
 
         try {
-            // 🔥 SIMPAN DATA
+            // SIMPAN DATA
             $periode = Periode::create([
                 'nama_kkn' => $request->nama_kkn,
                 'tahun_kkn' => $request->tahun_kkn,
@@ -43,10 +48,10 @@ class PeriodeController extends Controller
                 'status_publish' => 0 // default belum publish
             ]);
 
-            // 🔥 SET SESSION PERIODE AKTIF (PENTING)
+            // SET SESSION PERIODE AKTIF (PENTING)
             session(['periode_id' => $periode->id_periode]);
 
-            // 🔥 LOG ACTIVITY
+            // LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',
                 'aktivitas' => 'Tambah Periode - ' . $request->nama_kkn
@@ -61,12 +66,14 @@ class PeriodeController extends Controller
         }
     }
 
+    // Menampilkan halaman edit data periode berdasarkan ID periode
     public function edit($id)
     {
         $periode = Periode::findOrFail($id);
         return view('periode.edit', compact('periode'));
     }
 
+    // Memperbarui data periode yang sudah ada
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -99,7 +106,7 @@ class PeriodeController extends Controller
                 ]);
             }
 
-            // 🔥 LOG ACTIVITY
+            // LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',
                 'aktivitas' => 'Edit Periode - ' . $request->nama_kkn
@@ -114,13 +121,14 @@ class PeriodeController extends Controller
         }
     }
 
+    // Menghapus data periode berdasarkan ID periode
     public function destroy($id)
     {
         try {
             $periode = Periode::findOrFail($id);
             Periode::destroy($id);
 
-            // 🔥 LOG ACTIVITY
+            // LOG ACTIVITY
             LogActivity::create([
                 'username' => session('user')->username ?? 'Admin',
                 'aktivitas' => 'Hapus Periode - ' . $periode->nama_kkn
