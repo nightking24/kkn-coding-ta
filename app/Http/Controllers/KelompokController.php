@@ -869,14 +869,30 @@ class KelompokController extends Controller
 
             // =========================
             // URUTKAN BERDASARKAN SCORE
-            // SCORE TERBESAR DIPILIH
             // =========================
             $kandidat = collect($kandidat)
                 ->sortByDesc('score')
                 ->values();
 
-            // ambil kandidat terbaik
-            $pilih = $kandidat[0]['kelompok'];
+            // =========================
+            // AMBIL SCORE TERTINGGI
+            // =========================
+            $maxScore = $kandidat->first()['score'];
+
+            // =========================
+            // AMBIL SEMUA KANDIDAT
+            // DENGAN SCORE TERTINGGI
+            // =========================
+            $terbaik = $kandidat
+                ->where('score', $maxScore)
+                ->values();
+
+            // =========================
+            // RANDOMISASI TERBATAS
+            // HANYA PADA KANDIDAT
+            // DENGAN SCORE TERTINGGI
+            // =========================
+            $pilih = $terbaik->random()['kelompok'];
 
             $result[] = [
                 'nim' => $peserta['nim'],
