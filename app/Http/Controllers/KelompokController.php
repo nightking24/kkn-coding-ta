@@ -688,27 +688,38 @@ class KelompokController extends Controller
     // Melakukan proses randomisasi peserta ke dalam kelompok berdasarkan aturan sistem
     public function generate(Request $request)
     {
+        // Mengubah data JSON dari form menjadi array PHP
         $data = json_decode($request->data, true);
 
+        // Jika data kosong atau gagal dibaca
         if (!$data) {
             return redirect('/import')->with('error', 'Silakan upload ulang');
         }
 
+        // Menyimpan aktivitas generate ke log sistem
         $this->logAktivitas('Generate', 'Randomisasi kelompok');
 
+        // Mengambil id periode dari session / request / periode berjalan
         $periode_id = session('periode_id')
             ?? request('periode_id')
             ?? Periode::where('status', 'berjalan')->value('id_periode');
 
+        // Menggunakan helper getPeriodeId()
         $periode_id = $this->getPeriodeId();
 
+        // Mengecek apakah periode sudah dipublish
+        // Jika sudah publish maka data tidak boleh diubah
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
 
+        // Mengambil seluruh kelompok pada periode aktif
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
+
+        // Array untuk menampung hasil pembagian peserta
         $result = [];
 
+        // Memproses peserta satu per satu
         foreach ($data as $peserta) {
             // =========================
             // NORMALISASI GENDER
@@ -740,19 +751,26 @@ class KelompokController extends Controller
                 $peserta['gender'] = null;
             }
 
+            // Menampung kelompok yang memenuhi aturan
             $kandidat = [];
 
+            // Membandingkan peserta dengan seluruh kelompok
             foreach ($kelompokList as $kelompok) {
 
+                // Menghitung jumlah anggota sementara pada kelompok
                 $jumlah = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
                     ->count();
 
+                // Jika kelompok penuh maka dilewati
                 if ($jumlah >= $kelompok->kapasitas)
                     continue;
 
+                // Peserta dianggap khusus jika memiliki penyakit
+                // atau berkebutuhan khusus
                 $isKhusus = ($peserta['riwayat_penyakit'] == 1 || $peserta['berkebutuhan_khusus'] == 1);
 
+                // Jika peserta khusus
                 if ($isKhusus) {
                     $sudahAda = collect($result)
                         ->where('id_kelompok', $kelompok->id_kelompok)
@@ -767,6 +785,7 @@ class KelompokController extends Controller
                 // =========================
                 // SOFT RULE SCORING
                 // =========================
+                // Nilai awal kelompok 
                 $score = 0;
 
                 // =========================
@@ -786,11 +805,13 @@ class KelompokController extends Controller
                 // jika belum ada prodi sama
                 // maka tambah score
                 // =========================
+                // Hitung jumlah prodi yang sama
                 $jumlahProdiSama = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
                     ->where('prodi', $peserta['prodi'])
                     ->count();
 
+                // Jika belum ada prodi tersebut
                 if ($jumlahProdiSama == 0) {
                     $score += 2;
                 }
@@ -800,11 +821,14 @@ class KelompokController extends Controller
                 // minimal ada 1 orang
                 // bisa bahasa jawa tiap kelompok
                 // =========================
+                // Menghitung jumlah anggota yang bisa bahasa Jawa
                 $jumlahBisaJawa = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
                     ->where('bahasa_jawa', 1)
                     ->count();
 
+                // Jika peserta bisa bahasa Jawa
+                // dan kelompok belum memiliki anggota yang bisa bahasa Jawa
                 if (
                     $peserta['bahasa_jawa'] == 1 &&
                     $jumlahBisaJawa == 0
@@ -815,17 +839,19 @@ class KelompokController extends Controller
                 // =========================
                 // KESEIMBANGAN GENDER
                 // =========================
+                // Hitung jumlah pria
                 $laki = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
                     ->where('gender', 'Pria')
                     ->count();
 
+                // Hitung jumlah wanita
                 $perempuan = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
                     ->where('gender', 'Wanita')
                     ->count();
 
-                // peserta laki
+                // Jika peserta pria dan jumlah pria masih seimbang
                 if (
                     $peserta['gender'] == 'Pria' &&
                     $laki <= $perempuan
@@ -833,7 +859,7 @@ class KelompokController extends Controller
                     $score += 1;
                 }
 
-                // peserta perempuan
+                // Jika peserta wanita dan jumlah wanita masih seimbang
                 if (
                     $peserta['gender'] == 'Wanita' &&
                     $perempuan <= $laki
@@ -850,6 +876,7 @@ class KelompokController extends Controller
                 ];
             }
 
+            // Jika tidak ada kelompok yang lolos hard rule
             if (count($kandidat) == 0) {
                 $result[] = [
                     'nim' => $peserta['nim'],
@@ -870,6 +897,7 @@ class KelompokController extends Controller
             // =========================
             // URUTKAN BERDASARKAN SCORE
             // =========================
+            // Mengurutkan kandidat dari skor terbesar ke terkecil
             $kandidat = collect($kandidat)
                 ->sortByDesc('score')
                 ->values();
@@ -880,7 +908,7 @@ class KelompokController extends Controller
             $maxScore = $kandidat->first()['score'];
 
             // =========================
-            // AMBIL SEMUA KANDIDAT
+            // AMBIL SEMUA KANDIDAT KELOMPOK
             // DENGAN SCORE TERTINGGI
             // =========================
             $terbaik = $kandidat
@@ -892,8 +920,14 @@ class KelompokController extends Controller
             // HANYA PADA KANDIDAT
             // DENGAN SCORE TERTINGGI
             // =========================
+            // Jika terdapat lebih dari satu kelompok
+            // dengan skor tertinggi yang sama
+            // Sistem memilih satu kelompok secara acak
+            // hanya dari kandidat terbaik
+
             $pilih = $terbaik->random()['kelompok'];
 
+            // Menyimpan hasil penempatan peserta
             $result[] = [
                 'nim' => $peserta['nim'],
                 'nama' => $peserta['nama'],
@@ -903,81 +937,111 @@ class KelompokController extends Controller
                 'bahasa_jawa' => $peserta['bahasa_jawa'],
                 'riwayat_penyakit' => $peserta['riwayat_penyakit'],
                 'berkebutuhan_khusus' => $peserta['berkebutuhan_khusus'],
+                // Kelompok yang terpilih
                 'id_kelompok' => $pilih->id_kelompok,
+                // Nomor kelompok
                 'nomor_kelompok' => $pilih->nomor_kelompok,
                 'status' => 'ok',
             ];
         }
 
+        // Menghitung jumlah peserta yang gagal ditempatkan
         $melanggar = collect($result)->where('status', 'melanggar_rule')->count();
 
+        // Menyimpan hasil generate sementara ke session
         session([
             'hasil_generate_' . $periode_id => $result
         ]);
 
+        // Jika masih ada peserta yang gagal ditempatkan
         if ($melanggar > 0) {
             return redirect('/randomisasi')
                 ->with('warning', 'Tidak ada kelompok yang memenuhi aturan sistem.');
         }
 
+        // Menampilkan hasil pembagian kelompok
         return redirect('/randomisasi');
     }
 
     // Menampilkan hasil randomisasi peserta sebelum disimpan
     public function randomisasi()
     {
+        // Menyimpan periode yang dipilih ke dalam session
         $this->setPeriodeSession();
+
+        // Mengambil ID periode aktif
         $periode_id = $this->getPeriodeId();
 
+        // Mengambil hasil generate yang sebelumnya disimpan di session
         $data = session('hasil_generate_' . $periode_id);
 
+        // Jika hasil generate belum ada
         if (!$data) {
+            // Kembali ke halaman import dan tampilkan pesan error
             return redirect('/import')->withErrors([
                 'error' => 'Silakan upload dan generate ulang data peserta'
             ]);
         }
 
+        // Menampilkan halaman preview hasil randomisasi
         return view('kelompok.randomisasi', compact('data'));
     }
 
     // Menyimpan hasil randomisasi ke tabel peserta
     public function simpanHasil()
     {
+        // Menyimpan periode aktif ke session
         $this->setPeriodeSession();
 
+        // Mengambil ID periode dari session atau request
         $periode_id = session('periode_id')
             ?? request('periode_id');
 
+        // Jika periode tidak ditemukan
         if (!$periode_id) {
+            // Kembali ke halaman sebelumnya
             return back()->withErrors(['error' => 'Periode tidak ditemukan']);
         }
 
+        // Menyimpan aktivitas pengguna ke tabel log
         $this->logAktivitas('Simpan Hasil', 'Menyimpan hasil pembagian kelompok');
+
+        // Mengambil hasil randomisasi dari session
         $data = session('hasil_generate_' . $periode_id);
 
+        // Jika periode sudah dipublish
+        // maka data tidak boleh diubah lagi
         if ($lock = $this->checkPublishLock($periode_id)) {
             return $lock;
         }
 
+        // Jika data hasil generate tidak ditemukan
         if (!$data) {
             return back()->withErrors(['error' => 'Data tidak ditemukan']);
         }
 
+        // Mengambil nilai periode mentah
         $raw_periode = request('periode_id') ?? session('periode_id');
 
+        // Menghapus karakter selain angka
         $periode_id = (int) preg_replace('/[^0-9]/', '', $raw_periode);
 
+        // Debug jika periode gagal terbaca
         if (!$periode_id) {
             dd('PERIODE ERROR:', $raw_periode);
         }
 
+        // Mengambil ulang periode aktif
         $periode_id = (int) (
             session('periode_id')
             ?? request('periode_id')
         );
 
+        // Menghapus seluruh data peserta
+        // pada periode yang sedang diproses
         Peserta::where('id_periode', $periode_id)->delete();
 
+        // Menyimpan seluruh hasil randomisasi
         foreach ($data as $row) {
             Peserta::updateOrCreate(
                 [
@@ -999,32 +1063,47 @@ class KelompokController extends Controller
 
         }
 
+        // Setelah semua data berhasil disimpan
+        // pindah ke halaman hasil pembagian
         return redirect()->route('hasil.pembagian');
     }
 
     // Menampilkan hasil pembagian kelompok yang telah disimpan
     public function hasilPembagian(Request $request)
     {
+        // Jika user memilih periode dari dropdown/filter
         if ($request->periode_id) {
+            // Simpan periode yang dipilih ke session
             session(['periode_id' => $request->periode_id]);
         }
 
-        // HANYA PERIODE BERJALAN
+        // ======================================
+        // AMBIL DAFTAR PERIODE BERSTATUS BERJALAN
+        // ======================================
         $periodes = Periode::where('status', 'berjalan')
             ->latest()
             ->get();
 
+        // Ambil periode aktif dari session
         $periode_id = session('periode_id');
 
+        // ======================================
+        // JIKA SESSION BELUM ADA
+        // AMBIL PERIODE BERJALAN
+        // ======================================
         if (!$periode_id) {
 
             $periode_id = Periode::where('status', 'berjalan')
                 ->value('id_periode');
 
+            // Simpan ke session
             session(['periode_id' => $periode_id]);
         }
 
-        // DEFAULT KE YANG TERAKHIR BERJALAN
+        // ======================================
+        // JIKA MASIH BELUM ADA
+        // AMBIL PERIODE BERJALAN TERBARU
+        // ======================================
         if (!$periode_id) {
 
             $periode_id = Periode::where('status', 'berjalan')
@@ -1034,38 +1113,68 @@ class KelompokController extends Controller
             session(['periode_id' => $periode_id]);
         }
 
+        // ======================================
+        // JIKA TETAP TIDAK ADA PERIODE
+        // ======================================
         if (!$periode_id) {
             return redirect('/dashboard')
                 ->with('error', 'Belum ada data periode!');
         }
 
+        // ======================================
+        // AMBIL DATA PESERTA
+        // ======================================
         $peserta = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
             ->where('id_periode', $periode_id)
             ->get();
 
+        // ======================================
+        // KELOMPOKKAN PESERTA BERDASARKAN
+        // ID KELOMPOK
+        // ======================================
         $kelompok = $peserta->whereNotNull('id_kelompok')
             ->groupBy('id_kelompok')
             ->sortBy(function ($group) {
                 return optional($group->first()->kelompok)->nomor_kelompok ?? 0;
             });
 
+        // ======================================
+        // PESERTA YANG BELUM DAPAT KELOMPOK
+        // ======================================
         $belum = $peserta->whereNull('id_kelompok');
 
+
+        // ======================================
+        // AMBIL DATA MASTER KELOMPOK
+        // ======================================
         $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
+
+        // ======================================
+        // AMBIL DATA DPL
+        // ======================================
 
         $dplList = Dpl::where('id_periode', $periode_id)
             ->select('id_dpl', 'nama', 'no_telp')
             ->distinct()
             ->get();
 
+        // ======================================
+        // AMBIL DATA APL
+        // ======================================
         $aplList = Apl::where('id_periode', $periode_id)
             ->select('id_apl', 'nama', 'no_telp')
             ->distinct()
             ->get();
 
+        // ======================================
+        // CEK STATUS PUBLISH
+        // ======================================
         $status = Periode::where('id_periode', $periode_id)
             ->value('status_publish');
 
+        // ======================================
+        // KIRIM SEMUA DATA KE VIEW
+        // ======================================
         return view('kelompok.hasil_pembagian', compact(
             'kelompok',
             'belum',
