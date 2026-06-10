@@ -212,22 +212,33 @@
 
 @section('scripts')
     <script>
+        // seluruh kode jQuery dijalankan
+        // setelah halaman selesai dimuat
         $(document).ready(function () {
 
             // =========================
             // HANDLE DATALIST TUAN RUMAH
             // =========================
+            // dijalankan saat user mengetik
+            // pada textbox tuan rumah
             $('#tuan_rumah').on('input', function () {
 
+                // mengambil nilai yang sedang
+                // diketik oleh pengguna
                 let input = $(this).val().trim();
 
-                // reset hidden id
+                // mengosongkan id_tuan_rumah
+                // sebelum dilakukan pencarian ulang
                 $('#id_tuan_rumah').val('');
 
+                // memeriksa seluruh data
+                // tuan rumah pada datalist
                 $('#list_tuan option').each(function () {
 
                     if ($(this).val() === input) {
 
+                        // menyimpan id_tuan_rumah
+                        // yang sesuai dengan nama yang dipilih
                         $('#id_tuan_rumah').val(
                             $(this).data('id')
                         );
@@ -241,12 +252,16 @@
             // =========================
             // AUTO FILL TUAN RUMAH
             // =========================
+            // dijalankan ketika pengguna
+            // selesai mengisi nama tuan rumah
             $('#tuan_rumah').on('blur', function () {
 
                 let nama = $(this).val().trim();
 
                 if (!nama) return;
 
+                // mengambil data tuan rumah
+                // dari database tanpa reload halaman
                 $.get('/get-tuan-rumah/' + encodeURIComponent(nama), function (data) {
 
                     // kalau data tidak ditemukan
@@ -255,18 +270,25 @@
                     // =========================
                     // DATA TUAN RUMAH
                     // =========================
+                    // mengisi nomor telepon secara otomatis
+                    // berdasarkan data tuan rumah
                     $('input[name="nomor_telepon"]').val(
                         data.nomor_telepon ?? $('input[name="nomor_telepon"]').val()
                     );
 
+                    // mengisi alamat secara otomatis
                     $('input[name="alamat"]').val(
                         data.alamat ?? $('input[name="alamat"]').val()
                     );
 
+                    // mengisi koordinat latitude
+                    // secara otomatis
                     $('input[name="latitude"]').val(
                         data.latitude ?? $('input[name="latitude"]').val()
                     );
 
+                    // mengisi koordinat longitude
+                    // secara otomatis
                     $('input[name="longitude"]').val(
                         data.longitude ?? $('input[name="longitude"]').val()
                     );
@@ -274,14 +296,18 @@
                     // =========================
                     // DATA LOKASI
                     // =========================
+                    // mengisi desa berdasarkan
+                    // data tuan rumah
                     $('#desa').val(
                         data.desa ?? $('#desa').val()
                     );
 
+                    // mengisi kecamatan secara otomatis
                     $('#nama_kecamatan').val(
                         data.nama_kecamatan ?? $('#nama_kecamatan').val()
                     );
 
+                    // mengisi dusun secara otomatis
                     $('#dusun').val(
                         data.dusun ?? $('#dusun').val()
                     );
@@ -319,12 +345,16 @@
             // =========================
             // AUTO FILL DUSUN
             // =========================
+            // mengambil data lokasi
+            // berdasarkan nama dusun
             $('#dusun').on('blur', function () {
 
                 let dusun = $(this).val().trim();
 
                 if (!dusun) return;
 
+                // mengambil data dusun
+                // dari database tanpa reload halaman
                 $.get('/get-dusun/' + encodeURIComponent(dusun), function (data) {
 
                     // kalau data tidak ditemukan
@@ -369,6 +399,8 @@
             // =========================
             // DESA MANUAL
             // =========================
+            // dijalankan ketika
+            // desa berubah
             $('#desa').on('change', function () {
                 let desa = $(this).val();
 
@@ -377,20 +409,30 @@
                 }
             });
 
+            // mengambil daftar DPL dan APL
+            // berdasarkan desa yang dipilih
             function loadDplApl(desa) {
+                // mengambil data DPL dan APL
+                // dari server Laravel
                 $.get('/get-dpl-apl-by-desa/' + encodeURIComponent(desa), function (res) {
 
                     let dpl = $('#nik');
                     let apl = $('#nim');
 
+                    // menghapus isi dropdown DPL
+                    // sebelum data baru dimuat
                     dpl.html('<option value="">-- Pilih DPL --</option>');
                     apl.html('<option value="">-- Pilih APL --</option>');
 
                     res.dpl.forEach(d => {
+                        // menambahkan daftar DPL
+                        // ke dalam dropdown
                         dpl.append(`<option value="${d.nik}">${d.nama}</option>`);
                     });
 
                     res.apl.forEach(a => {
+                        // menambahkan daftar APL
+                        // ke dalam dropdown
                         apl.append(`<option value="${a.nim}">${a.nama}</option>`);
                     });
                 });
@@ -399,16 +441,24 @@
             // =========================
             // VALIDASI FORM
             // =========================
+            // menambahkan daftar APL
+            // ke dalam dropdown
             $('form').on('submit', function () {
 
+                // mengambil nilai
+                // nomor telepon
                 let telepon = $('input[name="nomor_telepon"]').val();
 
                 // VALIDASI NOMOR TELEPON SAJA
                 // karena ini frontend helper
                 // validasi utama tetap di Laravel
 
+                // memastikan nomor telepon
+                // minimal 10 digit
                 if (telepon && telepon.length > 0 && telepon.length < 10) {
 
+                    // menampilkan peringatan
+                    // kepada pengguna
                     alert('Nomor telepon harus 10 sampai 15 digit');
 
                     return false;
