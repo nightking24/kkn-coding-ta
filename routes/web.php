@@ -64,6 +64,8 @@ Route::middleware(['ceklogin', 'role:admin'])->group(function () {
     Route::post('/tempatkan', [PesertaController::class, 'tempatkan'])->name('peserta.tempatkan');
     Route::post('/reset-pembagian', [KelompokController::class, 'resetPembagian'])->name('reset.pembagian');
     Route::post('/reset-total', [KelompokController::class, 'resetTotal'])->name('reset.total');
+    Route::post('/peserta/hapus', [PesertaController::class, 'hapusPeserta'])
+        ->name('peserta.hapus');
     Route::get('/pindah-peserta', [PesertaController::class, 'halamanPindah'])->name('halaman.pindah');
     Route::get('/tukar-peserta', [PesertaController::class, 'halamanTukar'])->name('halaman.tukar');
     Route::post('/pindah-peserta', [PesertaController::class, 'pindah'])->name('peserta.pindah');

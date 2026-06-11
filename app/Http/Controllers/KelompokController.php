@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Models\Periode;
 use App\Exports\HasilPembagianExport;
+use App\Models\Prodi;
 use App\Models\LogActivity;
 
 class KelompokController extends Controller
@@ -714,10 +715,26 @@ class KelompokController extends Controller
         }
 
         // Mengambil seluruh kelompok pada periode aktif
-        $kelompokList = Kelompok::where('id_periode', $periode_id)->get();
+        // Diurutkan berdasarkan nomor kelompok agar hasil konsisten
+        $kelompokList = Kelompok::where('id_periode', $periode_id)
+            ->orderBy('nomor_kelompok')
+            ->get();
 
         // Array untuk menampung hasil pembagian peserta
         $result = [];
+
+        // ==================================================
+        // URUTKAN PESERTA BERDASARKAN NIM
+        // AGAR HASIL RANDOMISASI SELALU KONSISTEN
+        // ==================================================
+        usort($data, function ($a, $b) {
+
+            return strcmp(
+                (string) $a['nim'],
+                (string) $b['nim']
+            );
+
+        });
 
         // Memproses peserta satu per satu
         foreach ($data as $peserta) {
@@ -808,7 +825,7 @@ class KelompokController extends Controller
                 // Hitung jumlah prodi yang sama
                 $jumlahProdiSama = collect($result)
                     ->where('id_kelompok', $kelompok->id_kelompok)
-                    ->where('prodi', $peserta['prodi'])
+                    ->where('id_prodi', $peserta['id_prodi'])
                     ->count();
 
                 // Jika belum ada prodi tersebut
@@ -878,11 +895,13 @@ class KelompokController extends Controller
 
             // Jika tidak ada kelompok yang lolos hard rule
             if (count($kandidat) == 0) {
+                $namaProdi = Prodi::find($peserta['id_prodi'])?->nama_prodi;
                 $result[] = [
                     'nim' => $peserta['nim'],
                     'nama' => $peserta['nama'],
                     'no_telp' => $peserta['no_telp'] ?? null,
-                    'prodi' => $peserta['prodi'],
+                    'id_prodi' => $peserta['id_prodi'],
+                    'prodi' => $namaProdi,
                     'gender' => $peserta['gender'],
                     'bahasa_jawa' => $peserta['bahasa_jawa'],
                     'riwayat_penyakit' => $peserta['riwayat_penyakit'],
@@ -917,22 +936,33 @@ class KelompokController extends Controller
 
             // =========================
             // RANDOMISASI TERBATAS
-            // HANYA PADA KANDIDAT
-            // DENGAN SCORE TERTINGGI
             // =========================
-            // Jika terdapat lebih dari satu kelompok
-            // dengan skor tertinggi yang sama
-            // Sistem memilih satu kelompok secara acak
-            // hanya dari kandidat terbaik
 
-            $pilih = $terbaik->random()['kelompok'];
+            // =========================
+            // PEMILIHAN KONSISTEN
+            // JIKA ADA SCORE TERTINGGI YANG SAMA
+            // =========================
+
+            // Menghasilkan angka tetap berdasarkan NIM
+            $index = crc32($peserta['nim']) % $terbaik->count();
+
+            // Memilih kelompok secara deterministik
+            $item = $terbaik->get($index);
+
+            if (!$item) {
+                continue;
+            }
+
+            $pilih = $item['kelompok'];
 
             // Menyimpan hasil penempatan peserta
+            $namaProdi = Prodi::find($peserta['id_prodi'])?->nama_prodi;
             $result[] = [
                 'nim' => $peserta['nim'],
                 'nama' => $peserta['nama'],
                 'no_telp' => $peserta['no_telp'] ?? null,
-                'prodi' => $peserta['prodi'],
+                'id_prodi' => $peserta['id_prodi'],
+                'prodi' => $namaProdi,
                 'gender' => $peserta['gender'],
                 'bahasa_jawa' => $peserta['bahasa_jawa'],
                 'riwayat_penyakit' => $peserta['riwayat_penyakit'],
@@ -1026,11 +1056,6 @@ class KelompokController extends Controller
         // Menghapus karakter selain angka
         $periode_id = (int) preg_replace('/[^0-9]/', '', $raw_periode);
 
-        // Debug jika periode gagal terbaca
-        if (!$periode_id) {
-            dd('PERIODE ERROR:', $raw_periode);
-        }
-
         // Mengambil ulang periode aktif
         $periode_id = (int) (
             session('periode_id')
@@ -1043,24 +1068,24 @@ class KelompokController extends Controller
 
         // Menyimpan seluruh hasil randomisasi
         foreach ($data as $row) {
+
             Peserta::updateOrCreate(
                 [
                     'nim' => $row['nim'],
                     'id_periode' => $periode_id
                 ],
-
                 [
                     'nama' => $row['nama'],
                     'no_telp' => $row['no_telp'] ?? null,
-                    'prodi' => $row['prodi'],
+                    'id_prodi' => $row['id_prodi'] ?? null,
                     'gender' => $row['gender'],
                     'bahasa_jawa' => $row['bahasa_jawa'],
                     'riwayat_penyakit' => $row['riwayat_penyakit'],
                     'berkebutuhan_khusus' => $row['berkebutuhan_khusus'],
+
                     'id_kelompok' => $row['id_kelompok'] ?? null,
                 ]
             );
-
         }
 
         // Setelah semua data berhasil disimpan
@@ -1124,7 +1149,11 @@ class KelompokController extends Controller
         // ======================================
         // AMBIL DATA PESERTA
         // ======================================
-        $peserta = Peserta::with(['kelompok.dpl', 'kelompok.apl'])
+        $peserta = Peserta::with([
+            'kelompok.dpl',
+            'kelompok.apl',
+            'prodiRel'
+        ])
             ->where('id_periode', $periode_id)
             ->get();
 
@@ -1132,11 +1161,84 @@ class KelompokController extends Controller
         // KELOMPOKKAN PESERTA BERDASARKAN
         // ID KELOMPOK
         // ======================================
-        $kelompok = $peserta->whereNotNull('id_kelompok')
+        $kelompokCollection = $peserta->whereNotNull('id_kelompok')
             ->groupBy('id_kelompok')
             ->sortBy(function ($group) {
                 return optional($group->first()->kelompok)->nomor_kelompok ?? 0;
             });
+
+        $pilihanKelompok = $kelompokCollection->map(function ($group) {
+            return [
+                'id_kelompok' => $group->first()->id_kelompok,
+                'nomor_kelompok' => optional($group->first()->kelompok)->nomor_kelompok
+            ];
+        });
+
+        $selectedKelompok = $request->kelompok_id;
+
+        if ($selectedKelompok) {
+
+            $kelompokCollection = $kelompokCollection->filter(function ($group) use ($selectedKelompok) {
+
+                return $group->first()->id_kelompok == $selectedKelompok;
+
+            });
+
+        }
+
+        $search = strtolower(trim($request->search ?? ''));
+
+        if (!empty($search)) {
+
+            $kelompokCollection = $kelompokCollection->filter(function ($group) use ($search) {
+
+                $ketua = $group->first();
+
+                $kelompok = optional($ketua->kelompok);
+
+                // Data header kelompok
+                $headerText =
+                    'k' . ($kelompok->nomor_kelompok ?? '') . ' ' .
+                    optional($kelompok->dpl)->nama . ' ' .
+                    optional($kelompok->apl)->nama . ' ' .
+                    ($kelompok->nama_kecamatan ?? '') . ' ' .
+                    ($kelompok->desa ?? '') . ' ' .
+                    ($kelompok->dusun ?? '');
+
+                if (str_contains(strtolower($headerText), $search)) {
+                    return true;
+                }
+
+                // Data peserta
+                foreach ($group as $peserta) {
+
+                    $pesertaText =
+                        $peserta->nim . ' ' .
+                        $peserta->nama . ' ' .
+                        (optional($peserta->prodiRel)->nama_prodi ?? '');
+
+                    if (str_contains(strtolower($pesertaText), $search)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        }
+
+        $page = request()->get('page', 1);
+        $perPage = 1; // 1 card kelompok per halaman
+
+        $kelompok = new \Illuminate\Pagination\LengthAwarePaginator(
+            $kelompokCollection->forPage($page, $perPage),
+            $kelompokCollection->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query()
+            ]
+        );
 
         // ======================================
         // PESERTA YANG BELUM DAPAT KELOMPOK
@@ -1183,7 +1285,9 @@ class KelompokController extends Controller
             'aplList',
             'status',
             'periodes',
-            'periode_id'
+            'periode_id',
+            'pilihanKelompok',
+            'selectedKelompok'
         ));
     }
 

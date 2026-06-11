@@ -24,8 +24,30 @@
             width: 250px;
             background: #1e7e34;
             color: white;
-            min-height: 100vh;
-            padding: 0;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            height: 100vh;
+            overflow-y: auto;
+
+            z-index: 1000;
+
+            scrollbar-width: thin;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         .sidebar h3 {
@@ -85,6 +107,8 @@
             padding: 40px;
             display: flex;
             justify-content: center;
+
+            margin-left: 250px;
         }
 
         .container {

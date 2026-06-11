@@ -69,25 +69,21 @@ class HasilPembagianExport implements WithEvents
     
                 // Mengambil data kelompok beserta relasi yang dibutuhkan
                 $kelompok = Kelompok::with([
-                    'peserta',
+                    'peserta.prodiRel',
                     'dpl',
                     'apl',
                     'tuanRumah'
                 ])
-                    // Menampilkan kelompok berdasarkan periode yang dipilih
                     ->where('id_periode', $this->periode_id)
 
-                    // Jika terdapat filter DPL maka tampilkan kelompok DPL tersebut saja
                     ->when($this->dpl_id, function ($q) {
                     $q->where('nik', $this->dpl_id);
                 })
 
-                    // Jika terdapat filter APL maka tampilkan kelompok APL tersebut saja
                     ->when($this->apl_id, function ($q) {
                     $q->where('nim', $this->apl_id);
                 })
 
-                    // Mengurutkan kelompok berdasarkan nomor kelompok
                     ->orderBy('nomor_kelompok')
                     ->get();
 
@@ -233,7 +229,10 @@ class HasilPembagianExport implements WithEvents
 
                         $sheet->setCellValue("D{$currentRow}", $p->nama);
 
-                        $sheet->setCellValue("E{$currentRow}", $p->prodi);
+                        $sheet->setCellValue(
+                            "E{$currentRow}",
+                            optional($p->prodiRel)->nama_prodi
+                        );
 
                         $sheet->setCellValue(
                             "F{$currentRow}",

@@ -108,18 +108,13 @@ class PesertaExport implements WithEvents
     
                 // Mengambil seluruh kelompok beserta relasinya
                 $kelompok = Kelompok::with([
-                    'peserta',
+                    'peserta.prodiRel',
                     'dpl',
                     'apl',
                     'tuanRumah'
                 ])
-                    // Mengambil seluruh kelompok beserta relasinya
                     ->where('id_periode', $this->periode_id)
-
-                    // Mengurutkan berdasarkan nomor kelompok
                     ->orderBy('nomor_kelompok')
-
-                    // Mengambil seluruh hasil query
                     ->get();
 
                 // Memproses setiap kelompok
@@ -293,7 +288,10 @@ class PesertaExport implements WithEvents
 
                         $sheet->setCellValue("D{$currentRow}", $p->nama);
 
-                        $sheet->setCellValue("E{$currentRow}", $p->prodi);
+                        $sheet->setCellValue(
+                            "E{$currentRow}",
+                            optional($p->prodiRel)->nama_prodi
+                        );
 
                         $sheet->setCellValue(
                             "F{$currentRow}",

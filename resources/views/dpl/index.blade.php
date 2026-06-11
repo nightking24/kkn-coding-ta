@@ -74,8 +74,8 @@
                             <td style="text-align: left; padding: 12px;">{{ $d->nama }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $d->email }}</td>
                             <td style="text-align: center; padding: 12px;">{{ $d->no_telp }}</td>
-                            <td style="text-align: center; padding: 12px;">{{ $d->fakultas ?? '-' }}</td>
-                            <td style="text-align: center; padding: 12px;">{{ $d->prodi ?? '-' }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ $d->fakultas ?? '-' }}</td>
+                            <td style="text-align: left; padding: 12px;">{{ $d->prodi ?? '-' }}</td>
                             <td style="text-align: center; padding: 12px;">
                                 <a href="/dpl/edit/{{ $d->nik }}" class="btn btn-blue">Edit</a>
                                 <a href="/dpl/delete/{{ $d->nik }}" class="btn btn-red">Hapus</a>

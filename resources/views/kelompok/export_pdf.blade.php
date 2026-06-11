@@ -188,78 +188,98 @@
                 margin: 0;
                 padding: 5px;
             }
+
             table {
                 page-break-inside: avoid;
                 table-layout: fixed;
             }
+
             tr {
                 page-break-inside: avoid;
                 min-height: 18px;
             }
+
             td[rowspan] {
                 vertical-align: middle;
             }
+
             td.nama-lengkap {
                 text-align: left !important;
             }
+
             td.prodi-col {
                 text-align: left !important;
             }
+
             td.gender-col {
                 text-align: left !important;
             }
+
             th:nth-child(1),
             td:nth-child(1) {
                 width: 4.5%;
             }
+
             th:nth-child(2),
             td:nth-child(2) {
                 width: 3.5%;
             }
+
             th:nth-child(3),
             td:nth-child(3) {
                 width: 8%;
             }
+
             th:nth-child(4) {
                 width: 17%;
                 text-align: center;
             }
+
             td:nth-child(4) {
                 width: 17%;
                 text-align: left !important;
             }
+
             th:nth-child(5),
             td:nth-child(5) {
                 width: 9%;
             }
+
             th:nth-child(6),
             td:nth-child(6) {
                 width: 5%;
             }
+
             th:nth-child(7),
             td:nth-child(7) {
                 width: 10%;
             }
+
             th:nth-child(8),
             td:nth-child(8) {
                 width: 9%;
             }
+
             th:nth-child(9),
             td:nth-child(9) {
                 width: 10%;
             }
+
             th:nth-child(10),
             td:nth-child(10) {
                 width: 9%;
             }
+
             th:nth-child(11),
             td:nth-child(11) {
                 width: 7%;
             }
+
             th:nth-child(12),
             td:nth-child(12) {
                 width: 7%;
             }
+
             th:nth-child(13),
             td:nth-child(13) {
                 width: 7%;
@@ -318,12 +338,12 @@
 
                         {{-- NAMA --}}
                         <td class="nama-lengkap" style="text-align: left;">
-                            {{ $p->nama }}
+                            {{ $p->nama }}  
                         </td>
 
                         {{-- PRODI --}}
                         <td class="prodi-col" style="text-align: left;">
-                            {{ $p->prodi }}
+                            {{ optional($p->prodiRel)->nama_prodi ?? '-' }}
                         </td>
 
                         {{-- GENDER --}}

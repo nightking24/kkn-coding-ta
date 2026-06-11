@@ -344,6 +344,33 @@ class PesertaController extends Controller
         return back()->with('success', 'Peserta berhasil ditukar');
     }
 
+    public function hapusPeserta(Request $request)
+    {
+        $peserta = Peserta::where(
+            'nim',
+            $request->nim
+        )
+            ->where(
+                'id_periode',
+                $request->periode_id
+            )
+            ->first();
+
+        if (!$peserta) {
+            return back()->with(
+                'error',
+                'Peserta tidak ditemukan'
+            );
+        }
+
+        $peserta->delete();
+
+        return back()->with(
+            'success',
+            'Peserta berhasil dihapus dari kelompok ini'
+        );
+    }
+
     // Menampilkan halaman pemindahan peserta beserta daftar peserta dan kelompok yang tersedia
     public function halamanPindah(Request $request)
     {

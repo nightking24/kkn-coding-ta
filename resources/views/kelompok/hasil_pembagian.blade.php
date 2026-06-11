@@ -19,19 +19,25 @@
         body {
             overflow-x: hidden;
         }
+
+        .text-start {
+            text-align: left !important;
+        }
+        
     </style>
 
     <div class="card hasil-card">
 
         {{-- HEADER WITH TITLE AND FILTERS/EXPORTS --}}
-        <div style="display:flex; gap:20px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:20px;">
+        <div
+            style="display:flex; gap:20px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:20px;">
 
             {{-- LEFT: Title --}}
             <h2 style="margin:0;">Hasil Pembagian Kelompok</h2>
 
             {{-- RIGHT: Filters + Exports --}}
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                
+
                 {{-- Filter Section --}}
                 <form method="GET" action="" style="display:flex; gap:10px; align-items:center;">
 
@@ -71,13 +77,13 @@
                 @endphp
 
                 @if($periode_id)
-                    <a href="{{ route('export.excel', [
+                            <a href="{{ route('export.excel', [
                         'periode_id' => $periode_id,
                         'dpl_id' => request('dpl_id'),
                         'apl_id' => request('apl_id')
                     ]) }}" class="btn btn-success">
-                        Export Excel
-                    </a>
+                                Export Excel
+                            </a>
                 @else
                     <button class="btn btn-secondary" disabled>
                         Export Excel
@@ -85,13 +91,13 @@
                 @endif
 
                 @if($periode_id)
-                    <a href="{{ route('export.pdf', [
+                            <a href="{{ route('export.pdf', [
                         'periode_id' => $periode_id,
                         'dpl_id' => request('dpl_id'),
                         'apl_id' => request('apl_id')
                     ]) }}" class="btn btn-danger">
-                        Export PDF
-                    </a>
+                                Export PDF
+                            </a>
                 @else
                     <button class="btn btn-secondary" disabled>
                         Export PDF
@@ -140,274 +146,378 @@
             </div>
         @endif
 
-        <div style="overflow-x:auto;">
-            <div class="hasil-wrapper">
-                <table id="table-main" class="display">
-            </div>
-            <thead style="background: #343a40; color: white;">
-                <tr>
-                    <th style="text-align: center; padding: 12px;">No</th>
-                    <th style="text-align: center; padding: 12px;">Kelompok</th>
-                    <th style="text-align: center; padding: 12px;">NIM</th>
-                    <th style="text-align: center; padding: 12px;">Nama</th>
-                    <th style="text-align: center; padding: 12px;">Prodi</th>
-                    <th style="text-align: center; padding: 12px;">Gender</th>
-                    <th style="text-align: center; padding: 12px;">DPL</th>
-                    <th style="text-align: center; padding: 12px;">Kontak DPL</th>
-                    <th style="text-align: center; padding: 12px;">APL</th>
-                    <th style="text-align: center; padding: 12px;">Kontak APL</th>
-                    <th style="text-align: center; padding: 12px;">Kecamatan</th>
-                    <th style="text-align: center; padding: 12px;">Desa</th>
-                    <th style="text-align: center; padding: 12px;">Dusun</th>
-                </tr>
-            </thead>
+        <form method="GET" class="mb-3">
 
-            <tbody>
-                @php $no = 1; @endphp
+            <input type="hidden" name="periode_id" value="{{ $periode_id }}">
 
-                @foreach($kelompok as $id => $items)
+            <div class="row g-2">
 
-                    @foreach($items as $p)
+                {{-- Search --}}
+                <div class="col-md-7">
+                    <input type="text" name="search" class="form-control"
+                        placeholder="Cari kelompok, nama, NIM, prodi, DPL, APL, kecamatan, desa, atau dusun..."
+                        value="{{ request('search') }}">
+                </div>
 
-                        <tr style="border-bottom: 1px solid #eee;">
+                {{-- Filter Kelompok --}}
+                <div class="col-md-3">
+                    <select name="kelompok_id" class="form-control">
 
-                            <td style="text-align: center; padding: 12px;">
-                                {{ $no++ }}
-                            </td>
+                        <option value="">
+                            Semua Kelompok
+                        </option>
 
-                            <td style="text-align: center; padding: 12px;">
-                                K{{ optional($p->kelompok)->nomor_kelompok ?? '-' }}
-                            </td>
+                        @foreach($pilihanKelompok as $item)
 
-                            <td style="text-align: center; padding: 12px;">
-                                {{ $p->nim }}
-                            </td>
+                            <option value="{{ $item['id_kelompok'] }}" {{ request('kelompok_id') == $item['id_kelompok'] ? 'selected' : '' }}>
 
-                            <td style="text-align: left; padding: 12px;">
-                                {{ $p->nama }}
-                            </td>
+                                Kelompok K{{ $item['nomor_kelompok'] }}
 
-                            <td style="text-align: center; padding: 12px;">
-                                {{ $p->prodi }}
-                            </td>
+                            </option>
 
-                            <td style="text-align: center; padding: 12px;">
-                                {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
-                            </td>
+                        @endforeach
 
-                            <td style="text-align: left; padding: 12px;">
-                                {{ optional($p->kelompok?->dpl)->nama ?? '-' }}
-                            </td>
+                    </select>
+                </div>
 
-                            <td style="text-align: center; padding: 12px;">
-                                {{ optional($p->kelompok?->dpl)->no_telp ?? '-' }}
-                            </td>
-
-                            <td style="text-align: left; padding: 12px;">
-                                {{ optional($p->kelompok?->apl)->nama ?? '-' }}
-                            </td>
-
-                            <td style="text-align: center; padding: 12px;">
-                                {{ optional($p->kelompok?->apl)->no_telp ?? '-' }}
-                            </td>
-
-                            <td style="text-align: center; padding: 12px;">
-                                {{ optional($p->kelompok)->nama_kecamatan ?? '-' }}
-                            </td>
-
-                            <td style="text-align: center; padding: 12px;">
-                                {{ optional($p->kelompok)->desa ?? '-' }}
-                            </td>
-
-                            <td style="text-align: center; padding: 12px;">
-                                {{ optional($p->kelompok)->dusun ?? '-' }}
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                @endforeach
-
-            </tbody>
-            </table>
-        </div>
-
-        <br>
-
-        <h5>Peserta yang Belum Mendapat Kelompok</h5>
-
-        @if($belum->count() > 0 && $kelompok->count() > 0)
-
-            <table id="table-belum" class="table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Prodi</th>
-                        <th>Gender</th>
-                        <th>Bahasa Jawa</th>
-                        <th>Penyakit</th>
-                        <th>Khusus</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach($belum as $i => $p)
-                        <tr>
-                            <td>{{ $i + 1 }}</td>
-                            <td>{{ $p->nim }}</td>
-                            <td>{{ $p->nama }}</td>
-                            <td>{{ $p->prodi }}</td>
-                            <td>{{ $p->gender }}</td>
-                            <td>{{ $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak' }}</td>
-                            <td>{{ $p->riwayat_penyakit == 1 ? 'Ya' : 'Tidak' }}</td>
-                            <td>{{ $p->berkebutuhan_khusus == 1 ? 'Ya' : 'Tidak' }}</td>
-                            <td>
-                                @if($status == 0)
-                                    <form action="{{ route('peserta.tempatkan') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="nim" value="{{ $p->nim }}">
-
-                                        <select name="id_kelompok" required class="form-control kelompok-select">
-                                            <option value="">Pilih Kelompok</option>
-                                            @foreach($kelompokList as $k)
-                                                        <option value="{{ $k->id_kelompok }}" data-kapasitas="{{ $k->kapasitas }}" data-isi="{{ \App\Models\Peserta::where('id_kelompok', $k->id_kelompok)
-                                                ->where('id_periode', $periode_id)
-                                                ->count() }}">
-                                                            K{{ $k->nomor_kelompok }}
-                                                        </option>
-                                            @endforeach
-                                        </select>
-
-                                        <button class="btn btn-sm btn-success mt-1">
-                                            Tempatkan
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="badge bg-secondary">Terkunci</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @else
-
-            <div class="alert alert-success text-center">
-                Semua peserta sudah terdistribusi ke kelompok!
-            </div>
-
-        @endif
-
-        <br>
-
-        {{-- ROW 2: Action Buttons & Status --}}
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-
-            @if($status == 0)
-                <form action="{{ route('reset.pembagian') }}" method="POST">
-                    @csrf
-                    <button class="btn btn-secondary"
-                        onclick="return confirm('Apakah anda yakin ingin mereset semua pembagian kelompok ini?')">
-                        Reset Pembagian
+                {{-- Tombol Cari --}}
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Cari
                     </button>
-                </form>
-            @endif
-
-            {{-- Right Section: Pindah/Tukar + Publish + Status --}}
-            <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
-
-                @if($status == 0)
-                    @if($periode_id)
-                        <a href="{{ route('halaman.pindah', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
-                            Pindah Peserta
-                        </a>
-                    @else
-                        <button class="btn btn-secondary" disabled>
-                            Pindah Peserta
-                        </button>
-                    @endif
-                @endif
-
-                @if($status == 0)
-                    @if($periode_id)
-                        <a href="{{ route('halaman.tukar', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
-                            Tukar Peserta
-                        </a>
-                    @else
-                        <button class="btn btn-secondary" disabled>
-                            Tukar Peserta
-                        </button>
-                    @endif
-                @endif
-
-                @if($status == 0)
-                    <form action="{{ route('kelompok.publish') }}" method="POST" style="margin:0;">
-                        @csrf
-                        <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
-
-                        <button class="btn btn-dark"
-                            onclick="return confirm('Apakah anda yakin ingin publish? Data tidak dapat diubah setelah ini!')">
-                            Publish
-                        </button>
-                    </form>
-                @elseif($status == 1)
-                    <form action="{{ route('kelompok.unpublish') }}" method="POST" style="margin:0;">
-                        @csrf
-                        <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
-
-                        <button class="btn" style="background-color: #ff8c00; border-color: #ff8c00; color: white;"
-                            onclick="return confirm('Apakah anda yakin ingin unpublish? Data akan dapat diubah kembali.')">
-                            Unpublish
-                        </button>
-                    </form>
-                @endif
-
-                {{-- STATUS DISPLAY --}}
-                <div style="white-space:nowrap;">
-                    <strong>Status:</strong>
-
-                    @if($status == 1)
-                        <span style="color:green; font-weight:bold;">✔ Sudah Publish</span>
-                    @else
-                        <span style="color:orange; font-weight:bold;">⏳ Belum Publish</span>
-                    @endif
                 </div>
 
             </div>
 
+        </form>
+
+        @php
+            $nomorKelompok = 1;
+        @endphp
+
+        @foreach($kelompok as $idKelompok => $items)
+
+            @php
+                $ketua = $items->first();
+                $group = optional($ketua->kelompok);
+            @endphp
+
+            @php
+                $searchData =
+                    'K' . $group->nomor_kelompok . ' ' .
+                    optional($group->dpl)->nama . ' ' .
+                    optional($group->apl)->nama . ' ' .
+                    ($group->nama_kecamatan ?? '') . ' ' .
+                    ($group->desa ?? '') . ' ' .
+                    ($group->dusun ?? '');
+            @endphp
+
+            <div class="card mb-4 kelompok-card searchable-card" data-search="{{ strtolower($searchData) }}">
+
+                <div class="card-header bg-dark text-white" style="padding: 10px 15px;">
+
+                    {{-- ROW: Kelompok, DPL, APL, Kecamatan, Desa, Dusun - Distributed Evenly --}}
+                    <div
+                        style="display: flex; justify-content: space-around; align-items: flex-start; gap: 100px; flex-wrap: nowrap;">
+
+                        {{-- Kelompok --}}
+                        <div style="flex: 1; text-align: center; min-width: 70px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">Kelompok</div>
+                            <div style="font-weight: 600; font-size: 17px;">K{{ $group->nomor_kelompok }}</div>
+                        </div>
+
+                        {{-- DPL --}}
+                        <div style="flex: 1; text-align: center; min-width: 120px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">DPL</div>
+                            <div style="font-weight: 600; font-size: 13px;">{{ optional($group->dpl)->nama ?? '-' }}</div>
+                        </div>
+
+                        {{-- APL --}}
+                        <div style="flex: 1; text-align: center; min-width: 120px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">APL</div>
+                            <div style="font-weight: 600; font-size: 13px;">{{ optional($group->apl)->nama ?? '-' }}</div>
+                        </div>
+
+                        {{-- Kecamatan --}}
+                        <div style="flex: 1; text-align: center; min-width: 100px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">Kecamatan</div>
+                            <div style="font-weight: 600; font-size: 13px;">{{ $group->nama_kecamatan ?? '-' }}</div>
+                        </div>
+
+                        {{-- Desa --}}
+                        <div style="flex: 1; text-align: center; min-width: 80px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">Desa</div>
+                            <div style="font-weight: 600; font-size: 13px;">{{ $group->desa ?? '-' }}</div>
+                        </div>
+
+                        {{-- Dusun --}}
+                        <div style="flex: 1; text-align: center; min-width: 80px;">
+                            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">Dusun</div>
+                            <div style="font-weight: 600; font-size: 13px;">{{ $group->dusun ?? '-' }}</div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="card-body">
+
+                    <table class="table table-bordered table-striped">
+
+                        <thead>
+
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Nama</th>
+                                <th>Prodi</th>
+                                <th>Gender</th>
+
+                                @if($status == 0)
+                                    <th>Aksi</th>
+                                @endif
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach($items as $i => $p)
+
+                                <tr class="peserta-row">
+
+                                    <td>{{ $i + 1 }}</td>
+
+                                    <td class="searchable">
+                                        {{ $p->nim }}
+                                    </td>
+
+                                    <td class="searchable text-start">
+                                        {{ $p->nama }}
+                                    </td>
+
+                                    <td class="searchable text-start">
+                                        {{ optional($p->prodiRel)->nama_prodi ?? '-' }}
+                                    </td>
+
+                                    <td class="searchable text-start">
+                                        {{ in_array($p->gender, ['L', 'Pria']) ? 'Laki-Laki' : 'Perempuan' }}
+                                    </td>
+
+                                    @if($status == 0)
+
+                                        <td>
+
+                                            <form action="{{ route('peserta.hapus') }}" method="POST"
+                                                onsubmit="return confirm('Yakin hapus peserta?')">
+                                                @csrf
+
+                                                <input type="hidden" name="nim" value="{{ $p->nim }}">
+
+                                                <input type="hidden" name="periode_id" value="{{ $periode_id }}">
+
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    Hapus
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                    @endif
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        @endforeach
+
+        <div class="d-flex justify-content-center mt-4">
+            {{ $kelompok->links() }}
         </div>
 
-        <script>
-            $(document).ready(function () {
-                $('#table-main').DataTable({
-                    scrollX: true
-                });
+    </div>
 
-                $('#table-belum').DataTable();
+    <br>
+
+    <h5>Peserta yang Belum Mendapat Kelompok</h5>
+
+    @if($belum->count() > 0 && $kelompok->count() > 0)
+
+        <table id="table-belum" class="table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>NIM</th>
+                    <th>Nama</th>
+                    <th>Prodi</th>
+                    <th>Gender</th>
+                    <th>Bahasa Jawa</th>
+                    <th>Penyakit</th>
+                    <th>Khusus</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach($belum as $i => $p)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $p->nim }}</td>
+                        <td class="text-start">
+                            {{ $p->nama }}
+                        </td>
+                        <td class="text-start">{{ optional($p->prodiRel)->nama_prodi ?? '-' }}</td>
+                        <td class="text-start">{{ $p->gender }}</td>
+                        <td>{{ $p->bahasa_jawa == 1 ? 'Bisa' : 'Tidak' }}</td>
+                        <td>{{ $p->riwayat_penyakit == 1 ? 'Ya' : 'Tidak' }}</td>
+                        <td>{{ $p->berkebutuhan_khusus == 1 ? 'Ya' : 'Tidak' }}</td>
+                        <td>
+                            @if($status == 0)
+                                <form action="{{ route('peserta.tempatkan') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="nim" value="{{ $p->nim }}">
+
+                                    <select name="id_kelompok" required class="form-control kelompok-select">
+                                        <option value="">Pilih Kelompok</option>
+                                        @foreach($kelompokList as $k)
+                                                <option value="{{ $k->id_kelompok }}" data-kapasitas="{{ $k->kapasitas }}" data-isi="{{ \App\Models\Peserta::where('id_kelompok', $k->id_kelompok)
+                                            ->where('id_periode', $periode_id)
+                                            ->count() }}">
+                                                    K{{ $k->nomor_kelompok }}
+                                                </option>
+                                        @endforeach
+                                    </select>
+
+                                    <button class="btn btn-sm btn-success mt-1">
+                                        Tempatkan
+                                    </button>
+                                </form>
+                            @else
+                                <span class="badge bg-secondary">Terkunci</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+
+        <div class="alert alert-success text-center">
+            Semua peserta sudah terdistribusi ke kelompok!
+        </div>
+
+    @endif
+
+    <br>
+
+    {{-- ROW 2: Action Buttons & Status --}}
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+
+        @if($status == 0)
+            <form action="{{ route('reset.pembagian') }}" method="POST">
+                @csrf
+                <button class="btn btn-secondary"
+                    onclick="return confirm('Apakah anda yakin ingin mereset semua pembagian kelompok ini?')">
+                    Reset Pembagian
+                </button>
+            </form>
+        @endif
+
+        {{-- Right Section: Pindah/Tukar + Publish + Status --}}
+        <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
+
+            @if($status == 0)
+                @if($periode_id)
+                    <a href="{{ route('halaman.pindah', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
+                        Pindah Peserta
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Pindah Peserta
+                    </button>
+                @endif
+            @endif
+
+            @if($status == 0)
+                @if($periode_id)
+                    <a href="{{ route('halaman.tukar', ['periode_id' => $periode_id]) }}" class="btn btn-warning">
+                        Tukar Peserta
+                    </a>
+                @else
+                    <button class="btn btn-secondary" disabled>
+                        Tukar Peserta
+                    </button>
+                @endif
+            @endif
+
+            @if($status == 0)
+                <form action="{{ route('kelompok.publish') }}" method="POST" style="margin:0;">
+                    @csrf
+                    <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
+
+                    <button class="btn btn-dark"
+                        onclick="return confirm('Apakah anda yakin ingin publish? Data tidak dapat diubah setelah ini!')">
+                        Publish
+                    </button>
+                </form>
+            @elseif($status == 1)
+                <form action="{{ route('kelompok.unpublish') }}" method="POST" style="margin:0;">
+                    @csrf
+                    <input type="hidden" name="periode_id" value="{{ request('periode_id') ?? session('periode_id') }}">
+
+                    <button class="btn" style="background-color: #ff8c00; border-color: #ff8c00; color: white;"
+                        onclick="return confirm('Apakah anda yakin ingin unpublish? Data akan dapat diubah kembali.')">
+                        Unpublish
+                    </button>
+                </form>
+            @endif
+
+            {{-- STATUS DISPLAY --}}
+            <div style="white-space:nowrap;">
+                <strong>Status:</strong>
+
+                @if($status == 1)
+                    <span style="color:green; font-weight:bold;">✔ Sudah Publish</span>
+                @else
+                    <span style="color:orange; font-weight:bold;">⏳ Belum Publish</span>
+                @endif
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#table-belum').DataTable();
+        });
+    </script>
+
+    <script>
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 3000);
+    </script>
+
+    <script>
+        document.querySelectorAll('.kelompok-select').forEach(select => {
+            select.addEventListener('change', function () {
+                let kapasitas = this.options[this.selectedIndex].getAttribute('data-kapasitas');
+                let isi = this.options[this.selectedIndex].getAttribute('data-isi');
+
+                if (kapasitas && isi && parseInt(isi) >= parseInt(kapasitas)) {
+                    alert('⚠️ Kelompok sudah penuh!');
+                }
             });
-        </script>
-
-        <script>
-            setTimeout(function () {
-                $('.alert').fadeOut('slow');
-            }, 3000);
-        </script>
-
-        <script>
-            document.querySelectorAll('.kelompok-select').forEach(select => {
-                select.addEventListener('change', function () {
-                    let kapasitas = this.options[this.selectedIndex].getAttribute('data-kapasitas');
-                    let isi = this.options[this.selectedIndex].getAttribute('data-isi');
-
-                    if (kapasitas && isi && parseInt(isi) >= parseInt(kapasitas)) {
-                        alert('⚠️ Kelompok sudah penuh!');
-                    }
-                });
-            });
-        </script>
+        });
+    </script>
 
 @endsection

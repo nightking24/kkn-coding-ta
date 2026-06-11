@@ -201,12 +201,18 @@ class ImportController extends Controller
                 $errors[] = "Baris " . ($i + 1) . ": " . implode(', ', $rowError);
             }
 
+            $prodi = \App\Models\Prodi::whereRaw(
+                'LOWER(TRIM(nama_prodi)) = ?',
+                [strtolower(trim($rowData['prodi'] ?? ''))]
+            )->first();
+
             // Menyimpan data untuk ditampilkan pada halaman preview
             $preview[] = [
                 'nama' => $nama,
                 'nim' => $nim,
                 'email' => $rowData['email'] ?? '',
                 'no_telp' => $rowData['no_telp'] ?? '',
+                'id_prodi' => $prodi?->id_prodi,
                 'prodi' => $rowData['prodi'] ?? '',
 
                 // Konversi data agar sesuai format sistem
@@ -380,7 +386,7 @@ class ImportController extends Controller
                     'nim' => str_replace("'", '', trim($row['nim'])),
                     'email' => isset($row['email']) ? trim($row['email']) : null,
                     'no_telp' => isset($row['no_telp']) ? trim($row['no_telp']) : null,
-                    'prodi' => isset($row['prodi']) ? trim($row['prodi']) : null,
+                    'id_prodi' => $row['id_prodi'] ?? null,
                     'gender' => $row['gender'] ?? null,
                     'bahasa_jawa' => $row['bahasa_jawa'] ?? 0,
                     'riwayat_penyakit' => $row['riwayat_penyakit'] ?? 0,

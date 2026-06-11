@@ -3,20 +3,20 @@
 @section('content')
 
     <div style="
-        max-width: 700px;
-        margin: auto;
-    "></div>
+            max-width: 700px;
+            margin: auto;
+        "></div>
 
     <div class="card" style="
-        padding: 20px;
-    ">
+            padding: 20px;
+        ">
 
         <div style="margin-bottom: 15px;">
 
             <h3 style="
-                margin-bottom: 10px;
-                color: #000;
-            ">
+                    margin-bottom: 10px;
+                    color: #000;
+                ">
                 Selamat datang,
 
                 <b style="color: #1e7e34;">
@@ -25,20 +25,20 @@
             </h3>
 
             <p style="
-                color: #666;
-                font-size: 14px;
-                margin: 0;
-            ">
+                    color: #666;
+                    font-size: 14px;
+                    margin: 0;
+                ">
                 Portal Pembagian Kelompok KKN Reguler
             </p>
 
         </div>
 
         <hr style="
-            margin: 12px 0;
-            border: none;
-            border-top: 2px solid #eee;
-        ">
+                margin: 12px 0;
+                border: none;
+                border-top: 2px solid #eee;
+            ">
 
         {{-- ========================= --}}
         {{-- CEK PESERTA & KELOMPOK --}}
@@ -48,34 +48,34 @@
 
             {{-- HEADER KELOMPOK --}}
             <div style="
-                    background: linear-gradient(135deg, #1e7e34 0%, #0f5f37 100%);
-                    color: white;
-                    padding: 16px 20px;
-                    border-radius: 10px;
-                    margin-bottom: 22px;
-                ">
+                            background: linear-gradient(135deg, #1e7e34 0%, #0f5f37 100%);
+                            color: white;
+                            padding: 16px 20px;
+                            border-radius: 10px;
+                            margin-bottom: 22px;
+                        ">
 
                 <h2 style="
-                        margin: 0 0 15px 0;
-                        font-size: 20px;
-                    ">
+                                margin: 0 0 15px 0;
+                                font-size: 20px;
+                            ">
                     Kelompok {{ $peserta->kelompok->nomor_kelompok }}
                 </h2>
 
                 <p style="
-                        margin: 0 0 8px 0;
-                        font-size: 14px;
-                        opacity: 0.9;
-                    ">
+                                margin: 0 0 8px 0;
+                                font-size: 14px;
+                                opacity: 0.9;
+                            ">
                     Periode:
                     {{ optional($peserta->kelompok->periode)->tahun_kkn ?? '-' }}
                 </p>
 
                 <p style="
-                        margin: 0;
-                        font-size: 14px;
-                        opacity: 0.9;
-                    ">
+                                margin: 0;
+                                font-size: 14px;
+                                opacity: 0.9;
+                            ">
                     Lokasi:
                     {{ optional($peserta->kelompok->periode)->lokasi }}
                 </p>
@@ -84,47 +84,47 @@
 
             {{-- DETAIL --}}
             <div style="
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 18px;
-                    margin-bottom: 12px;
-                ">
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 18px;
+                            margin-bottom: 12px;
+                        ">
 
                 {{-- LOKASI --}}
                 <div style="
-                        border-left: 4px solid #1e7e34;
-                        padding-left: 12px;
-                    ">
+                                border-left: 4px solid #1e7e34;
+                                padding-left: 12px;
+                            ">
 
                     <h5 style="
-                            color: #1e7e34;
-                            margin-bottom: 10px;
-                            font-size: 16px;
-                            font-weight: 600;
-                        ">
+                                    color: #1e7e34;
+                                    margin-bottom: 10px;
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                ">
                         📍 Detail Lokasi
                     </h5>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 8px;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 8px;
+                                ">
                         <b>Kecamatan:</b>
                         {{ $peserta->kelompok->nama_kecamatan }}
                     </p>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 8px;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 8px;
+                                ">
                         <b>Desa:</b>
                         {{ $peserta->kelompok->desa }}
                     </p>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 0;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 0;
+                                ">
                         <b>Dusun:</b>
                         {{ $peserta->kelompok->dusun }}
                     </p>
@@ -133,31 +133,31 @@
 
                 {{-- DPL --}}
                 <div style="
-                        border-left: 4px solid #1e7e34;
-                        padding-left: 12px;
-                    ">
+                                border-left: 4px solid #1e7e34;
+                                padding-left: 12px;
+                            ">
 
                     <h5 style="
-                            color: #1e7e34;
-                            margin-bottom: 10px;
-                            font-size: 16px;
-                            font-weight: 600;
-                        ">
+                                    color: #1e7e34;
+                                    margin-bottom: 10px;
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                ">
                         👨‍🏫 Dosen Pembimbing Lapangan (DPL)
                     </h5>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 8px;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 8px;
+                                ">
                         <b>DPL:</b>
                         {{ optional($peserta->kelompok->dpl)->nama }}
                     </p>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 0;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 0;
+                                ">
                         <b>No Telp:</b>
                         {{ optional($peserta->kelompok->dpl)->no_telp }}
                     </p>
@@ -168,38 +168,38 @@
 
             {{-- APL --}}
             <div style="
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 18px;
-                    margin-bottom: 8px;
-                ">
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 18px;
+                            margin-bottom: 8px;
+                        ">
 
                 <div style="
-                        border-left: 4px solid #1e7e34;
-                        padding-left: 12px;
-                    ">
+                                border-left: 4px solid #1e7e34;
+                                padding-left: 12px;
+                            ">
 
                     <h5 style="
-                            color: #1e7e34;
-                            margin-bottom: 10px;
-                            font-size: 16px;
-                            font-weight: 600;
-                        ">
+                                    color: #1e7e34;
+                                    margin-bottom: 10px;
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                ">
                         👨‍💼 Asisten Pembimbing Lapangan (APL)
                     </h5>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 8px;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 8px;
+                                ">
                         <b>APL:</b>
                         {{ optional($peserta->kelompok->apl)->nama }}
                     </p>
 
                     <p style="
-                            font-size: 14px;
-                            margin-bottom: 0;
-                        ">
+                                    font-size: 14px;
+                                    margin-bottom: 0;
+                                ">
                         <b>No Telp:</b>
                         {{ optional($peserta->kelompok->apl)->no_telp }}
                     </p>
@@ -212,25 +212,25 @@
 
             {{-- BELUM DAPAT KELOMPOK --}}
             <div style="
-                    text-align: center;
-                    padding: 40px 20px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                ">
+                            text-align: center;
+                            padding: 40px 20px;
+                            background: #f8f9fa;
+                            border-radius: 8px;
+                        ">
 
                 <p style="
-                        font-size: 16px;
-                        color: #dc3545;
-                        margin: 0;
-                    ">
+                                font-size: 16px;
+                                color: #dc3545;
+                                margin: 0;
+                            ">
                     ⚠️ Belum mendapatkan kelompok
                 </p>
 
                 <p style="
-                        font-size: 14px;
-                        color: #666;
-                        margin-top: 10px;
-                    ">
+                                font-size: 14px;
+                                color: #666;
+                                margin-top: 10px;
+                            ">
                     Silakan hubungi admin untuk informasi lebih lanjut
                 </p>
 
@@ -249,29 +249,29 @@
         <div style="margin-top: 18px;">
 
             <div class="card" style="
-                    padding: 20px;
-                ">
+                            padding: 20px;
+                        ">
 
                 <h3 style="
-                        margin-bottom: 20px;
-                        color: #1e7e34;
-                        border-bottom: 3px solid #1e7e34;
-                        padding-bottom: 10px;
-                    ">
+                                margin-bottom: 20px;
+                                color: #1e7e34;
+                                border-bottom: 3px solid #1e7e34;
+                                padding-bottom: 10px;
+                            ">
                     👥 Anggota Kelompok
                 </h3>
 
                 <div style="overflow-x: auto;">
 
                     <table class="table table-hover" style="
-                            margin-bottom: 0;
-                            font-size: 13px;
-                        ">
+                                    margin-bottom: 0;
+                                    font-size: 13px;
+                                ">
 
                         <thead style="
-                                background: #343a40;
-                                color: white;
-                            ">
+                                        background: #343a40;
+                                        color: white;
+                                    ">
 
                             <tr>
                                 <th style="text-align:center;">No</th>
@@ -302,11 +302,11 @@
                                         {{ $p->nama }}
                                     </td>
 
-                                    <td>
-                                        {{ $p->prodi }}
+                                    <td style="text-align:left;">
+                                        {{ optional($p->prodiRel)->nama_prodi ?? '-' }}
                                     </td>
 
-                                    <td style="text-align:center;">
+                                    <td style="text-align:left;">
 
                                         @if(
                                                 $p->gender == 'L' ||

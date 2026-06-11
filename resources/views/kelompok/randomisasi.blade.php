@@ -46,8 +46,10 @@
                                     <td style="text-align: center; padding: 12px;">K{{ $d['nomor_kelompok'] }}</td>
                                     <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
                                     <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
+                                    <td style="text-align: left; padding: 12px;">
+                                        {{ $d['prodi'] ?? '-' }}
+                                    </td>
+                                    <td style="text-align: left; padding: 12px;">{{ $d['gender'] }}</td>
 
                                     <td style="text-align: center; padding: 12px;">{{ $d['no_telp'] ?? '-' }}</td>
 
@@ -96,8 +98,11 @@
                                     <td style="text-align: center; padding: 12px;">{{ $i + 1 }}</td>
                                     <td style="text-align: center; padding: 12px;">{{ $d['nim'] }}</td>
                                     <td style="text-align: left; padding: 12px;">{{ $d['nama'] }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['prodi'] }}</td>
-                                    <td style="text-align: center; padding: 12px;">{{ $d['gender'] }}</td>
+                                    <td style="text-align: left; padding: 12px;">
+                                       {{ $d['prodi'] ?? '-' }}
+                                    </td>
+                                    <td style="text-align: left; padding: 12px;">{{ $d['gender'] }}</td>
+                                    
                                     <td style="text-align: center; padding: 12px;">
                                         {{ $d['no_telp'] ?? '-' }}
                                     </td>
